@@ -6,8 +6,7 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "resolver": "npm run start --workspace=resolver",
-    "manage": "npm run start --workspace=cli",
-    "playground": "npm run playground --workspace=resolver"
+    "manage": "npm run start --workspace=cli"
   },
   "workspaces": [
     "./packages/*"
