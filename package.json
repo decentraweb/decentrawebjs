@@ -1,5 +1,6 @@
 {
-  "name": "decentraweb-node",
+  "name": "decentrawebjs",
+  "repository": "https://github.com/decentraweb/decentrawebjs",
   "version": "1.0.0",
   "description": "",
   "main": "packages/resolver/src/index.js",
