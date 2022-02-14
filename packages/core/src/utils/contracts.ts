@@ -11,13 +11,13 @@ export type EthNetwork = 'rinkeby'
 
 export function getRegistryAddress(networkId: EthNetwork) {
   if (EthNetworkIds[networkId]) {
-    return '0x99FeB3D2FEf014BFf5CeDff9f0EB4Cf708397BBA'
+    return '0xba4d288824ED9E810ddb8c05ceC021B3e2DE0d1C'
   }
   throw new Error('Unknown network ID')
 }
 export function getResolverAddress(networkId: EthNetwork) {
   if (EthNetworkIds[networkId]) {
-    return '0xdDf4Cd47f6AC2be831833b1d401143bce6762EDA'
+    return '0xC57fB913E64A928e6AB8443f22D0167A00F865a5'
   }
   throw new Error('Unknown network ID')
 }
