@@ -454,7 +454,7 @@
   {
     "inputs": [
       {
-        "internalType": "contract DWEB",
+        "internalType": "address",
         "name": "_dweb",
         "type": "address"
       }
