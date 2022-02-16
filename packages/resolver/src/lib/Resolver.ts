@@ -9,7 +9,6 @@ import * as punycode from "punycode/";
 import {EthNetwork} from "./ens/base";
 import ENS from "./ens/Ens";
 
-const {WebSocketProvider} = providers
 const DNS_SERVER = '8.8.8.8'
 const PORT = 53
 const ICANN_TLDS: Record<string, true> = fs.readFileSync(path.join(__dirname, '../../icann_tlds.txt'), 'utf-8')
@@ -119,6 +118,7 @@ class Resolver {
       logger.flush()
       return dnsPacket.encode(responseData)
     } catch (e) {
+      console.error(e);
       logger.log('Failed to resolve:', e as string)
       logger.flush()
       return null;
@@ -126,6 +126,9 @@ class Resolver {
   }
 
   async resolveDWEB(domain: string, questionType: dnsPacket.RecordType): Promise<DNSRecord[]> {
+    if(questionType === 'TXT' && domain.startsWith('_dnslink.')){
+      return this.emulateDNSLink(domain);
+    }
     const name = this.dweb.name(domain)
     if (!await name.hasResolver()) {
       return [];
@@ -171,6 +174,28 @@ class Resolver {
       }
     }
     return []
+  }
+
+  async emulateDNSLink(domain: string): Promise<DNSRecord[]> {
+    const name = this.dweb.name(domain.replace(/^_dnslink./i, ''))
+    if (!await name.hasResolver()) {
+      return [];
+    }
+    const content = await name.getContenthash();
+    if(!content){
+      return [];
+    }
+    const url = new URL(content)
+    if(url.protocol !== 'ipfs:'){
+      return [];
+    }
+    return [{
+      name: domain,
+      type: "TXT",
+      class: "IN",
+      data: `dnslink=/ipfs/${url.hostname}`,
+      ttl: 3600
+    }];
   }
 
   createResponse(request: dnsPacket.Packet, answers: DNSRecord[] = []): dnsPacket.Packet {
