@@ -153,6 +153,9 @@ class Resolver {
   }
 
   async resolveENS(domain: string, questionType: dnsPacket.RecordType): Promise<DNSRecord[]> {
+    if(questionType === 'TXT' && domain.startsWith('_dnslink.')){
+      return this.emulateDNSLink(domain);
+    }
     const name = this.ens.name(domain)
     if (!await name.hasResolver()) {
       return [];
