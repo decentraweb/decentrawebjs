@@ -8,9 +8,11 @@ import * as path from "path";
 import * as punycode from "punycode/";
 import {EthNetwork} from "./ens/base";
 import ENS from "./ens/Ens";
+import {getRandomReqId} from "./utils/dns";
 
 const DNS_SERVER = '8.8.8.8'
 const PORT = 53
+const MAX_RECURSION_DEPTH = 3;
 const ICANN_TLDS: Record<string, true> = fs.readFileSync(path.join(__dirname, '../../icann_tlds.txt'), 'utf-8')
   .split(/\s+/)
   .reduce((tlds: Record<string, true>, item: string) => {
@@ -29,7 +31,13 @@ function getTLD(name: string): string {
   return name.trim().toLowerCase().split('.').filter(s => !!s).pop() || '';
 }
 
-function createLogger() {
+interface Logger {
+  log(...mesages: string[]): void,
+
+  flush(): void,
+}
+
+function createLogger(): Logger {
   const messageStack: string[] = [];
   const startTime = new Date
   let written = false;
@@ -92,27 +100,16 @@ class Resolver {
     const domain = punycode.toUnicode(question.name).toLowerCase();
     const questionType = question.type
     logger.log(question.type, domain);
-    //We don't support reverse lookup now
-    if (isReverseLookup(domain)) {
-      logger.log('Send reverse lookup to ICANN')
-      const response = await this.resolveICANN(data);
-      logger.flush()
-      return response;
-    }
 
     try {
-      let answers: DNSRecord[] = [];
       const tld = getTLD(domain);
-      if (tld === 'eth') {
-        answers = await this.resolveENS(domain, questionType)
-      } else if (ICANN_TLDS[tld]) {
-        const result = await this.resolveICANN(data);
+      if (ICANN_TLDS[tld] && tld !== 'eth') {
+        const result = await this.requestICANN(data);
         logger.log('Resolved with ICANN')
         logger.flush()
         return result;
-      } else {
-        answers = await this.resolveDWEB(domain, questionType)
       }
+      const answers = await this.resolve(domain, questionType, logger)
       const responseData = this.createResponse(request, answers);
       logger.log(JSON.stringify(answers))
       logger.flush()
@@ -125,9 +122,51 @@ class Resolver {
     }
   }
 
+  async resolve(domain: string, resourceType: dnsPacket.RecordType, logger: Logger, recursionLevel = 0): Promise<DNSRecord[]> {
+    if (recursionLevel > MAX_RECURSION_DEPTH) {
+      return [];
+    }
+    if (resourceType !== 'CNAME') {
+      const [cname] = await this.resolve(domain, "CNAME", logger, recursionLevel + 1);
+      if (cname) {
+        return [
+          cname,
+          ...await this.resolve(cname.data as string, resourceType, logger, recursionLevel + 1)
+        ];
+      }
+    }
+    const tld = getTLD(domain);
+    if (tld === 'eth') {
+      return this.resolveENS(domain, resourceType)
+    }
+    if (ICANN_TLDS[tld]) {
+      return this.resolveICANN(domain, resourceType);
+    }
+    return this.resolveDWEB(domain, resourceType);
+  }
+
+  async resolveICANN(domain: string, questionType: dnsPacket.RecordType): Promise<DNSRecord[]> {
+    const request = dnsPacket.encode({
+      type: 'query',
+      id: getRandomReqId(),
+      flags: dnsPacket.RECURSION_DESIRED,
+      questions: [{
+        type: questionType,
+        name: domain
+      }]
+    });
+
+    const response = await this.requestICANN(request);
+    const {answers} = dnsPacket.decode(response);
+    return answers as DNSRecord[] || [];
+  }
+
   async resolveDWEB(domain: string, questionType: dnsPacket.RecordType): Promise<DNSRecord[]> {
-    if(questionType === 'TXT' && domain.startsWith('_dnslink.')){
+    if (questionType === 'TXT' && domain.startsWith('_dnslink.')) {
       return this.emulateDNSLink(domain);
+    }
+    if(domain.includes('_')){
+      return [];
     }
     const name = this.dweb.name(domain)
     if (!await name.hasResolver()) {
@@ -153,8 +192,11 @@ class Resolver {
   }
 
   async resolveENS(domain: string, questionType: dnsPacket.RecordType): Promise<DNSRecord[]> {
-    if(questionType === 'TXT' && domain.startsWith('_dnslink.')){
+    if (questionType === 'TXT' && domain.startsWith('_dnslink.')) {
       return this.emulateDNSLink(domain);
+    }
+    if(domain.includes('_')){
+      return [];
     }
     const name = this.ens.name(domain)
     if (!await name.hasResolver()) {
@@ -185,11 +227,11 @@ class Resolver {
       return [];
     }
     const content = await name.getContenthash();
-    if(!content){
+    if (!content) {
       return [];
     }
     const url = new URL(content)
-    if(url.protocol !== 'ipfs:'){
+    if (url.protocol !== 'ipfs:') {
       return [];
     }
     return [{
@@ -209,7 +251,7 @@ class Resolver {
     }
   }
 
-  resolveICANN(request: Buffer): Promise<Buffer> {
+  requestICANN(request: Buffer): Promise<Buffer> {
     const client = dgram.createSocket('udp4');
     return new Promise((resolve, reject) => {
       client.once('message', function onMessage(message) {
