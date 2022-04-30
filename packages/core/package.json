@@ -1,6 +1,6 @@
 {
   "name": "@decentraweb/core",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Decentraweb javascript library",
   "main": "build/index.js",
   "types": "build/index.d.ts",
