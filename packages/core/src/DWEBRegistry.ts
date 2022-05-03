@@ -2,6 +2,7 @@ import {ethers, providers} from "ethers";
 import {hash as namehash} from "@ensdomains/eth-ens-namehash";
 import DWEBName from "./DWEBName";
 import {
+  DEFAULT_TTL,
   EthNetwork,
   getRegistryAddress,
   getRegistryContract,
@@ -61,7 +62,8 @@ export default class DWEBRegistry {
   async setResolver(name: string, address: string): Promise<providers.TransactionResponse> {
     const contract = this.getWritableContract();
     const hash = namehash(name);
-    return contract.setResolver(hash, address)
+    const defaultResolverAddress = getResolverAddress(this.network);
+    return contract.setResolverAndTTL(hash, defaultResolverAddress, DEFAULT_TTL)
   }
 
 }

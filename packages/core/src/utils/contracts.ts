@@ -36,3 +36,5 @@ export function getRegistryContract({address, provider}: ContractOptions) {
 }
 
 export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000'
+
+export const DEFAULT_TTL = 600
