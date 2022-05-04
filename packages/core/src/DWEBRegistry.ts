@@ -56,14 +56,13 @@ export default class DWEBRegistry {
     const contract = this.getWritableContract();
     const hash = namehash(name);
     const defaultResolverAddress = getResolverAddress(this.network);
-    return contract.setResolver(hash, defaultResolverAddress)
+    return contract.setResolverAndTTL(hash, defaultResolverAddress, DEFAULT_TTL)
   }
 
   async setResolver(name: string, address: string): Promise<providers.TransactionResponse> {
     const contract = this.getWritableContract();
     const hash = namehash(name);
-    const defaultResolverAddress = getResolverAddress(this.network);
-    return contract.setResolverAndTTL(hash, defaultResolverAddress, DEFAULT_TTL)
+    return contract.setResolver(hash, address)
   }
 
 }
