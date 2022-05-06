@@ -12,10 +12,10 @@ export type EthNetwork = 'mainnet'
 export function getRegistryAddress(networkId: EthNetwork) {
   switch(EthNetworkIds[networkId]) {
     case 1:
-      return '0xFF01dD9876244b6D4835Deb8441f9605bFBdBfb3'
+      return '0x8eb93AB94A6Afa8d416aB1884Ebb5A3f00920a7A'
       break;
     case 2:
-      return '0x8eb93AB94A6Afa8d416aB1884Ebb5A3f00920a7A'
+      return '0xFF01dD9876244b6D4835Deb8441f9605bFBdBfb3'
       break;
     default:
       throw new Error('Unknown network ID')
@@ -24,10 +24,10 @@ export function getRegistryAddress(networkId: EthNetwork) {
 export function getResolverAddress(networkId: EthNetwork) {
   switch(EthNetworkIds[networkId]) {
     case 1:
-      return '0x4d8592961e2C68A0ce092D370EA2330B89091302'
+      return '0xf157D3559DF1F8c69cb757A1A2cdF8736618E083'
       break;
     case 2:
-      return '0xf157D3559DF1F8c69cb757A1A2cdF8736618E083'
+      return '0x4d8592961e2C68A0ce092D370EA2330B89091302'
       break;
     default:
       throw new Error('Unknown network ID')
