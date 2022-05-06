@@ -10,21 +10,28 @@ export const EthNetworkIds = {
 export type EthNetwork = 'mainnet'
 
 export function getRegistryAddress(networkId: EthNetwork) {
-  if (networkId === 'rinkeby') {
-    return '0xFF01dD9876244b6D4835Deb8441f9605bFBdBfb3'
-  }else if (networkId === 'mainnet') {
-    return '0x8eb93AB94A6Afa8d416aB1884Ebb5A3f00920a7A'
+  switch(EthNetworkIds[networkId]) {
+    case 1:
+      return '0xFF01dD9876244b6D4835Deb8441f9605bFBdBfb3'
+      break;
+    case 2:
+      return '0x8eb93AB94A6Afa8d416aB1884Ebb5A3f00920a7A'
+      break;
+    default:
+      throw new Error('Unknown network ID')
   }
-  throw new Error('Unknown network ID')
 }
 export function getResolverAddress(networkId: EthNetwork) {
-  if (networkId === 'rinkeby') {
-    return '0x4d8592961e2C68A0ce092D370EA2330B89091302'
-  }else if (networkId === 'mainnet') {
-    return '0xf157D3559DF1F8c69cb757A1A2cdF8736618E083'
+  switch(EthNetworkIds[networkId]) {
+    case 1:
+      return '0x4d8592961e2C68A0ce092D370EA2330B89091302'
+      break;
+    case 2:
+      return '0xf157D3559DF1F8c69cb757A1A2cdF8736618E083'
+      break;
+    default:
+      throw new Error('Unknown network ID')
   }
-
-  throw new Error('Unknown network ID')
 }
 
 export type ContractOptions = {
