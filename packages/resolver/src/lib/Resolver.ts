@@ -77,7 +77,7 @@ class Resolver {
   constructor(options: ResolverConfig) {
     const {provider} = options;
     this.ens = new ENS({network: options.network, provider})
-    this.dweb = new DWEBRegistry({network: 'rinkeby', provider})
+    this.dweb = new DWEBRegistry({network: 'mainnet', provider})
     this.options = options;
   }
 
