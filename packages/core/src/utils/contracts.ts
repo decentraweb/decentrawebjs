@@ -7,7 +7,7 @@ export const EthNetworkIds = {
   'rinkeby': 4
 }
 
-export declare type EthNetwork = 'mainnet' | 'ropsten' | 'rinkeby' | 'goerli';
+export declare type EthNetwork = 'mainnet' | 'rinkeby';
 
 export function getRegistryAddress(networkId: EthNetwork) {
   switch(EthNetworkIds[networkId]) {
