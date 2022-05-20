@@ -6,6 +6,7 @@
   "types": "build/index.d.ts",
   "scripts": {
     "prepare": "npm run build",
+    "preinstall": "npx npm-force-resolutions",
     "build": "tsc",
     "watch": "tsc --watch"
   },
@@ -17,11 +18,15 @@
     "@ensdomains/eth-ens-namehash": "^2.0.15",
     "bs58": "^4.0.1",
     "dns-packet": "^5.3.1",
-    "ethers": "^5.5.2"
+    "ethers": "^5.5.2",
+    "npm-force-resolutions": "0.0.10"
   },
   "devDependencies": {
     "@types/bs58": "^4.0.1",
     "@types/dns-packet": "^5.2.4",
     "typescript": "^4.5.4"
+  },
+  "resolutions": {
+    "@leichtgewicht/ip-codec": "2.0.3"
   }
 }
