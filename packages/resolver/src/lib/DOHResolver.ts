@@ -3,6 +3,11 @@ import http, {IncomingMessage, ServerResponse} from "http";
 import {URL} from "url";
 import ReadableStream = NodeJS.ReadableStream;
 import {Buffer} from "buffer";
+import * as dnsPacket from "dns-packet";
+import {getRandomReqId} from "./utils/dns";
+import {RecordSet} from "@decentraweb/core";
+import {RecordType} from "dns-packet";
+import {createDeflateRaw} from "zlib";
 
 function decodeBase64URL(str: string): string | undefined {
   let queryData = str
@@ -48,10 +53,34 @@ class DOHResolver extends Resolver {
     this.server.on('request', this.handleRequest)
   }
 
-  async handleRequest(req: IncomingMessage, res: ServerResponse){
+  handleRequest(req: IncomingMessage, res: ServerResponse){
+    const { url } = req;
+    const { pathname } = new URL(url as string, 'http://unused/');
+
+    switch (pathname){
+      case '/dns-query':
+        return this.handleBinaryRequest(req, res);
+      case '/resolve':
+        return this.handleJSONRequest(req, res);
+      default:
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.write('404 Not Found\n');
+        res.end();
+    }
+  }
+
+
+  async handleBinaryRequest(req: IncomingMessage, res: ServerResponse){
     const { method, url, headers } = req;
-    const { pathname, searchParams: query } = new URL(url as string, 'http://unused/');
+    const { searchParams: query } = new URL(url as string, 'http://unused/');
     const { cors } = this;
+    const contentType = headers.accept;
+    if (contentType !== 'application/dns-message') {
+      res.writeHead(400, { 'Content-Type': 'text/plain' });
+      res.write('400 Bad Request: Illegal content type\n');
+      res.end();
+      return;
+    }
     if (cors === true) {
       res.setHeader('Access-Control-Allow-Origin', '*');
     } else if (typeof cors === 'string') {
@@ -73,21 +102,7 @@ class DOHResolver extends Resolver {
       res.end();
       return;
     }
-    // Check so the uri is correct
-    if (pathname !== '/dns-query') {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
-      res.write('404 Not Found\n');
-      res.end();
-      return;
-    }
-    // Make sure the requestee is requesting the correct content type
-    const contentType = headers.accept;
-    if (contentType !== 'application/dns-message') {
-      res.writeHead(400, { 'Content-Type': 'text/plain' });
-      res.write('400 Bad Request: Illegal content type\n');
-      res.end();
-      return;
-    }
+
     let queryData: Buffer;
     if (method === 'GET') {
       // Parse query string for the request data
@@ -114,6 +129,42 @@ class DOHResolver extends Resolver {
     const response = await this.processRequest(queryData);
     res.writeHead(200, {'Content-Type': 'application/dns-message'});
     res.end(response);
+  }
+
+  async handleJSONRequest(req: IncomingMessage, res: ServerResponse){
+    const { url } = req;
+    const { searchParams: query } = new URL(url as string, 'http://unused/');
+    const name = query.get('name');
+    const recordType = parseInt(query.get('type') || '1');
+    if(!name){
+      res.writeHead(400, { 'Content-Type': 'text/plain' });
+      res.write('400 Bad Request: No name defined\n');
+      res.end();
+      return;
+    }
+
+    if(isNaN(recordType) || 0>recordType || recordType>65535){
+      res.writeHead(400, { 'Content-Type': 'text/plain' });
+      res.write('400 Bad Request: Type must be number between 1 and 65535\n');
+      res.end();
+      return;
+    }
+    const dnsRequest = dnsPacket.encode({
+      type: 'query',
+      id: getRandomReqId(),
+      flags: dnsPacket.RECURSION_DESIRED,
+      questions: [{
+        type: RecordSet.recordType.toString(recordType) as RecordType,
+        name
+      }]
+    });
+    const dnsResponse = await this.processRequest(dnsRequest);
+    if(!dnsResponse){
+      return;
+    }
+    const data = dnsPacket.decode(dnsResponse);
+    res.writeHead(200, {'Content-Type': 'application/json'});
+    res.end(JSON.stringify(data));
   }
 
   listen(port: number): Promise<void> {
