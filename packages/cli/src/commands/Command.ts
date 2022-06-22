@@ -1,4 +1,4 @@
-import {DWEBName, DWEBRegistry} from "../../../core";
+import {DWEBName, DWEBRegistry} from "@decentraweb/core";
 import prompts from "prompts";
 import {waitForTransaction} from "../utils/transaction";
 
