@@ -7,7 +7,6 @@ import * as dnsPacket from "dns-packet";
 import {getRandomReqId} from "./utils/dns";
 import {RecordSet} from "@decentraweb/core";
 import {RecordType} from "dns-packet";
-import {createDeflateRaw} from "zlib";
 
 function decodeBase64URL(str: string): string | undefined {
   let queryData = str
@@ -53,19 +52,27 @@ class DOHResolver extends Resolver {
     this.server.on('request', this.handleRequest)
   }
 
-  handleRequest(req: IncomingMessage, res: ServerResponse){
-    const { url } = req;
-    const { pathname } = new URL(url as string, 'http://unused/');
-
-    switch (pathname){
-      case '/dns-query':
-        return this.handleBinaryRequest(req, res);
-      case '/resolve':
-        return this.handleJSONRequest(req, res);
-      default:
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.write('404 Not Found\n');
-        res.end();
+  async handleRequest(req: IncomingMessage, res: ServerResponse){
+    try {
+      const { url } = req;
+      const { pathname } = new URL(url as string, 'http://unused/');
+      switch (pathname){
+        case '/dns-query':
+          await this.handleBinaryRequest(req, res);
+          break;
+        case '/resolve':
+          await this.handleJSONRequest(req, res);
+          break;
+        default:
+          res.writeHead(404, { 'Content-Type': 'text/plain' });
+          res.write('404 Not Found\n');
+          res.end();
+      }
+    } catch (e) {
+      console.log('Unexpected error', e);
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.write('500 Unexpected error\n');
+      res.end();
     }
   }
 
@@ -160,6 +167,9 @@ class DOHResolver extends Resolver {
     });
     const dnsResponse = await this.processRequest(dnsRequest);
     if(!dnsResponse){
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.write('500 Unexpected error\n');
+      res.end();
       return;
     }
     const data = dnsPacket.decode(dnsResponse);
@@ -168,7 +178,7 @@ class DOHResolver extends Resolver {
   }
 
   listen(port: number): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       this.server.listen(port, () => resolve())
     });
   }
