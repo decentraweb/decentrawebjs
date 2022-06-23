@@ -9,6 +9,7 @@ import * as punycode from "punycode/";
 import {EthNetwork} from "./ens/base";
 import ENS from "./ens/Ens";
 import {getRandomReqId} from "./utils/dns";
+import config from "../config";
 
 const DNS_SERVER = '8.8.8.8'
 const PORT = 53
@@ -77,7 +78,7 @@ class Resolver {
   constructor(options: ResolverConfig) {
     const {provider} = options;
     this.ens = new ENS({network: options.network, provider})
-    this.dweb = new DWEBRegistry({network: 'mainnet', provider})
+    this.dweb = new DWEBRegistry({network: config.eth_network, provider})
     this.options = options;
   }
 
