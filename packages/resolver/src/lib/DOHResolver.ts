@@ -4,7 +4,6 @@ import {URL} from "url";
 import ReadableStream = NodeJS.ReadableStream;
 import {Buffer} from "buffer";
 import * as dnsPacket from "dns-packet";
-import {getRandomReqId} from "./utils/dns";
 import {RecordSet} from "@decentraweb/core";
 import {RecordType} from "dns-packet";
 
@@ -142,7 +141,8 @@ class DOHResolver extends Resolver {
     const { url } = req;
     const { searchParams: query } = new URL(url as string, 'http://unused/');
     const name = query.get('name');
-    const recordType = parseInt(query.get('type') || '1');
+    const recordTypeRaw = query.get('type') || '1';
+    let recordTypeStr;
     if(!name){
       res.writeHead(400, { 'Content-Type': 'text/plain' });
       res.write('400 Bad Request: No name defined\n');
@@ -150,18 +150,31 @@ class DOHResolver extends Resolver {
       return;
     }
 
-    if(isNaN(recordType) || 0>recordType || recordType>65535){
-      res.writeHead(400, { 'Content-Type': 'text/plain' });
-      res.write('400 Bad Request: Type must be number between 1 and 65535\n');
-      res.end();
-      return;
+    //If number is passed convert it to string
+    if(/\d+/.test(recordTypeRaw)){
+      const typeCode = parseInt(recordTypeRaw);
+      if(0>typeCode || typeCode>65535){
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.write('400 Bad Request: Invalid record type\n');
+        res.end();
+        return;
+      }
+      recordTypeStr = RecordSet.recordType.toString(typeCode)
+    } else {
+      if(!RecordSet.recordType.toType(recordTypeRaw)){
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.write('400 Bad Request: Invalid record type\n');
+        res.end();
+        return;
+      }
+      recordTypeStr = recordTypeRaw.toUpperCase();
     }
     const dnsRequest = dnsPacket.encode({
       type: 'query',
-      id: getRandomReqId(),
+      id: 0,
       flags: dnsPacket.RECURSION_DESIRED,
       questions: [{
-        type: RecordSet.recordType.toString(recordType) as RecordType,
+        type: recordTypeStr as RecordType,
         name
       }]
     });
@@ -173,6 +186,11 @@ class DOHResolver extends Resolver {
       return;
     }
     const data = dnsPacket.decode(dnsResponse);
+    data.answers?.forEach(a=>{
+      if(a.type === 'TXT'){
+        a.data = a.data.toString('utf-8');
+      }
+    })
     res.writeHead(200, {'Content-Type': 'application/json'});
     res.end(JSON.stringify(data));
   }
