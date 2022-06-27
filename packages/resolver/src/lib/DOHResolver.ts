@@ -3,6 +3,9 @@ import http, {IncomingMessage, ServerResponse} from "http";
 import {URL} from "url";
 import ReadableStream = NodeJS.ReadableStream;
 import {Buffer} from "buffer";
+import * as dnsPacket from "dns-packet";
+import {RecordSet} from "@decentraweb/core";
+import {RecordType} from "dns-packet";
 
 function decodeBase64URL(str: string): string | undefined {
   let queryData = str
@@ -49,9 +52,41 @@ class DOHResolver extends Resolver {
   }
 
   async handleRequest(req: IncomingMessage, res: ServerResponse){
+    try {
+      const { url } = req;
+      const { pathname } = new URL(url as string, 'http://unused/');
+      switch (pathname){
+        case '/dns-query':
+          await this.handleBinaryRequest(req, res);
+          break;
+        case '/resolve':
+          await this.handleJSONRequest(req, res);
+          break;
+        default:
+          res.writeHead(404, { 'Content-Type': 'text/plain' });
+          res.write('404 Not Found\n');
+          res.end();
+      }
+    } catch (e) {
+      console.log('Unexpected error', e);
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.write('500 Unexpected error\n');
+      res.end();
+    }
+  }
+
+
+  async handleBinaryRequest(req: IncomingMessage, res: ServerResponse){
     const { method, url, headers } = req;
-    const { pathname, searchParams: query } = new URL(url as string, 'http://unused/');
+    const { searchParams: query } = new URL(url as string, 'http://unused/');
     const { cors } = this;
+    const contentType = headers.accept;
+    if (contentType !== 'application/dns-message') {
+      res.writeHead(400, { 'Content-Type': 'text/plain' });
+      res.write('400 Bad Request: Illegal content type\n');
+      res.end();
+      return;
+    }
     if (cors === true) {
       res.setHeader('Access-Control-Allow-Origin', '*');
     } else if (typeof cors === 'string') {
@@ -73,21 +108,7 @@ class DOHResolver extends Resolver {
       res.end();
       return;
     }
-    // Check so the uri is correct
-    if (pathname !== '/dns-query') {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
-      res.write('404 Not Found\n');
-      res.end();
-      return;
-    }
-    // Make sure the requestee is requesting the correct content type
-    const contentType = headers.accept;
-    if (contentType !== 'application/dns-message') {
-      res.writeHead(400, { 'Content-Type': 'text/plain' });
-      res.write('400 Bad Request: Illegal content type\n');
-      res.end();
-      return;
-    }
+
     let queryData: Buffer;
     if (method === 'GET') {
       // Parse query string for the request data
@@ -116,8 +137,66 @@ class DOHResolver extends Resolver {
     res.end(response);
   }
 
+  async handleJSONRequest(req: IncomingMessage, res: ServerResponse){
+    const { url } = req;
+    const { searchParams: query } = new URL(url as string, 'http://unused/');
+    const name = query.get('name');
+    const recordTypeRaw = query.get('type') || '1';
+    let recordTypeStr;
+    if(!name){
+      res.writeHead(400, { 'Content-Type': 'text/plain' });
+      res.write('400 Bad Request: No name defined\n');
+      res.end();
+      return;
+    }
+
+    //If number is passed convert it to string
+    if(/\d+/.test(recordTypeRaw)){
+      const typeCode = parseInt(recordTypeRaw);
+      if(0>typeCode || typeCode>65535){
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.write('400 Bad Request: Invalid record type\n');
+        res.end();
+        return;
+      }
+      recordTypeStr = RecordSet.recordType.toString(typeCode)
+    } else {
+      if(!RecordSet.recordType.toType(recordTypeRaw)){
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.write('400 Bad Request: Invalid record type\n');
+        res.end();
+        return;
+      }
+      recordTypeStr = recordTypeRaw.toUpperCase();
+    }
+    const dnsRequest = dnsPacket.encode({
+      type: 'query',
+      id: 0,
+      flags: dnsPacket.RECURSION_DESIRED,
+      questions: [{
+        type: recordTypeStr as RecordType,
+        name
+      }]
+    });
+    const dnsResponse = await this.processRequest(dnsRequest);
+    if(!dnsResponse){
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.write('500 Unexpected error\n');
+      res.end();
+      return;
+    }
+    const data = dnsPacket.decode(dnsResponse);
+    data.answers?.forEach(a=>{
+      if(a.type === 'TXT'){
+        a.data = a.data.toString('utf-8');
+      }
+    })
+    res.writeHead(200, {'Content-Type': 'application/json'});
+    res.end(JSON.stringify(data));
+  }
+
   listen(port: number): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       this.server.listen(port, () => resolve())
     });
   }

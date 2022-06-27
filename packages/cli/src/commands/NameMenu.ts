@@ -1,5 +1,5 @@
 import Command from "./Command";
-import {DWEBName, DWEBRegistry} from "../../../core";
+import {DWEBName, DWEBRegistry} from "@decentraweb/core";
 import prompts from "prompts";
 import Contenthash from "./Contenthash";
 import DNSRecords from "./DNSRecords";

@@ -8,12 +8,10 @@ import {
 
 export const EthNetworkIds = {
   'mainnet': 1,
-  'ropsten': 3,
   'rinkeby': 4,
-  'goerli': 5
 }
 
-export type EthNetwork = 'mainnet' | 'ropsten' | 'rinkeby' | 'goerli'
+export type EthNetwork = 'mainnet' | 'rinkeby'
 
 export function getEnsAddress(networkId: EthNetwork) {
   if (EthNetworkIds[networkId]) {

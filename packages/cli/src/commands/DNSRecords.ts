@@ -1,5 +1,4 @@
-import {DNSRecord, Record, DWEBName, DWEBRegistry, RecordSet} from "../../../core";
-import {providers} from "ethers";
+import {DNSRecord, Record, DWEBName, DWEBRegistry, RecordSet} from "@decentraweb/core";
 import prompts from "prompts";
 import chalk from "chalk";
 import {waitForTransaction} from "../utils/transaction";

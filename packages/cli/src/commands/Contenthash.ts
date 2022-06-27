@@ -1,4 +1,4 @@
-import {DWEBName, DWEBRegistry, RecordSet, contentHash} from "../../../core";
+import {DWEBName, DWEBRegistry, contentHash} from "@decentraweb/core";
 import prompts from "prompts";
 import chalk from "chalk";
 import Command from "./Command";
