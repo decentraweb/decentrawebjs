@@ -6,7 +6,8 @@ import {
   EthNetwork,
   getRegistryAddress,
   getRegistryContract,
-  getResolverAddress,
+  getResolverAddress, getReverseRegistrarAddress,
+  getReverseRegistrarContract,
 } from "./utils/contracts";
 
 export type EnsConfig = {
@@ -52,6 +53,16 @@ export default class DWEBRegistry {
     })
   }
 
+  async getNameByAddress(address: string): Promise<string|null> {
+    const reverseNode = `${address.slice(2)}.addr.reverse`;
+    const reverseName = this.name(reverseNode);
+    const resolver = await reverseName.getResolver();
+    if(!resolver){
+      return null;
+    }
+    return resolver.name(reverseName.namehash)
+  }
+
   async assignDefaultResolver(name: string): Promise<providers.TransactionResponse> {
     const contract = this.getWritableContract();
     const hash = namehash(name);
@@ -63,6 +74,17 @@ export default class DWEBRegistry {
     const contract = this.getWritableContract();
     const hash = namehash(name);
     return contract.setResolver(hash, address)
+  }
+
+  async setReverseRecord(name: string) {
+    if (!this.signer) {
+      throw new Error('DWEBRegistry is initialized in read-only mode. Provide signer to write data.')
+    }
+    const reverseRegistrar = getReverseRegistrarContract({
+      address: getReverseRegistrarAddress(this.network),
+      provider: this.signer,
+    })
+    return reverseRegistrar.setName(name)
   }
 
 }
