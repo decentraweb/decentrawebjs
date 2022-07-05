@@ -1,10 +1,11 @@
 import {ethers, providers} from "ethers";
 import {hash as namehash} from "@ensdomains/eth-ens-namehash";
 import {formatsByName} from '@ensdomains/address-encoder'
-import {EMPTY_ADDRESS, getResolverContract} from "./utils/contracts";
+import {EMPTY_ADDRESS} from "./utils/contracts";
 import {decode, encode} from "./utils/content";
 import {dnsWireNameHash} from "./utils/dns";
 import {Buffer} from "buffer";
+import {getContract} from "./contracts";
 
 const NO_DATA = '0x';
 
@@ -76,13 +77,15 @@ export default class DWEBName {
       if(!this.signer){
         throw new Error('Name is initialized in read-only mode. Provide signer to write data.')
       }
-      return getResolverContract({
+      return getContract({
         address: resolverAddr,
+        name: "PublicResolver",
         provider: this.signer,
       })
     }
-    return getResolverContract({
+    return getContract({
       address: resolverAddr,
+      name: "PublicResolver",
       provider: this.provider,
     })
   }

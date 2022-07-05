@@ -1,35 +1,33 @@
 import {ethers, providers} from "ethers";
 import {hash as namehash} from "@ensdomains/eth-ens-namehash";
 import DWEBName from "./DWEBName";
-import {
-  DEFAULT_TTL,
-  EthNetwork,
-  getRegistryAddress,
-  getRegistryContract,
-  getResolverAddress, getReverseRegistrarAddress,
-  getReverseRegistrarContract,
-} from "./utils/contracts";
+import {DEFAULT_TTL} from "./utils/contracts";
+import {getContractConfig, getContract} from "./contracts";
+import {ContractConfig, EthNetwork} from "./contracts/interfaces";
 
-export type EnsConfig = {
+export type RegistryConfig = {
   network: EthNetwork,
   provider: providers.BaseProvider,
   signer?: ethers.Signer
+  contracts?: ContractConfig
 }
 
 export default class DWEBRegistry {
   network: EthNetwork
   provider: providers.BaseProvider
   private readonly contract: ethers.Contract
+  readonly contractConfig: ContractConfig
   signer?: ethers.Signer
 
-  constructor(options: EnsConfig) {
+  constructor(options: RegistryConfig) {
     const {network, provider, signer} = options
     this.provider = provider
     this.signer = signer
-    const registryContractAddress = getRegistryAddress(network)
     this.network = network;
-    this.contract = getRegistryContract({
-      address: registryContractAddress,
+    this.contractConfig = options.contracts || getContractConfig(network)
+    this.contract = getContract({
+      address: this.contractConfig.DWEBRegistry,
+      name: 'DWEBRegistry',
       provider: provider,
     })
   }
@@ -38,12 +36,17 @@ export default class DWEBRegistry {
     if (!this.signer) {
       throw new Error('DWEBRegistry is initialized in read-only mode. Provide signer to write data.')
     }
-    return getRegistryContract({
-      address: getRegistryAddress(this.network),
+    return getContract({
+      address: this.contractConfig.DWEBRegistry,
+      name: 'DWEBRegistry',
       provider: this.signer,
     })
   }
 
+  /**
+   * Create instance of DWEBName to read/write data for specific domain name
+   * @param name - domain name you would like to work with
+   */
   name(name: string) {
     return new DWEBName({
       name,
@@ -53,21 +56,10 @@ export default class DWEBRegistry {
     })
   }
 
-  async getNameByAddress(address: string): Promise<string|null> {
-    const reverseNode = `${address.slice(2)}.addr.reverse`;
-    const reverseName = this.name(reverseNode);
-    const resolver = await reverseName.getResolver();
-    if(!resolver){
-      return null;
-    }
-    return resolver.name(reverseName.namehash)
-  }
-
   async assignDefaultResolver(name: string): Promise<providers.TransactionResponse> {
     const contract = this.getWritableContract();
     const hash = namehash(name);
-    const defaultResolverAddress = getResolverAddress(this.network);
-    return contract.setResolverAndTTL(hash, defaultResolverAddress, DEFAULT_TTL)
+    return contract.setResolverAndTTL(hash, this.contractConfig.PublicResolver, DEFAULT_TTL)
   }
 
   async setResolver(name: string, address: string): Promise<providers.TransactionResponse> {
@@ -76,12 +68,28 @@ export default class DWEBRegistry {
     return contract.setResolver(hash, address)
   }
 
+  async getReverseRecord(address: string): Promise<string|null> {
+    const reverseName = `${address.slice(2)}.addr.reverse`;
+    const reverseHash = namehash(reverseName)
+    const resolverAddr = await this.contract.resolver(reverseHash);
+    if(parseInt(address, 16) === 0){
+      return null;
+    }
+    const resolver = getContract({
+      address: resolverAddr,
+      name: "DefaultReverseResolver",
+      provider: this.provider,
+    })
+    return resolver.name(reverseHash)
+  }
+
   async setReverseRecord(name: string) {
     if (!this.signer) {
       throw new Error('DWEBRegistry is initialized in read-only mode. Provide signer to write data.')
     }
-    const reverseRegistrar = getReverseRegistrarContract({
-      address: getReverseRegistrarAddress(this.network),
+    const reverseRegistrar = getContract({
+      address: this.contractConfig.ReverseRegistrar,
+      name: "ReverseRegistrar",
       provider: this.signer,
     })
     return reverseRegistrar.setName(name)
