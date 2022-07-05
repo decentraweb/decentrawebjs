@@ -2,6 +2,8 @@
 
 This is a library for interacting with the Decentraweb smart contracts. It contains tools for resolving DNS, getting/setting records, and more. It contains Decentraweb's latest ABIs and can be used directly or embedded in other projects such as the Decentraweb Resolver and CLI.
 
+This library is using [ethers.js](https://docs.ethers.io/v5/) to interact with Ethereum blockchain. `ethers.js` is included as peer dependency, so don't forget to add it to your `package.json`
+
 ## Usage
 ### Initialization
 ```typescript
@@ -10,11 +12,11 @@ import {DWEBRegistry} from "@decentraweb/core";
 
 const ETH_NETWORK = 'rinkeby';
 const JSONRPC_URL = '';
-const PKEY = ``;
+const PRIVATE_KEY = '';
 
 const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
 //Signer only required if you want to write data to blockchain
-const signer = new Wallet(PKEY, provider); 
+const signer = new Wallet(PRIVATE_KEY, provider); 
 const contracts = {
   "DWEBRegistry": "0x8eb93AB94A6Afa8d416aB1884Ebb5A3f00920a7A",
   "DefaultReverseResolver": "0x7d770Cfe9608Ff3AA3F5A34bdCd27c3870a370Da",
