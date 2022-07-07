@@ -1,10 +1,11 @@
 import {ethers, providers} from "ethers";
 import {hash as namehash} from "@ensdomains/eth-ens-namehash";
 import {formatsByName} from '@ensdomains/address-encoder'
-import {EMPTY_ADDRESS, getResolverContract} from "./utils/contracts";
+import {EMPTY_ADDRESS} from "./utils/contracts";
 import {decode, encode} from "./utils/content";
 import {dnsWireNameHash} from "./utils/dns";
 import {Buffer} from "buffer";
+import {getContract} from "./contracts";
 
 const NO_DATA = '0x';
 
@@ -35,7 +36,7 @@ export default class DWEBName {
   }
 
   async getOwner(): Promise<string> {
-    return this.registryContract.owner(this.namehash)
+    return this.registryContract['owner(bytes32)'](this.namehash)
   }
 
   async hasResolver(): Promise<boolean> {
@@ -76,13 +77,15 @@ export default class DWEBName {
       if(!this.signer){
         throw new Error('Name is initialized in read-only mode. Provide signer to write data.')
       }
-      return getResolverContract({
+      return getContract({
         address: resolverAddr,
+        name: "PublicResolver",
         provider: this.signer,
       })
     }
-    return getResolverContract({
+    return getContract({
       address: resolverAddr,
+      name: "PublicResolver",
       provider: this.provider,
     })
   }
@@ -112,6 +115,29 @@ export default class DWEBName {
       return EMPTY_ADDRESS
     }
   }
+
+  async setAddress(coinId: string, address: string): Promise<providers.TransactionResponse> {
+    if (!coinId) {
+      throw new Error('No coinId provided');
+    }
+
+    if (!address) {
+      throw new Error('No address provided');
+    }
+    const Resolver = await this.getResolver(true);
+    if(!Resolver){
+      throw new Error(`No resolver found for name ${this.name}`);
+    }
+    const { decoder, coinType } = formatsByName[coinId];
+    let addressAsBytes;
+    if (!address || address === '') {
+      addressAsBytes = Buffer.from('');
+    } else {
+      addressAsBytes = decoder(address);
+    }
+    return Resolver['setAddr(bytes32,uint256,bytes)'](this.namehash, coinType, addressAsBytes);
+  }
+
 
   async getText(key: string): Promise<string> {
     const Resolver = await this.getResolver()
