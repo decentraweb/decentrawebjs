@@ -192,7 +192,10 @@ class DOHResolver extends Resolver {
       }
     })
     res.writeHead(200, {'Content-Type': 'application/json'});
-    res.end(JSON.stringify(data));
+    res.end(JSON.stringify({
+      provider: await this.getDomainProvider(name),
+      result: data,
+    }));
   }
 
   listen(port: number): Promise<void> {
