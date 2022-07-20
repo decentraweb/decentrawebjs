@@ -1,28 +1,22 @@
 import { providers } from 'ethers';
 import http, { IncomingMessage, RequestOptions, ServerResponse } from 'http';
-import axios from 'axios';
-import { EthNetwork, DWEBRegistry, DWEBName, RecordSet } from '@decentraweb/core';
-import {supportsHTTPS} from "./lib/utils";
-import * as https from "https";
-import resolveDNS, {DNSResult} from "./lib/resolveDNS";
+import { EthNetwork, DWEBRegistry } from '@decentraweb/core';
+import * as https from 'https';
+import resolveDNS, { DNSResult } from './lib/resolveDNS';
 
 interface Logger {
-  log(...mesages: string[]): void;
+  (...mesages: string[]): void;
 }
 
 function createLogger(): Logger {
-  const messageStack: string[] = [];
-  const startTime = new Date();
-  let written = false;
-  const logger = {
-    log(...mesages: string[]) {
-      console.log(`${Date.now() - startTime.getTime()}ms ${mesages}`);
-    }
+  const startTime = Date.now();
+  let lastCall = startTime;
+  return (...mesages: string[]) => {
+    const now = Date.now();
+    console.log(`${now - startTime}ms (${now - lastCall}ms)${mesages}`);
+    lastCall = now;
   };
-  return logger;
 }
-
-const CACHE: Record<string, { address: string; proto: Protocol }> = {};
 
 export interface GatewayOptions {
   baseDomain: string;
@@ -39,8 +33,6 @@ class Context {
     this.res = res;
   }
 }
-
-type Protocol = 4 | 6;
 
 export class HTTPGateway {
   readonly baseDomain: string;
@@ -62,7 +54,7 @@ export class HTTPGateway {
   }
 
   async handleRequest(req: IncomingMessage, res: ServerResponse) {
-    const logger = createLogger();
+    const log = createLogger();
     const ctx = new Context(req, res);
     console.log(req.headers.host);
     const hostname = req.headers.host?.split(':').shift() || '';
@@ -70,15 +62,15 @@ export class HTTPGateway {
     if (!hostname.endsWith(this.baseDomain)) {
       return this.notFound(ctx);
     }
-    logger.log('Parsed domain');
+    log('Parsed domain');
     const dwebName = hostname.slice(0, -1 - this.baseDomain.length);
     const name = this.dweb.name(dwebName);
     if (!(await name.hasResolver())) {
       return this.notFound(ctx);
     }
-    logger.log('Has resolver');
+    log('Has resolver');
     const dnsData = await resolveDNS(name);
-    logger.log('Got server address');
+    log('Got server address');
     if (dnsData) {
       return this.proxyHTTP(ctx, dnsData);
     }
@@ -93,11 +85,11 @@ export class HTTPGateway {
     ctx.res.end();
   }
 
-  async proxyHTTP(ctx: Context, dnsData: DNSResult){
-    const {req, res} = ctx;
-    const {domain, address, protocol, isHTTPS} = dnsData;
-    if(!address){
-
+  async proxyHTTP(ctx: Context, dnsData: DNSResult) {
+    const { req, res } = ctx;
+    const { domain, address, protocol, isHTTPS } = dnsData;
+    if (!address) {
+      return this.notFound(ctx);
     }
     const url = `${isHTTPS ? 'https' : 'http'}://${domain}${req.url}`;
     const client = isHTTPS ? https : http;
@@ -108,45 +100,21 @@ export class HTTPGateway {
         host: domain
       },
       lookup: (hostname, options, callback) => {
-        console.log('LOOKUP', hostname, options);
         callback(null, address, protocol);
       }
     };
-    client
-      .request(url, options, (result) => {
-        console.log('Got response');
-        Object.entries(result.headers).forEach(([key, value]) => {
-          if (value) {
-            res.setHeader(key, value);
-          }
-        });
-        res.statusCode = result.statusCode || 200;
-        result.pipe(res);
-        console.log('Piped');
-      })
-      .end();
+    const handleResult = (result: IncomingMessage) => {
+      Object.entries(result.headers).forEach(([key, value]) => {
+        if (value) {
+          res.setHeader(key, value);
+        }
+      });
+      res.statusCode = result.statusCode || 200;
+      result.pipe(res);
+    };
+    const remoteReq = client.request(url, options, handleResult);
+    req.pipe(remoteReq);
   }
-
-  async resolveDNS(name: DWEBName): Promise<{ address: string | null; proto: Protocol }> {
-    if (CACHE[name.name]) {
-      return CACHE[name.name];
-    }
-    let recordsRaw = await name.getDNS(RecordSet.recordType.toType('A'));
-    let proto: Protocol = 4;
-    if (!recordsRaw) {
-      recordsRaw = await name.getDNS(RecordSet.recordType.toType('AAAA'));
-      proto = 6;
-    }
-    if (!recordsRaw) {
-      return { address: null, proto };
-    }
-    const records = RecordSet.decode(recordsRaw);
-    const result = { address: records[0].data as string, proto };
-    CACHE[name.name] = result;
-
-    return result;
-  }
-
 }
 
 export default HTTPGateway;

@@ -29,7 +29,7 @@
     "url": "https://github.com/decentraweb/decentrawebjs/issues"
   },
   "dependencies": {
-    "@decentraweb/core": "^0.0.14",
+    "@decentraweb/core": "^0.0.15",
     "ethers": "^5.5.2"
   },
   "devDependencies": {
