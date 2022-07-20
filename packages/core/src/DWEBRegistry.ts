@@ -4,6 +4,7 @@ import DWEBName from "./DWEBName";
 import {DEFAULT_TTL} from "./utils/contracts";
 import {getContractConfig, getContract} from "./contracts";
 import {ContractConfig, EthNetwork} from "./contracts/interfaces";
+import {isValidDomain} from "./utils/dns";
 
 export type RegistryConfig = {
   network: EthNetwork,
@@ -68,19 +69,30 @@ export default class DWEBRegistry {
     return contract.setResolver(hash, address)
   }
 
-  async getReverseRecord(address: string): Promise<string|null> {
+  async getReverseRecord(address: string, skipForwardCheck = false): Promise<string|null> {
     const reverseName = `${address.slice(2)}.addr.reverse`;
     const reverseHash = namehash(reverseName)
     const resolverAddr = await this.contract.resolver(reverseHash);
-    if(parseInt(address, 16) === 0){
+    if(parseInt(resolverAddr, 16) === 0){
       return null;
     }
     const resolver = getContract({
       address: resolverAddr,
       name: "DefaultReverseResolver",
       provider: this.provider,
-    })
-    return resolver.name(reverseHash)
+    });
+    const domain = await resolver.name(reverseHash);
+    if(!domain || !isValidDomain(domain)){
+      return null;
+    }
+    if(!skipForwardCheck){
+      const name = this.name(domain);
+      const ethAddress = await name.getAddress('ETH');
+      if(ethAddress!==address){
+        return null;
+      }
+    }
+    return domain;
   }
 
   async setReverseRecord(name: string) {

@@ -70,6 +70,8 @@ export interface ResolverConfig {
   }
 }
 
+export type DomainProvider = 'dweb' | 'ens' | 'icann';
+
 class Resolver {
   protected ens: ENS;
   protected dweb: DWEBRegistry;
@@ -136,14 +138,27 @@ class Resolver {
         ];
       }
     }
+    const provider = await this.getDomainProvider(domain);
+    switch (provider) {
+      case 'ens':
+        return this.resolveENS(domain, resourceType);
+      case 'dweb':
+        return this.resolveDWEB(domain, resourceType);
+      case 'icann':
+        return this.resolveICANN(domain, resourceType);
+    }
+  }
+
+  async getDomainProvider(domain: string): Promise<DomainProvider>{
     const tld = getTLD(domain);
     if (tld === 'eth') {
-      return this.resolveENS(domain, resourceType)
+      return 'ens'
     }
+    //TODO: Once we support hosting ICANN names on DWEB we will need to rewrite this
     if (ICANN_TLDS[tld]) {
-      return this.resolveICANN(domain, resourceType);
+      return 'icann';
     }
-    return this.resolveDWEB(domain, resourceType);
+    return 'dweb';
   }
 
   async resolveICANN(domain: string, questionType: dnsPacket.RecordType): Promise<DNSRecord[]> {
