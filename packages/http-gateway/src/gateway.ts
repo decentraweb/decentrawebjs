@@ -1,13 +1,14 @@
-import HTTPGateway from "./index";
-import {providers} from "ethers";
+import HTTPGateway from './index';
+import { providers } from 'ethers';
+import config from './config';
 
-const provider = new providers.JsonRpcProvider('https://rinkeby.infura.io/v3/9b829b3ce637400894fc7401540b2dfc', 'rinkeby');
+const provider = new providers.JsonRpcProvider(config.jsonrpc_url, config.eth_network);
 const gateway = new HTTPGateway({
-  baseDomain: 'dwebs.to',
-  network: 'rinkeby',
+  baseDomain: config.gateway_domain,
+  network: config.eth_network,
   provider
 });
 
-gateway.listen(3000).then(()=>{
-  console.log('Listening port 3000')
+gateway.listen(config.gateway_port).then(() => {
+  console.log(`Decentraweb gateway listening port ${config.gateway_port}`);
 });

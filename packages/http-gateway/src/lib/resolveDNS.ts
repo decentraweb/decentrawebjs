@@ -1,5 +1,6 @@
 import { DWEBName, RecordSet } from '@decentraweb/core';
 import { supportsHTTPS } from './utils';
+import Cache from './Cache';
 
 export interface DNSResult {
   domain: string;
@@ -8,12 +9,12 @@ export interface DNSResult {
   isHTTPS: boolean;
 }
 
-const CACHE: Record<string, DNSResult> = {};
+const DNS_CACHE = new Cache<DNSResult | null>(5 * 60 * 1000);
 
 export async function resolveDNS(name: DWEBName): Promise<DNSResult | null> {
-  if (CACHE[name.namehash]) {
-    console.log('Use cached value');
-    return CACHE[name.namehash];
+  const cached = await DNS_CACHE.read(name.namehash);
+  if (cached !== undefined) {
+    return cached;
   }
   let recordsRaw = await name.getDNS(RecordSet.recordType.toType('A'));
   if (!recordsRaw) {
@@ -30,7 +31,8 @@ export async function resolveDNS(name: DWEBName): Promise<DNSResult | null> {
     protocol: record.type === 'AAAA' ? 6 : 4,
     isHTTPS: await supportsHTTPS(record.data as string)
   };
-  CACHE[name.namehash] = result;
+  await DNS_CACHE.write(name.namehash, result, record.ttl * 1000);
+  console.log('DNS', result);
   return result;
 }
 

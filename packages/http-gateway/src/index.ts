@@ -1,8 +1,9 @@
 import { providers } from 'ethers';
 import http, { IncomingMessage, RequestOptions, ServerResponse } from 'http';
-import { EthNetwork, DWEBRegistry } from '@decentraweb/core';
+import { DWEBRegistry, EthNetwork } from '@decentraweb/core';
 import * as https from 'https';
 import resolveDNS, { DNSResult } from './lib/resolveDNS';
+import { hasResolver } from './lib/hasResolver';
 
 interface Logger {
   (...mesages: string[]): void;
@@ -65,7 +66,7 @@ export class HTTPGateway {
     log('Parsed domain');
     const dwebName = hostname.slice(0, -1 - this.baseDomain.length);
     const name = this.dweb.name(dwebName);
-    if (!(await name.hasResolver())) {
+    if (!(await hasResolver(name))) {
       return this.notFound(ctx);
     }
     log('Has resolver');
@@ -74,7 +75,6 @@ export class HTTPGateway {
     if (dnsData) {
       return this.proxyHTTP(ctx, dnsData);
     }
-    console.log('DOMAIN', dwebName);
     res.write(dwebName);
     res.end();
   }
