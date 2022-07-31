@@ -1,5 +1,5 @@
-import {DWEBName, RecordSet} from '@decentraweb/core';
-import {supportsHTTPS} from './utils';
+import { DWEBName, RecordSet } from '@decentraweb/core';
+import { supportsHTTPS } from './utils';
 import Cache from './Cache';
 
 export interface DNSResult {
@@ -12,10 +12,13 @@ export interface DNSResult {
 const DNS_CACHE = new Cache<DNSResult | null>(5 * 60 * 1000);
 
 interface Options {
-  ipfsGatewayIp: string
+  ipfsGatewayIp: string;
 }
 
-export async function resolveDNS(name: DWEBName, {ipfsGatewayIp}: Options): Promise<DNSResult | null> {
+export async function resolveDNS(
+  name: DWEBName,
+  { ipfsGatewayIp }: Options
+): Promise<DNSResult | null> {
   const cached = await DNS_CACHE.read(name.namehash);
   if (cached !== undefined) {
     return cached;

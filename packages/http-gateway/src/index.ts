@@ -1,22 +1,12 @@
-import {providers} from 'ethers';
-import http, {IncomingMessage, RequestOptions, ServerResponse} from 'http';
-import {DWEBRegistry, EthNetwork} from '@decentraweb/core';
+import { providers } from 'ethers';
+import http, { IncomingMessage, RequestOptions, ServerResponse } from 'http';
+import { DWEBRegistry, EthNetwork } from '@decentraweb/core';
 import * as https from 'https';
-import resolveDNS, {DNSResult} from './lib/resolveDNS';
-import {hasResolver} from './lib/hasResolver';
+import resolveDNS, { DNSResult } from './lib/resolveDNS';
+import { hasResolver } from './lib/hasResolver';
 
 interface Logger {
   (...mesages: string[]): void;
-}
-
-function createLogger(): Logger {
-  const startTime = Date.now();
-  let lastCall = startTime;
-  return (...mesages: string[]) => {
-    const now = Date.now();
-    console.log(`${now - startTime}ms (${now - lastCall}ms)${mesages}`);
-    lastCall = now;
-  };
 }
 
 export interface GatewayOptions {
@@ -48,7 +38,7 @@ export class HTTPGateway {
     this.server = http.createServer({});
     this.handleRequest = this.handleRequest.bind(this);
     this.server.on('request', this.handleRequest);
-    this.dweb = new DWEBRegistry({network: options.network, provider: options.provider});
+    this.dweb = new DWEBRegistry({ network: options.network, provider: options.provider });
   }
 
   listen(port: number): Promise<void> {
@@ -68,7 +58,7 @@ export class HTTPGateway {
     if (!(await hasResolver(name))) {
       return this.notFound(ctx);
     }
-    const dnsData = await resolveDNS(name, {ipfsGatewayIp: this.ipfsGatewayIp});
+    const dnsData = await resolveDNS(name, { ipfsGatewayIp: this.ipfsGatewayIp });
     if (dnsData) {
       return this.proxyHTTP(ctx, dnsData);
     }
@@ -82,8 +72,8 @@ export class HTTPGateway {
   }
 
   async proxyHTTP(ctx: Context, dnsData: DNSResult) {
-    const {req, res} = ctx;
-    const {domain, address, protocol, isHTTPS} = dnsData;
+    const { req, res } = ctx;
+    const { domain, address, protocol, isHTTPS } = dnsData;
     if (!address) {
       return this.notFound(ctx);
     }
