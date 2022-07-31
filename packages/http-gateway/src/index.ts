@@ -58,7 +58,6 @@ export class HTTPGateway {
   }
 
   async handleRequest(req: IncomingMessage, res: ServerResponse) {
-    const log = createLogger();
     const ctx = new Context(req, res);
     const hostname = req.headers.host?.split(':').shift() || '';
     if (!hostname.endsWith(this.baseDomain)) {

@@ -9,7 +9,7 @@ export default class Cache<V = any> {
 
   constructor(defaultTTL: number) {
     this.ttl = defaultTTL;
-    setInterval(() => this.cleanup(), 1000);
+    setInterval(() => this.cleanup(), 10000);
   }
 
   private cleanup() {
