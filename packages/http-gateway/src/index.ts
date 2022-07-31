@@ -1,9 +1,9 @@
-import { providers } from 'ethers';
-import http, { IncomingMessage, RequestOptions, ServerResponse } from 'http';
-import { DWEBRegistry, EthNetwork } from '@decentraweb/core';
+import {providers} from 'ethers';
+import http, {IncomingMessage, RequestOptions, ServerResponse} from 'http';
+import {DWEBRegistry, EthNetwork} from '@decentraweb/core';
 import * as https from 'https';
-import resolveDNS, { DNSResult } from './lib/resolveDNS';
-import { hasResolver } from './lib/hasResolver';
+import resolveDNS, {DNSResult} from './lib/resolveDNS';
+import {hasResolver} from './lib/hasResolver';
 
 interface Logger {
   (...mesages: string[]): void;
@@ -23,6 +23,7 @@ export interface GatewayOptions {
   baseDomain: string;
   provider: providers.BaseProvider;
   network: EthNetwork;
+  ipfsGatewayIp: string;
 }
 
 class Context {
@@ -37,15 +38,17 @@ class Context {
 
 export class HTTPGateway {
   readonly baseDomain: string;
+  readonly ipfsGatewayIp: string;
   private server: http.Server;
   private dweb: DWEBRegistry;
 
   constructor(options: GatewayOptions) {
     this.baseDomain = options.baseDomain;
+    this.ipfsGatewayIp = options.ipfsGatewayIp;
     this.server = http.createServer({});
     this.handleRequest = this.handleRequest.bind(this);
     this.server.on('request', this.handleRequest);
-    this.dweb = new DWEBRegistry({ network: options.network, provider: options.provider });
+    this.dweb = new DWEBRegistry({network: options.network, provider: options.provider});
   }
 
   listen(port: number): Promise<void> {
@@ -57,26 +60,20 @@ export class HTTPGateway {
   async handleRequest(req: IncomingMessage, res: ServerResponse) {
     const log = createLogger();
     const ctx = new Context(req, res);
-    console.log(req.headers.host);
     const hostname = req.headers.host?.split(':').shift() || '';
-    console.log('hostname', hostname);
     if (!hostname.endsWith(this.baseDomain)) {
       return this.notFound(ctx);
     }
-    log('Parsed domain');
     const dwebName = hostname.slice(0, -1 - this.baseDomain.length);
     const name = this.dweb.name(dwebName);
     if (!(await hasResolver(name))) {
       return this.notFound(ctx);
     }
-    log('Has resolver');
-    const dnsData = await resolveDNS(name);
-    log('Got server address');
+    const dnsData = await resolveDNS(name, {ipfsGatewayIp: this.ipfsGatewayIp});
     if (dnsData) {
       return this.proxyHTTP(ctx, dnsData);
     }
-    res.write(dwebName);
-    res.end();
+    return this.notFound(ctx);
   }
 
   notFound(ctx: Context) {
@@ -86,8 +83,8 @@ export class HTTPGateway {
   }
 
   async proxyHTTP(ctx: Context, dnsData: DNSResult) {
-    const { req, res } = ctx;
-    const { domain, address, protocol, isHTTPS } = dnsData;
+    const {req, res} = ctx;
+    const {domain, address, protocol, isHTTPS} = dnsData;
     if (!address) {
       return this.notFound(ctx);
     }

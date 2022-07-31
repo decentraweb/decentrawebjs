@@ -5,7 +5,7 @@ const CACHE = new Cache<boolean>(5 * 60 * 1000);
 
 export async function hasResolver(name: DWEBName) {
   const cached = await CACHE.read(name.namehash);
-  if (cached !== undefined) {
+  if (typeof cached !== 'undefined') {
     return cached;
   }
   const hasResolver = await name.hasResolver();
