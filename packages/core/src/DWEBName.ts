@@ -94,9 +94,9 @@ export default class DWEBName {
    * Get Ethereum or other blockchain address associated with name
    * @param coinId
    */
-  async getAddress(coinId?: string): Promise<string> {
+  async getAddress(coinId?: string): Promise<string | null> {
     const Resolver = await this.getResolver();
-    if (!Resolver) return EMPTY_ADDRESS
+    if (!Resolver) return null
     if (!coinId) {
       return Resolver['addr(bytes32)'](this.namehash)
     }
@@ -104,7 +104,7 @@ export default class DWEBName {
       const {coinType, encoder} = formatsByName[coinId]
       const addr = await Resolver['addr(bytes32,uint256)'](this.namehash, coinType)
       if (addr === '0x') {
-        return EMPTY_ADDRESS
+        return null;
       }
       return encoder(Buffer.from(addr.slice(2), 'hex'))
     } catch (e) {
@@ -112,7 +112,7 @@ export default class DWEBName {
       console.warn(
         'Error getting address of the resolver contract, are you sure the resolver address is a resolver contract?'
       )
-      return EMPTY_ADDRESS
+      return null
     }
   }
 

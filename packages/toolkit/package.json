@@ -1,0 +1,32 @@
+{
+  "name": "@decentraweb/toolkit",
+  "version": "0.0.1",
+  "description": "Toolkit to work with Decentraweb and ENS names",
+  "author": "",
+  "license": "ISC",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decentraweb/decentrawebjs.git"
+  },
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "bugs": {
+    "url": "https://github.com/decentraweb/decentrawebjs/issues"
+  },
+  "peerDependencies": {
+    "ethers": "^5.6.9"
+  },
+  "dependencies": {
+    "@decentraweb/core": "^0.0.15",
+    "punycode": "^2.1.1"
+  },
+  "devDependencies": {
+    "@types/punycode": "^2.1.0",
+    "ethers": "^5.6.9"
+  }
+}
