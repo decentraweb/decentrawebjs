@@ -7,6 +7,8 @@ import ENSDomain from './domain/ENSDomain/index';
 
 export * from './types/index';
 
+export { ENSDomain, DWEBDomain };
+
 export class DwebToolkit extends ApiGroup {
   readonly address: EthereumAddress;
 
