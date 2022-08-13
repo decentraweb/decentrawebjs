@@ -23,6 +23,9 @@
   },
   "dependencies": {
     "@decentraweb/core": "^0.0.15",
+    "@ensdomains/address-encoder": "^0.2.18",
+    "@ensdomains/ens-contracts": "^0.0.11",
+    "@ensdomains/eth-ens-namehash": "^2.0.15",
     "punycode": "^2.1.1"
   },
   "devDependencies": {

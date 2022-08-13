@@ -1,7 +1,6 @@
 import {ethers, providers} from "ethers";
 import {hash as namehash} from "@ensdomains/eth-ens-namehash";
 import {formatsByName} from '@ensdomains/address-encoder'
-import {EMPTY_ADDRESS} from "./utils/contracts";
 import {decode, encode} from "./utils/content";
 import {dnsWireNameHash} from "./utils/dns";
 import {Buffer} from "buffer";

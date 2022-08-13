@@ -1,6 +1,6 @@
 import ApiGroup from './lib/ApiGroup';
-import { DWEBRegistry } from '@decentraweb/core';
-import {DomainProvider, getNameProvider} from './lib/getNameProvider';
+import { getNameProvider } from './lib/getNameProvider';
+import { DomainProvider } from './types';
 
 interface ResolutionResult {
   provider: DomainProvider;
@@ -31,7 +31,10 @@ export class EthereumAddress extends ApiGroup {
    * @param address valid ethereum address
    * @param domainProvider domain name provider to use. If omitted all supported providers will be used
    */
-  async resolve(address: string, domainProvider?: DomainProvider): Promise<ResolutionResult[] | string | null> {
+  async resolve(
+    address: string,
+    domainProvider?: DomainProvider
+  ): Promise<ResolutionResult[] | string | null> {
     const result: ResolutionResult[] = [];
     if (!domainProvider || domainProvider === 'dweb') {
       const name = await this.dweb.getReverseRecord(address);
@@ -51,6 +54,6 @@ export class EthereumAddress extends ApiGroup {
         });
       }
     }
-    return domainProvider ? (result[0]?.name || null) : result
+    return domainProvider ? result[0]?.name || null : result;
   }
 }

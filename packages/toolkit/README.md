@@ -1,6 +1,7 @@
 # `toolkit`
 
 ## Initialization
+
 ```typescript
 import {providers, Wallet} from "ethers";
 import DwebToolkit, {ToolkitConfig} from "@decentraweb/toolkit";
@@ -8,7 +9,7 @@ import DwebToolkit, {ToolkitConfig} from "@decentraweb/toolkit";
 const ETH_NETWORK = 'rinkeby';
 const JSONRPC_URL = 'https://rinkeby.infura.io/v3/00000000000000000000000000000000';
 const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
-const config: ToolkitConfig = { network: ETH_NETWORK, provider };
+const config: ToolkitConfig = {network: ETH_NETWORK, provider};
 const toolkit = new DwebToolkit(config);
 ```
 
@@ -31,4 +32,18 @@ const address = await toolkit.address.lookup('serhii');
 /*
 Returns: '0x13BCb838DAEFF08f4E56237098dB1d814eeB837D'
 */
+```
+
+## Reading domain data
+
+```typescript
+const domain = await toolkit.domain('mauvis.eth');
+if (domain) {
+  const domainProvider = domain.provider;
+  const ethAddress = await domain.address('ETH');
+  const btcAddress = await domain.address('BTC');
+  const contentHash = await domain.contentHash();
+  const githubName = await domain.txt('com.github');
+  const records = await domain.dns('A');
+}
 ```
