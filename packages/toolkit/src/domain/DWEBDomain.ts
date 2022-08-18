@@ -1,6 +1,6 @@
 import BaseDomain from './BaseDomain';
 import { DWEBName, DWEBRegistry, RecordSet } from '@decentraweb/core';
-import { RecordType } from '@decentraweb/core/build/RecordSet/DNSRecord';
+import { RecordType } from '@decentraweb/core';
 import { toType } from '@decentraweb/core/build/RecordSet/type';
 import { ToolkitConfig } from '../types';
 

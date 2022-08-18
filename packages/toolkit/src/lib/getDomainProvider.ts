@@ -12,7 +12,7 @@ function getTLD(name: string): string {
   );
 }
 
-export async function getNameProvider(domain: string): Promise<DomainProvider> {
+export async function getDomainProvider(domain: string): Promise<DomainProvider> {
   const tld = getTLD(domain);
   if (tld === 'eth') {
     return 'ens';
@@ -24,4 +24,4 @@ export async function getNameProvider(domain: string): Promise<DomainProvider> {
   return 'dweb';
 }
 
-export default getNameProvider;
+export default getDomainProvider;

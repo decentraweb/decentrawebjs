@@ -1,11 +1,5 @@
 import {Buffer} from "buffer";
-
-export type RecordType =
-  | "A"
-  | "AAAA"
-  | "CNAME"
-  | "MX"
-  | "TXT";
+import {RecordType} from "dns-packet";
 
 export type RecordClass = "IN" | "CS" | "CH" | "HS" | "ANY";
 

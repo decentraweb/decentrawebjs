@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import {EthNetwork} from "./lib/ens/base";
+import {EthNetwork} from "@decentraweb/core";
 dotenv.config()
 
 const config = {

@@ -1,4 +1,4 @@
-import { RecordType } from '@decentraweb/core/build/RecordSet/DNSRecord';
+import { RecordType } from '@decentraweb/core';
 import { DNSRecord } from '@decentraweb/core';
 import { DomainProvider, ToolkitConfig } from '../types';
 

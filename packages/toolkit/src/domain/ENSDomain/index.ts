@@ -4,7 +4,7 @@ import { PublicResolver as publicResolverContract } from '@ensdomains/ens-contra
 import { hash as namehash } from '@ensdomains/eth-ens-namehash';
 import BaseDomain from '../BaseDomain';
 import { RecordSet } from '@decentraweb/core';
-import { RecordType } from '@decentraweb/core/build/RecordSet/DNSRecord';
+import { RecordType } from '@decentraweb/core';
 import { toType } from '@decentraweb/core/build/RecordSet/type';
 import { dnsWireNameHash } from './utils';
 

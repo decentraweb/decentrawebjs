@@ -1,5 +1,5 @@
 import ApiGroup from './lib/ApiGroup';
-import { getNameProvider } from './lib/getNameProvider';
+import { getDomainProvider } from './lib/getDomainProvider';
 import { DomainProvider } from './types';
 
 interface ResolutionResult {
@@ -13,7 +13,7 @@ export class EthereumAddress extends ApiGroup {
    * @param name
    */
   async lookup(name: string): Promise<string | null> {
-    const domainProvider = await getNameProvider(name);
+    const domainProvider = await getDomainProvider(name);
     switch (domainProvider) {
       case 'dweb': {
         const dwebName = this.dweb.name('test');

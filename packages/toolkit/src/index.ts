@@ -1,6 +1,6 @@
 import ApiGroup from './lib/ApiGroup';
 import { EthereumAddress } from './EthereumAddress';
-import getNameProvider from './lib/getNameProvider';
+import getDomainProvider from './lib/getDomainProvider';
 import DWEBDomain from './domain/DWEBDomain';
 import { ToolkitConfig } from './types';
 import ENSDomain from './domain/ENSDomain/index';
@@ -18,7 +18,7 @@ export class DwebToolkit extends ApiGroup {
   }
 
   async domain(name: string) {
-    const provider = await getNameProvider(name);
+    const provider = await getDomainProvider(name);
     let domain;
     switch (provider) {
       case 'dweb':
@@ -32,6 +32,7 @@ export class DwebToolkit extends ApiGroup {
     }
     return (await domain.exists()) ? domain : null;
   }
+
 }
 
 export default DwebToolkit;
