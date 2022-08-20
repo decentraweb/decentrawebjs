@@ -1,13 +1,13 @@
 import { RecordType } from '@decentraweb/core';
 import { DomainProvider } from '../types';
-import {Answer} from "dns-packet";
+import { Answer } from 'dns-packet';
 
-type DomainFeature = 'address' | 'contentHash' | 'dns' | 'txt'
+type DomainFeature = 'address' | 'contentHash' | 'dns' | 'txt';
 
 export abstract class BaseDomain {
   readonly name: string;
   abstract provider: DomainProvider;
-  abstract features: Record<DomainFeature, boolean>
+  abstract features: Record<DomainFeature, boolean>;
 
   constructor(name: string) {
     this.name = name;
