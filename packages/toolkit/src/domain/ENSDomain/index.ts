@@ -5,7 +5,6 @@ import { hash as namehash } from '@ensdomains/eth-ens-namehash';
 import BaseDomain from '../BaseDomain';
 import { RecordSet } from '@decentraweb/core';
 import { RecordType } from '@decentraweb/core';
-import { toType } from '@decentraweb/core/build/RecordSet/type';
 import { dnsWireNameHash } from './utils';
 
 export function getResolverContract(address: string, provider: providers.Provider) {
@@ -43,7 +42,7 @@ export class ENSDomain extends BaseDomain {
     const data = await contract.dnsRecord(
       namehash(this.name),
       dnsWireNameHash(this.name),
-      toType(recordType)
+      RecordSet.recordType.toType(recordType)
     );
     const buf = Buffer.from(data.replace('0x', ''), 'hex');
     if (!buf.length) {

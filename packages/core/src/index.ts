@@ -1,9 +1,8 @@
 import DWEBName from './DWEBName';
 import DWEBRegistry from './DWEBRegistry';
-import { DNSRecord, Record, RecordSet } from './RecordSet';
+import { DNSRecord, Record, RecordSet, RecordType, RecordClass } from './RecordSet';
 import { EthNetwork } from './contracts/interfaces';
 import * as contentHash from './utils/content';
-import { RecordType } from 'dns-packet';
 
 export {
   EthNetwork,
@@ -13,5 +12,6 @@ export {
   DWEBRegistry,
   RecordSet,
   RecordType,
+  RecordClass,
   contentHash
 };

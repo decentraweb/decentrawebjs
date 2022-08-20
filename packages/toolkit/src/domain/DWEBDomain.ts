@@ -1,7 +1,6 @@
 import BaseDomain from './BaseDomain';
 import { DWEBName, DWEBRegistry, RecordSet } from '@decentraweb/core';
 import { RecordType } from '@decentraweb/core';
-import { toType } from '@decentraweb/core/build/RecordSet/type';
 import { ToolkitConfig } from '../types';
 
 export class DWEBDomain extends BaseDomain {
@@ -23,7 +22,7 @@ export class DWEBDomain extends BaseDomain {
   }
 
   async dns(recordType: RecordType) {
-    const recordsData = await this.dwebName.getDNS(toType(recordType));
+    const recordsData = await this.dwebName.getDNS(RecordSet.recordType.toType(recordType));
     if (!recordsData || !recordsData.length) {
       return [];
     }

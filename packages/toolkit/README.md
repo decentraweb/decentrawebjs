@@ -47,3 +47,11 @@ if (domain) {
   const records = await domain.dns('A');
 }
 ```
+
+## Domain resolution logic
+If domain ends with `.eth` then it is resolved through ENS. If domain has
+one of the ICANN TLDs, then it is resolved through regular DNS. All other domains are resolved
+with DWEB contracts.
+
+List of ICANN domains can be found at https://data.iana.org/TLD/tlds-alpha-by-domain.txt and is
+stored in `./icann_tlds.txt` file. It needs to be regulary updated.

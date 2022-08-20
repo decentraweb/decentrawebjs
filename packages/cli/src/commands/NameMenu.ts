@@ -1,10 +1,9 @@
-import Command from "./Command";
-import {DWEBName, DWEBRegistry} from "@decentraweb/core";
-import prompts from "prompts";
-import Contenthash from "./Contenthash";
-import DNSRecords from "./DNSRecords";
-import chalk from "chalk";
-
+import Command from './Command';
+import { DWEBName, DWEBRegistry } from '@decentraweb/core';
+import prompts from 'prompts';
+import Contenthash from './Contenthash';
+import DNSRecords from './DNSRecords';
+import chalk from 'chalk';
 
 class NameMenu extends Command {
   constructor(registry: DWEBRegistry, name: DWEBName) {
@@ -17,11 +16,11 @@ class NameMenu extends Command {
   }
 
   async showSummary() {
-    this.writeln(chalk.bold(`Domain name ${chalk.cyan(this.name.name)}`))
-    this.writeln(chalk.bold('Content:'))
+    this.writeln(chalk.bold(`Domain name ${chalk.cyan(this.name.name)}`));
+    this.writeln(chalk.bold('Content:'));
     const contenthash = await this.name.getContenthash();
     if (contenthash) {
-      this.writeln(contenthash)
+      this.writeln(contenthash);
     } else {
       this.writeln(chalk.gray('No content set'));
     }
@@ -29,7 +28,7 @@ class NameMenu extends Command {
     this.writeln(chalk.bold('DNS records:'));
     const records = await DNSRecords.getDNSRecords(this.name);
     if (records.length) {
-      records.forEach(record => this.writeln(DNSRecords.recordToString(record)));
+      records.forEach((record) => this.writeln(DNSRecords.recordToString(record)));
     } else {
       this.writeln(chalk.gray('No DNS records set for name'));
     }
@@ -37,15 +36,15 @@ class NameMenu extends Command {
   }
 
   async showMenu() {
-    const {section} = await prompts([
+    const { section } = await prompts([
       {
         type: 'select',
         name: 'section',
         message: 'What type of data you would like to edit?',
         choices: [
-          {value: 'contenthash', title: 'Contenthash', description: 'Set contenthash'},
-          {value: 'dns', title: 'DNS Records', description: "Manage DNS records"},
-          {value: 'exit', title: 'Exit', description: "Exit CLI tool"}
+          { value: 'contenthash', title: 'Contenthash', description: 'Set contenthash' },
+          { value: 'dns', title: 'DNS Records', description: 'Manage DNS records' },
+          { value: 'exit', title: 'Exit', description: 'Exit CLI tool' }
         ],
         initial: 0
       }

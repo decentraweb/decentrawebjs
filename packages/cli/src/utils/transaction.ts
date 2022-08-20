@@ -1,5 +1,5 @@
-import {providers} from "ethers";
-import chalk from "chalk";
+import { providers } from 'ethers';
+import chalk from 'chalk';
 
 export async function waitForTransaction(response: providers.TransactionResponse, message = '') {
   process.stdout.write(chalk.cyan(message || 'Waiting for transaction to confirm...'));

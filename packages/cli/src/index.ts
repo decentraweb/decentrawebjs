@@ -1,24 +1,24 @@
 #!/usr/bin/env node
-import {ethers} from 'ethers';
+import { ethers } from 'ethers';
 import prompts from 'prompts';
-import {DWEBRegistry} from "@decentraweb/core";
-import NameMenu from "./commands/NameMenu";
-import chalk from "chalk";
+import { DWEBRegistry } from '@decentraweb/core';
+import NameMenu from './commands/NameMenu';
+import chalk from 'chalk';
 
 let PKEY: string;
 let PROVIDER: ethers.providers.BaseProvider;
 
 async function showMenu(): Promise<void> {
-  if(!PROVIDER){
-    const {projectId} = await prompts([
+  if (!PROVIDER) {
+    const { projectId } = await prompts([
       {
         type: 'text',
         name: 'projectId',
         message: `Enter Infura project id (otherwise API access may be slow)`
       }
     ]);
-    if(projectId){
-      PROVIDER = new ethers.providers.InfuraProvider('rinkeby', projectId)
+    if (projectId) {
+      PROVIDER = new ethers.providers.InfuraProvider('rinkeby', projectId);
     } else {
       PROVIDER = ethers.getDefaultProvider('rinkeby');
     }
@@ -26,8 +26,8 @@ async function showMenu(): Promise<void> {
     await PROVIDER.getBlockNumber();
   }
 
-  if(!PKEY){
-    const {pkey} = await prompts([
+  if (!PKEY) {
+    const { pkey } = await prompts([
       {
         type: 'password',
         name: 'pkey',
@@ -36,21 +36,21 @@ async function showMenu(): Promise<void> {
     ]);
     PKEY = pkey;
   }
-  if(!PKEY){
-    return ;
+  if (!PKEY) {
+    return;
   }
   const signer = new ethers.Wallet(PKEY, PROVIDER);
-  const {domain} = await prompts([
+  const { domain } = await prompts([
     {
       type: 'text',
       name: 'domain',
       message: `Enter domain you would like to manage?`
-    },
+    }
   ]);
   if (!domain) {
     return;
   }
-  const registry = new DWEBRegistry({network: 'rinkeby', provider: PROVIDER, signer})
+  const registry = new DWEBRegistry({ network: 'rinkeby', provider: PROVIDER, signer });
   const name = registry.name(domain);
   const ownerAddress = await name.getOwner();
   if (ownerAddress !== signer.address) {
@@ -62,9 +62,11 @@ async function showMenu(): Promise<void> {
   return showMenu();
 }
 
-showMenu().then(() => {
-  setTimeout(() => process.exit(0), 1000)
-}).catch((e) => {
-  console.log(e.stack)
-  setTimeout(() => process.exit(1), 1000)
-});
+showMenu()
+  .then(() => {
+    setTimeout(() => process.exit(0), 1000);
+  })
+  .catch((e) => {
+    console.log(e.stack);
+    setTimeout(() => process.exit(1), 1000);
+  });

@@ -33,6 +33,9 @@ export class DwebToolkit extends ApiGroup {
     return (await domain.exists()) ? domain : null;
   }
 
+  getDomainProvider(name: string) {
+    return getDomainProvider(name);
+  }
 }
 
 export default DwebToolkit;

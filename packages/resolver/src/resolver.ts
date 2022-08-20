@@ -1,8 +1,8 @@
-import {providers} from "ethers";
-import UDPResolver from "./lib/UDPResolver";
-import TCPResolver from "./lib/TCPResolver";
-import DOHResolver from "./lib/DOHResolver";
-import config from "./config";
+import { providers } from 'ethers';
+import UDPResolver from './lib/UDPResolver';
+import TCPResolver from './lib/TCPResolver';
+import DOHResolver from './lib/DOHResolver';
+import config from './config';
 
 const provider = new providers.JsonRpcProvider(config.jsonrpc_url, config.eth_network);
 
@@ -25,20 +25,14 @@ const dohServer = new DOHResolver({
   ipfsGateway: config.ipfs_gateway
 });
 
-udpServer
-  .listen(config.resolver_port, config.resolver_addr)
-  .then(()=>{
-    console.log(`UDP resolver listening on ${config.resolver_addr}:${config.resolver_port}`)
-  });
+udpServer.listen(config.resolver_port, config.resolver_addr).then(() => {
+  console.log(`UDP resolver listening on ${config.resolver_addr}:${config.resolver_port}`);
+});
 
-tcpServer
-  .listen(config.resolver_port, config.resolver_addr)
-  .then(()=>{
-    console.log(`TCP resolver listening on ${config.resolver_addr}:${config.resolver_port}`)
-  });
+tcpServer.listen(config.resolver_port, config.resolver_addr).then(() => {
+  console.log(`TCP resolver listening on ${config.resolver_addr}:${config.resolver_port}`);
+});
 
-dohServer
-  .listen(config.doh_port)
-  .then(()=>{
-    console.log(`DOH resolver listening on ${config.doh_port}`)
-  });
+dohServer.listen(config.doh_port).then(() => {
+  console.log(`DOH resolver listening on ${config.doh_port}`);
+});

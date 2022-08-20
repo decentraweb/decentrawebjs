@@ -1,11 +1,9 @@
 import { Buffer } from 'buffer';
-import { DNSRecord, EthNetwork, Record } from '@decentraweb/core';
+import { DNSRecord, EthNetwork } from '@decentraweb/core';
 import DwebToolkit from '@decentraweb/toolkit';
 import dgram from 'dgram';
 import * as dnsPacket from 'dns-packet';
 import { providers } from 'ethers';
-import * as fs from 'fs';
-import * as path from 'path';
 import * as punycode from 'punycode/';
 
 function getRandomReqId() {
@@ -15,31 +13,6 @@ function getRandomReqId() {
 const DNS_SERVER = '8.8.8.8';
 const PORT = 53;
 const MAX_RECURSION_DEPTH = 3;
-const ICANN_TLDS: Record<string, true> = fs
-  .readFileSync(path.join(__dirname, '../../icann_tlds.txt'), 'utf-8')
-  .split(/\s+/)
-  .reduce((tlds: Record<string, true>, item: string) => {
-    let tld = punycode.toUnicode(item.trim().toLowerCase());
-    if (tld) {
-      tlds[tld] = true;
-    }
-    return tlds;
-  }, {});
-
-function isReverseLookup(domain: string): boolean {
-  return domain.replace(/\.$/, '').endsWith('in-addr.arpa');
-}
-
-function getTLD(name: string): string {
-  return (
-    name
-      .trim()
-      .toLowerCase()
-      .split('.')
-      .filter((s) => !!s)
-      .pop() || ''
-  );
-}
 
 interface Logger {
   log(...mesages: string[]): void;
@@ -83,7 +56,7 @@ export type DomainProvider = 'dweb' | 'ens' | 'icann';
 
 class Resolver {
   protected options: ResolverConfig;
-  private toolkit: DwebToolkit;
+  protected toolkit: DwebToolkit;
 
   constructor(options: ResolverConfig) {
     this.options = options;
@@ -114,13 +87,6 @@ class Resolver {
     logger.log(question.type, domain);
 
     try {
-      const tld = getTLD(domain);
-      if (ICANN_TLDS[tld] && tld !== 'eth') {
-        const result = await this.requestICANN(data);
-        logger.log('Resolved with ICANN');
-        logger.flush();
-        return result;
-      }
       const answers = await this.resolve(domain, questionType, logger);
       const responseData = this.createResponse(request, answers);
       logger.log(JSON.stringify(answers));
@@ -152,7 +118,7 @@ class Resolver {
         ];
       }
     }
-    const provider = await this.getDomainProvider(domain);
+    const provider = await this.toolkit.getDomainProvider(domain);
     switch (provider) {
       case 'ens':
       case 'dweb':
@@ -160,18 +126,6 @@ class Resolver {
       case 'icann':
         return this.resolveICANN(domain, resourceType);
     }
-  }
-
-  async getDomainProvider(domain: string): Promise<DomainProvider> {
-    const tld = getTLD(domain);
-    if (tld === 'eth') {
-      return 'ens';
-    }
-    //TODO: Once we support hosting ICANN names on DWEB we will need to rewrite this
-    if (ICANN_TLDS[tld]) {
-      return 'icann';
-    }
-    return 'dweb';
   }
 
   async resolveICANN(domain: string, questionType: dnsPacket.RecordType): Promise<DNSRecord[]> {

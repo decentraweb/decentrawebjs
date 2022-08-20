@@ -15,6 +15,7 @@
     "skipLibCheck": true
   },
   "include": [
+    "./src/declarations/dns-packet.d.ts",
     "./src"
   ]
 }

@@ -1,50 +1,50 @@
-import {ethers, providers} from "ethers";
-import {hash as namehash} from "@ensdomains/eth-ens-namehash";
-import {formatsByName} from '@ensdomains/address-encoder'
-import {decode, encode} from "./utils/content";
-import {dnsWireNameHash} from "./utils/dns";
-import {Buffer} from "buffer";
-import {getContract} from "./contracts";
+import { ethers, providers } from 'ethers';
+import { hash as namehash } from '@ensdomains/eth-ens-namehash';
+import { formatsByName } from '@ensdomains/address-encoder';
+import { decode, encode } from './utils/content';
+import { dnsWireNameHash } from './utils/dns';
+import { Buffer } from 'buffer';
+import { getContract } from './contracts';
 
 const NO_DATA = '0x';
 
 type NameConfig = {
-  name: string
-  provider: providers.BaseProvider
-  registry: ethers.Contract
-  signer?: ethers.Signer
-}
+  name: string;
+  provider: providers.BaseProvider;
+  registry: ethers.Contract;
+  signer?: ethers.Signer;
+};
 
 export default class DWEBName {
-  readonly name: string
-  readonly namehash: string
-  private readonly provider: providers.BaseProvider
-  private readonly registryContract: ethers.Contract
+  readonly name: string;
+  readonly namehash: string;
+  private readonly provider: providers.BaseProvider;
+  private readonly registryContract: ethers.Contract;
   //private readonly ensWithSigner: ethers.Contract
-  private readonly signer?: ethers.Signer
+  private readonly signer?: ethers.Signer;
   private resolverAddress?: string;
 
   constructor(options: NameConfig) {
-    const {name, registry, provider, signer} = options
-    this.registryContract = registry
+    const { name, registry, provider, signer } = options;
+    this.registryContract = registry;
     //this.ensWithSigner = this.ens.connect(signer)
-    this.name = name
-    this.namehash = namehash(name)
-    this.provider = provider
-    this.signer = signer
+    this.name = name;
+    this.namehash = namehash(name);
+    this.provider = provider;
+    this.signer = signer;
   }
 
   async getOwner(): Promise<string> {
-    return this.registryContract['owner(bytes32)'](this.namehash)
+    return this.registryContract['owner(bytes32)'](this.namehash);
   }
 
   async hasResolver(): Promise<boolean> {
-    const resolverArrd = await this.getResolverAddr()
-    return !!resolverArrd
+    const resolverArrd = await this.getResolverAddr();
+    return !!resolverArrd;
   }
 
   async getTTL() {
-    return this.registryContract.ttl(this.namehash)
+    return this.registryContract.ttl(this.namehash);
   }
 
   /**
@@ -52,15 +52,15 @@ export default class DWEBName {
    * @param forceRefresh - if true will query blockchain for address even if we have it
    */
   async getResolverAddr(forceRefresh = false): Promise<string | null> {
-    if(this.resolverAddress && !forceRefresh){
+    if (this.resolverAddress && !forceRefresh) {
       return this.resolverAddress;
     }
-    const address = await this.registryContract.resolver(this.namehash)
-    if(parseInt(address, 16) === 0){
+    const address = await this.registryContract.resolver(this.namehash);
+    if (parseInt(address, 16) === 0) {
       return null;
     }
     this.resolverAddress = address;
-    return address
+    return address;
   }
 
   /**
@@ -69,24 +69,24 @@ export default class DWEBName {
    */
   async getResolver(writable = false): Promise<ethers.Contract | null> {
     const resolverAddr = await this.getResolverAddr();
-    if(!resolverAddr){
+    if (!resolverAddr) {
       return null;
     }
-    if(writable){
-      if(!this.signer){
-        throw new Error('Name is initialized in read-only mode. Provide signer to write data.')
+    if (writable) {
+      if (!this.signer) {
+        throw new Error('Name is initialized in read-only mode. Provide signer to write data.');
       }
       return getContract({
         address: resolverAddr,
-        name: "PublicResolver",
-        provider: this.signer,
-      })
+        name: 'PublicResolver',
+        provider: this.signer
+      });
     }
     return getContract({
       address: resolverAddr,
-      name: "PublicResolver",
-      provider: this.provider,
-    })
+      name: 'PublicResolver',
+      provider: this.provider
+    });
   }
 
   /**
@@ -95,23 +95,23 @@ export default class DWEBName {
    */
   async getAddress(coinId?: string): Promise<string | null> {
     const Resolver = await this.getResolver();
-    if (!Resolver) return null
+    if (!Resolver) return null;
     if (!coinId) {
-      return Resolver['addr(bytes32)'](this.namehash)
+      return Resolver['addr(bytes32)'](this.namehash);
     }
     try {
-      const {coinType, encoder} = formatsByName[coinId]
-      const addr = await Resolver['addr(bytes32,uint256)'](this.namehash, coinType)
+      const { coinType, encoder } = formatsByName[coinId];
+      const addr = await Resolver['addr(bytes32,uint256)'](this.namehash, coinType);
       if (addr === '0x') {
         return null;
       }
-      return encoder(Buffer.from(addr.slice(2), 'hex'))
+      return encoder(Buffer.from(addr.slice(2), 'hex'));
     } catch (e) {
-      console.log(e)
+      console.log(e);
       console.warn(
         'Error getting address of the resolver contract, are you sure the resolver address is a resolver contract?'
-      )
-      return null
+      );
+      return null;
     }
   }
 
@@ -124,7 +124,7 @@ export default class DWEBName {
       throw new Error('No address provided');
     }
     const Resolver = await this.getResolver(true);
-    if(!Resolver){
+    if (!Resolver) {
       throw new Error(`No resolver found for name ${this.name}`);
     }
     const { decoder, coinType } = formatsByName[coinId];
@@ -137,29 +137,28 @@ export default class DWEBName {
     return Resolver['setAddr(bytes32,uint256,bytes)'](this.namehash, coinType, addressAsBytes);
   }
 
-
   async getText(key: string): Promise<string> {
-    const Resolver = await this.getResolver()
+    const Resolver = await this.getResolver();
     if (!Resolver) {
-      return ''
+      return '';
     }
     try {
-      return Resolver.text(this.namehash, key)
+      return Resolver.text(this.namehash, key);
     } catch (e) {
       console.warn(
         'Error getting text record on the resolver contract, are you sure the resolver address is a resolver contract?'
-      )
-      return ''
+      );
+      return '';
     }
   }
 
   //TODO: This is not working properly currently. Looks like in go-ens it is broken too
   async hasDNS() {
-    const Resolver = await this.getResolver()
-    if(!Resolver){
-      return false
+    const Resolver = await this.getResolver();
+    if (!Resolver) {
+      return false;
     }
-    return Resolver.hasDNSRecords(this.namehash, dnsWireNameHash(this.namehash))
+    return Resolver.hasDNSRecords(this.namehash, dnsWireNameHash(this.namehash));
   }
 
   /**
@@ -167,11 +166,11 @@ export default class DWEBName {
    * @param data - DNS records encoded in binary format
    */
   async setDNS(data: Buffer): Promise<providers.TransactionResponse> {
-    const Resolver = await this.getResolver(true)
-    if(!Resolver){
-      throw new Error(`No resolver found for name ${this.name}`)
+    const Resolver = await this.getResolver(true);
+    if (!Resolver) {
+      throw new Error(`No resolver found for name ${this.name}`);
     }
-    return Resolver.setDNSRecords(this.namehash, data)
+    return Resolver.setDNSRecords(this.namehash, data);
   }
 
   /**
@@ -180,11 +179,11 @@ export default class DWEBName {
    */
   async getDNS(type: number): Promise<Buffer | null> {
     const Resolver = await this.getResolver();
-    if(!Resolver){
-      return null
+    if (!Resolver) {
+      return null;
     }
     const data = await Resolver.dnsRecord(this.namehash, dnsWireNameHash(this.name), type);
-    return Buffer.from(data.replace('0x', ''),'hex');
+    return Buffer.from(data.replace('0x', ''), 'hex');
   }
 
   /**
@@ -192,8 +191,8 @@ export default class DWEBName {
    */
   async clearDNS(): Promise<providers.TransactionResponse> {
     const Resolver = await this.getResolver(true);
-    if(!Resolver){
-      throw new Error(`No resolver found for name ${this.name}`)
+    if (!Resolver) {
+      throw new Error(`No resolver found for name ${this.name}`);
     }
     return Resolver.clearDNSZone(this.namehash);
   }
@@ -205,22 +204,22 @@ export default class DWEBName {
    *
    * @param contentUrl
    */
-  async setContenthash(contentUrl: string | null): Promise<providers.TransactionResponse>{
+  async setContenthash(contentUrl: string | null): Promise<providers.TransactionResponse> {
     const Resolver = await this.getResolver(true);
-    if(!Resolver){
-      throw new Error(`No resolver found for name ${this.name}`)
+    if (!Resolver) {
+      throw new Error(`No resolver found for name ${this.name}`);
     }
     const data = contentUrl ? encode(contentUrl) : Buffer.from('');
     return Resolver.setContenthash(this.namehash, data);
   }
 
-  async getContenthash(): Promise<string | null>{
+  async getContenthash(): Promise<string | null> {
     const Resolver = await this.getResolver();
-    if(!Resolver){
+    if (!Resolver) {
       return null;
     }
     const encoded = await Resolver.contenthash(this.namehash);
-    if(encoded === NO_DATA){
+    if (encoded === NO_DATA) {
       return null;
     }
     return decode(encoded);
