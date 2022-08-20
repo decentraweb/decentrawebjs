@@ -189,7 +189,8 @@ class Resolver {
       return [];
     }
     const url = new URL(content);
-    if (url.protocol !== 'ipfs:') {
+    const protocol = url.protocol.slice(0,-1)
+    if (protocol !== 'ipfs' && protocol !== 'ipns') {
       return [];
     }
     return [
@@ -197,7 +198,7 @@ class Resolver {
         name: domain,
         type: 'TXT',
         class: 'IN',
-        data: `dnslink=/ipfs/${url.hostname}`,
+        data: `dnslink=/${protocol}/${url.hostname}`,
         ttl: 3600
       }
     ];
