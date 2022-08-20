@@ -5,10 +5,18 @@ import { ToolkitConfig } from '../types';
 
 export class DWEBDomain extends BaseDomain {
   readonly provider = 'dweb';
+  readonly features = {
+    address: true,
+    contentHash: true,
+    dns: true,
+    txt: true
+  };
   private readonly dwebName: DWEBName;
+  private config: ToolkitConfig;
 
   constructor(name: string, config: ToolkitConfig) {
-    super(name, config);
+    super(name);
+    this.config = config;
     const dweb = new DWEBRegistry({ network: config.network, provider: config.provider });
     this.dwebName = dweb.name(name);
   }

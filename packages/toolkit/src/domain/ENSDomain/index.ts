@@ -6,6 +6,7 @@ import BaseDomain from '../BaseDomain';
 import { RecordSet } from '@decentraweb/core';
 import { RecordType } from '@decentraweb/core';
 import { dnsWireNameHash } from './utils';
+import { ToolkitConfig } from '../../types';
 
 export function getResolverContract(address: string, provider: providers.Provider) {
   return new ethers.Contract(address, publicResolverContract, provider);
@@ -13,7 +14,19 @@ export function getResolverContract(address: string, provider: providers.Provide
 
 export class ENSDomain extends BaseDomain {
   readonly provider = 'ens';
+  readonly features = {
+    address: true,
+    contentHash: true,
+    dns: true,
+    txt: true
+  };
   private resolver?: providers.Resolver | null;
+  private config: ToolkitConfig;
+
+  constructor(name: string, config: ToolkitConfig) {
+    super(name);
+    this.config = config;
+  }
 
   async getResolver() {
     if (typeof this.resolver === 'undefined') {

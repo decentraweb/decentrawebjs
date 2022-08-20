@@ -1,13 +1,25 @@
-import ApiGroup from './lib/ApiGroup';
+import { providers } from 'ethers';
 import { getDomainProvider } from './lib/getDomainProvider';
-import { DomainProvider } from './types';
+import { DomainProvider, ToolkitConfig } from './types';
+import { DWEBRegistry, EthNetwork } from '@decentraweb/core';
 
 interface ResolutionResult {
   provider: DomainProvider;
   name: string;
 }
 
-export class EthereumAddress extends ApiGroup {
+export class EthereumAddress {
+  readonly network: EthNetwork;
+  readonly provider: providers.BaseProvider;
+  protected dweb: DWEBRegistry;
+
+  constructor(options: ToolkitConfig) {
+    const { network, provider } = options;
+    this.provider = provider;
+    this.network = network;
+    this.dweb = new DWEBRegistry(options);
+  }
+
   /**
    * Find ethereum address by domain name
    * @param name

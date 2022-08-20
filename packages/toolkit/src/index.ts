@@ -1,19 +1,20 @@
-import ApiGroup from './lib/ApiGroup';
 import { EthereumAddress } from './EthereumAddress';
 import getDomainProvider from './lib/getDomainProvider';
 import DWEBDomain from './domain/DWEBDomain';
 import { ToolkitConfig } from './types';
 import ENSDomain from './domain/ENSDomain/index';
+import ICANNDomain from './domain/ICANNDomain';
 
 export * from './types/index';
 
 export { ENSDomain, DWEBDomain };
 
-export class DwebToolkit extends ApiGroup {
+export class DwebToolkit {
   readonly address: EthereumAddress;
+  readonly config: ToolkitConfig;
 
   constructor(config: ToolkitConfig) {
-    super(config);
+    this.config = config;
     this.address = new EthereumAddress(config);
   }
 
@@ -22,10 +23,19 @@ export class DwebToolkit extends ApiGroup {
     let domain;
     switch (provider) {
       case 'dweb':
-        domain = new DWEBDomain(name, { network: this.network, provider: this.provider });
+        domain = new DWEBDomain(name, {
+          network: this.config.network,
+          provider: this.config.provider
+        });
         break;
       case 'ens':
-        domain = new ENSDomain(name, { network: this.network, provider: this.provider });
+        domain = new ENSDomain(name, {
+          network: this.config.network,
+          provider: this.config.provider
+        });
+        break;
+      case 'icann':
+        domain = new ICANNDomain(name, this.config.dnsServer);
         break;
       default:
         return null;
