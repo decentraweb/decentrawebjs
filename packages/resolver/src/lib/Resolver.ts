@@ -189,7 +189,7 @@ class Resolver {
       return [];
     }
     const url = new URL(content);
-    const protocol = url.protocol.slice(0,-1)
+    const protocol = url.protocol.slice(0, -1);
     if (protocol !== 'ipfs' && protocol !== 'ipns') {
       return [];
     }
