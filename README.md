@@ -1,27 +1,25 @@
 # Decentraweb node DNS resolver and DNS management library
 
-This is a monorepo consisting of:
-
-- Decentraweb Core - Core SDK.
-- Decentraweb CLI - Command-line interface for interacting with Decentraweb smart contract
-- Decentraweb Resolver - Node.js Decentraweb Resolver
-
-Both the CLI and Resolver depend on Decentraweb Core, that is why this project is a monorepo. Detailed README of each project is in its own folder under packages/*.
+This monorepo is home for [Decentraweb](https://www.decentraweb.org/) JS libraries. It contains:
+- `@decentraweb/core` - core library to interact with Decentraweb contracts.
+- `@decentraweb/toolkit` - library to read data for DWEB, ENS and classic domains
+- `@decentraweb/cli` - Command-line tool for interacting with Decentraweb smart contract
+- `@decentraweb/resolver` - DNS resolver server that support domain name resolution for DWEB, ENS and classic domains
+- `@decentraweb/http-gateway` - HTTP gateway that is used by [dwebs.to](https://dwebs.to)
 
 ## Setup
 ```shell
 npm install
 npx lerna bootstrap
 ```
-Create `.env` file. If you only want to read data, you can leave `WALLET` and `PKEY` empty.
+### Run resolver
+Create `.env` file in `packages/resolver` from `.env.example`.
 
 To start resolver run:
 ```shell
 npm run resolver 
 ```
-In shell console run:
+To test resolver in shell console run:
 ```shell
-dig @127.0.0.1 -p 5333 sergiy.eth A
+dig @127.0.0.1 -p 5333 your_dweb_domain A
 ```
-
-Also you can find sample code to set some DNS data in `packages/decentraweb-resolver/src/playground.ts`. To run playground code use `npm run playground` 
