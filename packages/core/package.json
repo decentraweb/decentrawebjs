@@ -1,0 +1,29 @@
+{
+  "name": "@decentraweb/core",
+  "version": "1.0.0-alpha.3",
+  "description": "Decentraweb javascript library",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@ensdomains/address-encoder": "^0.2.18",
+    "@ensdomains/content-hash": "^2.5.7",
+    "@ensdomains/eth-ens-namehash": "^2.0.15",
+    "bs58": "^4.0.1",
+    "dns-packet": "^5.4.0"
+  },
+  "devDependencies": {
+    "@types/bs58": "^4.0.1",
+    "ethers": "^5.7.0",
+    "typescript": "^4.5.4"
+  },
+  "peerDependencies": {
+    "ethers": "^5.7.0"
+  }
+}

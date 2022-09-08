@@ -1,0 +1,36 @@
+{
+  "name": "@decentraweb/http-gateway",
+  "version": "1.0.0-alpha.3",
+  "description": "HTTP gateway service",
+  "author": "Serhii Lytvynenko <lytvynenkosv@gmail.com>",
+  "license": "ISC",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decentraweb/decentrawebjs.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "start": "node build/index.js",
+    "watch:ts": "tsc --watch",
+    "watch:js": "nodemon --watch build build/gateway.js"
+  },
+  "bugs": {
+    "url": "https://github.com/decentraweb/decentrawebjs/issues"
+  },
+  "dependencies": {
+    "@decentraweb/core": "^1.0.0-alpha.3",
+    "dotenv": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.3",
+    "ethers": "^5.7.0",
+    "nodemon": "^2.0.19",
+    "typescript": "^4.7.4"
+  },
+  "peerDependencies": {
+    "ethers": "^5.7.0"
+  }
+}
