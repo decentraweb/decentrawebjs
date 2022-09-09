@@ -31,6 +31,21 @@ Parameters:
 3. `signer` (optional) - [ethers Signer](https://docs.ethers.io/v5/api/signer/) instance. Only required if you need to write data to blockchain.
 4. `contracts` (optional) - used to override default Decentraweb contract addresses. Only needs to be used for development purposes.
 
+#### Browser bundle
+In most cases importing library using `npm` is preferred way, but for fast prototyping you can load it from our CND:
+```html
+<script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js" type="application/javascript"></script>
+<script src="https://cdn.decentraweb.org/decentraweb-core-1.0.1.min.js" type="application/javascript"></script>
+<script>
+  window.addEventListener('load', () => {
+    const {DWEBRegistry} = Decentraweb;
+    const dweb = new DWEBRegistry({network: 'rinkeby', provider: ethers.getDefaultProvider('rinkeby')});
+    const name = dweb.name('some_dweb_name');
+  })
+</script>
+```
+
+
 ### Writing data to blockchain
 As it was stated above, a valid signer instance must be provided to enable writing data to blockchain.
 

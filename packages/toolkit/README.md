@@ -30,6 +30,18 @@ const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
 const config: ToolkitConfig = {network: ETH_NETWORK, provider};
 const toolkit = new DwebToolkit(config);
 ```
+### Browser bundle
+In most cases importing library using `npm` is preferred way, but for fast prototyping you can load it from our CND:
+```html
+<script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js" type="application/javascript"></script>
+<script src="https://cdn.decentraweb.org/decentraweb-toolkit-1.0.1.min.js" type="application/javascript"></script>
+<script>
+  window.addEventListener('load', async () => {
+    const {DwebToolkit} = Decentraweb;
+    const toolkit = new DwebToolkit({network: 'rinkeby', provider: ethers.getDefaultProvider('rinkeby')});
+  })
+</script>
+```
 ## Resolve Ethereum address to name
 Ethereum address can be resolved through both Decentraweb and ENS contracts or through one specified system.
 ```typescript
