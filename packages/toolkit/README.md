@@ -18,14 +18,14 @@ List of ICANN domains can be found [here](https://data.iana.org/TLD/tlds-alpha-b
 
 ## Initialization
 Toolkit uses [ethers.js](https://docs.ethers.io/v5/) to call Ethereum contracts. It is required as peer dependency.
-To initialize Toolkit instance just pass Ethereum network name (`mainnet` and `rinkeby` supported at the moment) and valid 
+To initialize Toolkit instance just pass Ethereum network name (`mainnet` and `goerli` supported at the moment) and valid 
 `etherers.js` provider instance. 
 ```typescript
 import {providers, Wallet} from "ethers";
 import DwebToolkit, {ToolkitConfig} from "@decentraweb/toolkit";
 
-const ETH_NETWORK = 'rinkeby';
-const JSONRPC_URL = 'https://rinkeby.infura.io/v3/00000000000000000000000000000000';
+const ETH_NETWORK = 'goerli';
+const JSONRPC_URL = 'https://goerli.infura.io/v3/00000000000000000000000000000000';
 const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
 const config: ToolkitConfig = {network: ETH_NETWORK, provider};
 const toolkit = new DwebToolkit(config);
@@ -38,7 +38,7 @@ In most cases importing library using `npm` is preferred way, but for fast proto
 <script>
   window.addEventListener('load', async () => {
     const {DwebToolkit} = Decentraweb;
-    const toolkit = new DwebToolkit({network: 'rinkeby', provider: ethers.getDefaultProvider('rinkeby')});
+    const toolkit = new DwebToolkit({network: 'goerli', provider: ethers.getDefaultProvider('goerli')});
   })
 </script>
 ```

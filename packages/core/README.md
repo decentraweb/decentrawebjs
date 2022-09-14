@@ -10,7 +10,7 @@ This library is using [ethers.js](https://docs.ethers.io/v5/) to interact with E
 import {providers, Wallet} from "ethers";
 import {DWEBRegistry} from "@decentraweb/core";
 
-const ETH_NETWORK = 'rinkeby';
+const ETH_NETWORK = 'goerli';
 const JSONRPC_URL = '';
 const PRIVATE_KEY = '';
 
@@ -26,7 +26,7 @@ const contracts = {
 const dweb = new DWEBRegistry({network: ETH_NETWORK, provider, signer, contracts});
 ```
 Parameters:
-1. `network` (required) - Ethereum network name. Only `rinkeby` and `mainnet` supported currently.
+1. `network` (required) - Ethereum network name. Only `goerli` and `mainnet` supported currently.
 2. `provider` (required) - [ethers Provider](https://docs.ethers.io/v5/api/providers/provider/) instance to read blockchain data.
 3. `signer` (optional) - [ethers Signer](https://docs.ethers.io/v5/api/signer/) instance. Only required if you need to write data to blockchain.
 4. `contracts` (optional) - used to override default Decentraweb contract addresses. Only needs to be used for development purposes.
@@ -39,7 +39,7 @@ In most cases importing library using `npm` is preferred way, but for fast proto
 <script>
   window.addEventListener('load', () => {
     const {DWEBRegistry} = Decentraweb;
-    const dweb = new DWEBRegistry({network: 'rinkeby', provider: ethers.getDefaultProvider('rinkeby')});
+    const dweb = new DWEBRegistry({network: 'goerli', provider: ethers.getDefaultProvider('goerli')});
     const name = dweb.name('some_dweb_name');
   })
 </script>

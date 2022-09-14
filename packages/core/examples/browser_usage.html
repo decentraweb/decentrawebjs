@@ -13,7 +13,7 @@
 <script>
   window.addEventListener('load', async () => {
     const {DWEBRegistry, RecordSet} = Decentraweb;
-    const dweb = new DWEBRegistry({network: 'rinkeby', provider: ethers.getDefaultProvider('rinkeby')});
+    const dweb = new DWEBRegistry({network: 'goerli', provider: ethers.getDefaultProvider('goerli')});
     const name = dweb.name('serhii');
     console.log('ETH Adress', await name.getAddress('ETH'));
     console.log('BTC Adress', await name.getAddress('BTC'));

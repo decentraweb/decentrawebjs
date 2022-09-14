@@ -18,9 +18,9 @@ async function showMenu(): Promise<void> {
       }
     ]);
     if (projectId) {
-      PROVIDER = new ethers.providers.InfuraProvider('rinkeby', projectId);
+      PROVIDER = new ethers.providers.InfuraProvider('goerli', projectId);
     } else {
-      PROVIDER = ethers.getDefaultProvider('rinkeby');
+      PROVIDER = ethers.getDefaultProvider('goerli');
     }
     //Test that provider works
     await PROVIDER.getBlockNumber();
@@ -50,7 +50,7 @@ async function showMenu(): Promise<void> {
   if (!domain) {
     return;
   }
-  const registry = new DWEBRegistry({ network: 'rinkeby', provider: PROVIDER, signer });
+  const registry = new DWEBRegistry({ network: 'goerli', provider: PROVIDER, signer });
   const name = registry.name(domain);
   const ownerAddress = await name.getOwner();
   if (ownerAddress !== signer.address) {

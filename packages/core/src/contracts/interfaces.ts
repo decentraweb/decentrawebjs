@@ -1,6 +1,6 @@
 import { ethers, providers } from 'ethers';
 
-export type EthNetwork = 'mainnet' | 'rinkeby';
+export type EthNetwork = 'mainnet' | 'goerli';
 
 export type DwebContract =
   | 'DWEBRegistry'
