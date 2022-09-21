@@ -13,10 +13,10 @@ const CONTRACT_ADDRESSES: Record<EthNetwork, ContractConfig> = {
     ReverseRegistrar: '0x3D8f878584199e47a2d40A1E269042E10aa50754'
   },
   goerli: {
-    DWEBRegistry: '0x3ADcefb6835BD806bEaD4295aB696c9411e55FDE',
-    DefaultReverseResolver: '0x7082e7180AF92f4640557AfA17205E11a1BF3619',
-    PublicResolver: '0xFf2B6c01b3610c1eb2FFDf8648bF66d319B36180',
-    ReverseRegistrar: '0xC1C76435EC3b1d66A1B83dA50781138126AAfeed'
+    DWEBRegistry: '0x33564B7b69E385615Db1e26A0fF917F3B2992c87',
+    DefaultReverseResolver: '0xfF2e022F4D45ef8D4c7eA73f4dE2D63C8d437F2e',
+    PublicResolver: '0xfE3146317183cBdebDeE12c3584141Fb15a80668',
+    ReverseRegistrar: '0xA6E4607755F1cbF45E6f9e0840d3Be3075F3d729'
   }
 };
 
