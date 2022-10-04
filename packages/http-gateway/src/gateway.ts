@@ -7,9 +7,16 @@ const gateway = new HTTPGateway({
   baseDomain: config.gateway_domain,
   ipfsGatewayIp: config.ipfs_gateway,
   network: config.eth_network,
-  provider
+  provider,
+  certs: {
+    maintainerEmail: config.cert_maintainer_email,
+    storageDir: config.cert_storage_dir
+  }
 });
 
-gateway.listen(config.gateway_port).then(() => {
-  console.log(`Decentraweb gateway listening port ${config.gateway_port}`);
+gateway.listenHttp(config.gateway_port).then(() => {
+  console.log(`Decentraweb HTTP gateway listening port ${config.gateway_port}`);
+});
+gateway.listenHttp(config.gateway_secure_port).then(() => {
+  console.log(`Decentraweb HTTPS gateway listening port ${config.gateway_secure_port}`);
 });

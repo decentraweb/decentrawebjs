@@ -22,7 +22,9 @@
   },
   "dependencies": {
     "@decentraweb/core": "^1.2.0",
-    "dotenv": "^10.0.0"
+    "acme-http-01-webroot": "^3.0.0",
+    "dotenv": "^10.0.0",
+    "greenlock": "^4.0.4"
   },
   "devDependencies": {
     "@types/node": "^18.0.3",
