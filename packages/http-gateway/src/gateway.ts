@@ -17,6 +17,6 @@ const gateway = new HTTPGateway({
 gateway.listenHttp(config.gateway_port).then(() => {
   console.log(`Decentraweb HTTP gateway listening port ${config.gateway_port}`);
 });
-gateway.listenHttp(config.gateway_secure_port).then(() => {
+gateway.listenHttps(config.gateway_secure_port).then(() => {
   console.log(`Decentraweb HTTPS gateway listening port ${config.gateway_secure_port}`);
 });
