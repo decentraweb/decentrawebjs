@@ -13,7 +13,7 @@
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "start": "node build/index.js",
+    "start": "node build/gateway.js",
     "watch:ts": "tsc --watch",
     "watch:js": "nodemon --watch build build/gateway.js"
   },
