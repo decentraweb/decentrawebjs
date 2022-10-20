@@ -1,4 +1,4 @@
-import { providers } from 'ethers';
+import { providers, utils } from 'ethers';
 import { getDomainProvider } from './lib/getDomainProvider';
 import { DomainProvider, ToolkitConfig } from './types';
 import { DWEBRegistry, EthNetwork } from '@decentraweb/core';
@@ -28,7 +28,7 @@ export class EthereumAddress {
     const domainProvider = await getDomainProvider(name);
     switch (domainProvider) {
       case 'dweb': {
-        const dwebName = this.dweb.name('test');
+        const dwebName = this.dweb.name(name);
         return dwebName.getAddress('ETH');
       }
       case 'ens':
@@ -47,9 +47,10 @@ export class EthereumAddress {
     address: string,
     domainProvider?: DomainProvider
   ): Promise<ResolutionResult[] | string | null> {
+    const checksumAddress = utils.getAddress(address);
     const result: ResolutionResult[] = [];
     if (!domainProvider || domainProvider === 'dweb') {
-      const name = await this.dweb.getReverseRecord(address);
+      const name = await this.dweb.getReverseRecord(checksumAddress);
       if (name) {
         result.push({
           provider: 'dweb',
@@ -58,7 +59,7 @@ export class EthereumAddress {
       }
     }
     if (!domainProvider || domainProvider === 'ens') {
-      const name = await this.provider.lookupAddress(address);
+      const name = await this.provider.lookupAddress(checksumAddress);
       if (name) {
         result.push({
           provider: 'ens',
