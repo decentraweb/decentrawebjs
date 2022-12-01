@@ -1,4 +1,3 @@
-./certs
 .idea
 node_modules
 build
@@ -6,3 +5,4 @@ dist
 .env
 .npmrc
 playground.ts
+/certs/
