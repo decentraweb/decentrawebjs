@@ -1,3 +1,4 @@
+./certs
 .idea
 node_modules
 build
