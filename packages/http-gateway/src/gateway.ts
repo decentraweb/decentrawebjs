@@ -1,8 +1,27 @@
+import * as Sentry from '@sentry/node';
+import { addExtensionMethods } from '@sentry/tracing';
 import HTTPGateway from './index';
 import { providers } from 'ethers';
 import config from './config';
 
-const provider = new providers.JsonRpcProvider(config.jsonrpc_url, config.eth_network);
+if (config.senrty_dsn) {
+  Sentry.init({
+    environment: process.env.NODE_ENV,
+    dsn: config.senrty_dsn,
+    serverName: config.gateway_domain,
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for performance monitoring.
+    // We recommend adjusting this value in production
+    tracesSampleRate: 0.1,
+    integrations: [
+      // enable HTTP calls tracing
+      new Sentry.Integrations.Http({ tracing: true }),
+    ],
+  });
+  addExtensionMethods();
+}
+
+const provider = new providers.WebSocketProvider(config.websocket_url, config.eth_network);
 const gateway = new HTTPGateway({
   baseDomain: config.gateway_domain,
   ipfsGatewayIp: config.ipfs_gateway,

@@ -1,4 +1,7 @@
 import * as net from 'net';
+import Cache from "./Cache";
+
+const CACHE = new Cache<boolean>(10 * 60 * 1000);
 
 export default async function isPortReachable(host: string, port: number, timeout = 1000) {
   const promise = new Promise((resolve, reject) => {
@@ -28,5 +31,11 @@ export default async function isPortReachable(host: string, port: number, timeou
 }
 
 export async function supportsHTTPS(host: string) {
-  return isPortReachable(host, 443);
+  const cached = await CACHE.read(host);
+  if (typeof cached !== 'undefined') {
+    return cached;
+  }
+  const supportHTTPS = await isPortReachable(host, 443);
+  await CACHE.write(host, supportHTTPS);
+  return supportHTTPS;
 }

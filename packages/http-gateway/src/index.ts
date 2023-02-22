@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node';
 import { providers } from 'ethers';
 import Greenlock from 'greenlock';
 import path from 'path';
@@ -45,12 +46,21 @@ export class HTTPGateway {
     this.httpServer = http.createServer({});
     this.httpsServer = https.createServer({
       SNICallback: (name, cb) => {
+        const transaction = Sentry.startTransaction({
+          name: 'SNI Callback',
+          data: { domain: name }
+        });
         this.handleSNI(name)
-          .then((ctx) => cb(null, ctx))
+          .then((ctx) => {
+            cb(null, ctx);
+            transaction.setStatus('ok');
+          })
           .catch((e) => {
-            console.log('SNI ERR', e);
-            cb(e);
-          });
+            Sentry.captureException(e);
+            cb(null);
+            transaction.setStatus('unknown_error');
+          })
+          .then(() => transaction.finish());
       }
     });
     this.httpServer.on('request', this.handleRequest);
@@ -86,17 +96,22 @@ export class HTTPGateway {
   }
 
   handleSNI = async (name: string): Promise<SecureContext | undefined> => {
-    const dwebName = await this.getDwebName(name);
-    if (!dwebName) {
-      return;
-    }
     let site = await this.greenlock.get({ servername: name });
     if (!site) {
-      const result = await this.greenlock.add({
-        subject: name,
-        altnames: [name]
-      });
-      console.log('Add', result);
+      const transaction = Sentry.getCurrentHub().getScope()?.getTransaction();
+      const span = transaction?.startChild({ op: 'Issue certificate' });
+      try {
+        await this.greenlock.add({
+          subject: name,
+          altnames: [name]
+        });
+        span?.setStatus('ok');
+      } catch (err) {
+        span?.setStatus('unknown_error');
+        throw err;
+      } finally {
+        span?.finish();
+      }
       site = await this.greenlock.get({ servername: name });
     }
     return createSecureContext({
@@ -122,20 +137,44 @@ export class HTTPGateway {
     res.end();
   };
 
-  handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
+  handleRequest = (req: IncomingMessage, res: ServerResponse): void => {
+    const transaction = Sentry.startTransaction({
+      name: 'Proxied request'
+    });
+    Sentry.getCurrentHub().configureScope((scope) => scope.setSpan(transaction));
+    res.on('close', () => {
+      transaction.finish();
+    });
     const ctx = new Context(req, res);
+    this._handleRequest(ctx)
+      .then(() => {
+        transaction.setStatus('ok');
+      })
+      .catch((e) => {
+        console.error(e);
+        Sentry.captureException(e);
+        transaction?.setStatus('unknown_error');
+        this.showError(ctx);
+      });
+  };
+
+  _handleRequest = async (ctx: Context): Promise<void> => {
+    const transaction = Sentry.getCurrentHub().getScope()?.getTransaction();
+    const isAcmeChallenge = ctx.req.url?.startsWith('/.well-known/acme-challenge/');
+    if (isAcmeChallenge) {
+      transaction?.setName('ACME Challenge');
+      transaction?.setData('domain', ctx.hostname);
+      return this.handleAcmeChallenge(ctx);
+    }
     const name = await this.getDwebName(ctx.hostname);
     if (!name) {
       return this.notFound(ctx);
-    }
-    if (req.url?.startsWith('/.well-known/acme-challenge/')) {
-      return this.handleAcmeChallenge(ctx);
     }
     const dnsData = await resolveDNS(name, { ipfsGatewayIp: this.ipfsGatewayIp });
     if (dnsData) {
       return this.proxyHTTP(ctx, dnsData);
     }
-    return this.notFound(ctx);
+    return this.noContent(ctx);
   };
 
   async getDwebName(domain: string): Promise<DWEBName | null> {
@@ -150,6 +189,18 @@ export class HTTPGateway {
   notFound(ctx: Context) {
     ctx.res.statusCode = 404;
     ctx.res.write('Not found');
+    ctx.res.end();
+  }
+
+  noContent(ctx: Context) {
+    ctx.res.statusCode = 404;
+    ctx.res.write('No content');
+    ctx.res.end();
+  }
+
+  showError(ctx: Context) {
+    ctx.res.statusCode = 500;
+    ctx.res.write('Unexpected error');
     ctx.res.end();
   }
 
