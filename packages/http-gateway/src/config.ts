@@ -9,7 +9,7 @@ const config = {
   gateway_domain: process.env.GATEWAY_DOMAIN || 'dwebs.to',
   eth_network: process.env.ETH_NETWORK as EthNetwork,
   websocket_url: process.env.WEBSOCKET_URL as string,
-  senrty_dsn: null,//process.env.SENTRY_DSN as string || '',
+  sentry_dsn: process.env.SENTRY_DSN as string || '',
   ipfs_gateway: process.env.IPFS_GATEWAY as string,
   cert_maintainer_email: process.env.CERT_MAINTAINER_EMAIL as string,
   cert_storage_dir: process.env.CERT_STORAGE_DIR as string

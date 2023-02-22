@@ -4,10 +4,10 @@ import HTTPGateway from './index';
 import { providers } from 'ethers';
 import config from './config';
 
-if (config.senrty_dsn) {
+if (config.sentry_dsn) {
   Sentry.init({
     environment: process.env.NODE_ENV,
-    dsn: config.senrty_dsn,
+    dsn: config.sentry_dsn,
     serverName: config.gateway_domain,
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
