@@ -29,7 +29,8 @@ export default class DWEBRegistry {
     this.contract = getContract({
       address: this.contractConfig.DWEBRegistry,
       name: 'DWEBRegistry',
-      provider: provider
+      provider: provider,
+      network: this.network
     });
   }
 
@@ -42,7 +43,8 @@ export default class DWEBRegistry {
     return getContract({
       address: this.contractConfig.DWEBRegistry,
       name: 'DWEBRegistry',
-      provider: this.signer
+      provider: this.signer,
+      network: this.network
     });
   }
 
@@ -55,6 +57,7 @@ export default class DWEBRegistry {
       name,
       registry: this.contract,
       provider: this.provider,
+      network: this.network,
       signer: this.signer
     });
   }
@@ -81,7 +84,8 @@ export default class DWEBRegistry {
     const resolver = getContract({
       address: resolverAddr,
       name: 'DefaultReverseResolver',
-      provider: this.provider
+      provider: this.provider,
+      network: this.network
     });
     const domain = await resolver.name(reverseHash);
     if (!domain || !isValidDomain(domain)) {
@@ -106,7 +110,8 @@ export default class DWEBRegistry {
     const reverseRegistrar = getContract({
       address: this.contractConfig.ReverseRegistrar,
       name: 'ReverseRegistrar',
-      provider: this.signer
+      provider: this.signer,
+      network: this.network
     });
     return reverseRegistrar.setName(name);
   }

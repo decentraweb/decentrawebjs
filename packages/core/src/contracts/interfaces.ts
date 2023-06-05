@@ -1,6 +1,6 @@
 import { ethers, providers } from 'ethers';
 
-export type EthNetwork = 'mainnet' | 'goerli';
+export type EthNetwork = 'mainnet' | 'goerli' | 'polygon' | 'mumbai';
 
 export type DwebContract =
   | 'DWEBRegistry'
@@ -14,4 +14,5 @@ export type ContractOptions = {
   address: string;
   name: DwebContract;
   provider: ethers.Signer | providers.Provider;
+  network: EthNetwork;
 };
