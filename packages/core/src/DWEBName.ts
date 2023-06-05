@@ -10,28 +10,27 @@ const NO_DATA = '0x';
 
 type NameConfig = {
   name: string;
-  provider: providers.BaseProvider;
+  provider: ethers.Signer | providers.BaseProvider;
   registry: ethers.Contract;
-  signer?: ethers.Signer;
 };
 
 export default class DWEBName {
   readonly name: string;
   readonly namehash: string;
-  private readonly provider: providers.BaseProvider;
+  private readonly provider: ethers.Signer | providers.BaseProvider;
   private readonly registryContract: ethers.Contract;
-  //private readonly ensWithSigner: ethers.Contract
-  private readonly signer?: ethers.Signer;
   private resolverAddress?: string;
 
+  get readonly(): boolean {
+    return !(this.provider instanceof ethers.Signer);
+  }
+
   constructor(options: NameConfig) {
-    const { name, registry, provider, signer } = options;
+    const { name, registry, provider } = options;
     this.registryContract = registry;
-    //this.ensWithSigner = this.ens.connect(signer)
     this.name = name;
     this.namehash = namehash(name);
     this.provider = provider;
-    this.signer = signer;
   }
 
   async getOwner(): Promise<string> {
@@ -72,15 +71,8 @@ export default class DWEBName {
     if (!resolverAddr) {
       return null;
     }
-    if (writable) {
-      if (!this.signer) {
-        throw new Error('Name is initialized in read-only mode. Provide signer to write data.');
-      }
-      return getContract({
-        address: resolverAddr,
-        name: 'PublicResolver',
-        provider: this.signer
-      });
+    if (writable && this.readonly) {
+      throw new Error('Name is initialized in read-only mode. Provide signer to write data.');
     }
     return getContract({
       address: resolverAddr,
@@ -127,7 +119,7 @@ export default class DWEBName {
     let addressAsBytes;
     if (!address) {
       //Special handling for ETH
-      if(coinType === 60){
+      if (coinType === 60) {
         addressAsBytes = decoder('0x0000000000000000000000000000000000000000');
       } else {
         addressAsBytes = Buffer.alloc(0);

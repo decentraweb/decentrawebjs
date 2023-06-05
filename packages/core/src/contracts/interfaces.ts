@@ -3,10 +3,12 @@ import { ethers, providers } from 'ethers';
 export type EthNetwork = 'mainnet' | 'goerli';
 
 export type DwebContract =
+  | 'DecentraWebToken'
   | 'DWEBRegistry'
   | 'DefaultReverseResolver'
   | 'PublicResolver'
-  | 'ReverseRegistrar';
+  | 'ReverseRegistrar'
+  | 'RootRegistrarController';
 
 export type ContractConfig = Record<DwebContract, string>;
 

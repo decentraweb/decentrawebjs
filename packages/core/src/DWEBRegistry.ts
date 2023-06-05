@@ -1,49 +1,15 @@
-import { ethers, providers } from 'ethers';
+import { providers } from 'ethers';
 import { hash as namehash } from '@ensdomains/eth-ens-namehash';
 import DWEBName from './DWEBName';
 import { DEFAULT_TTL } from './utils/contracts';
-import { getContractConfig, getContract } from './contracts';
-import { ContractConfig, EthNetwork } from './contracts/interfaces';
+import { getContract } from './contracts';
 import { isValidDomain } from './utils/dns';
+import { DwebConfig } from './types/common';
+import DwebContractWrapper, { requiresSigner } from './DwebContractWrapper';
 
-export type RegistryConfig = {
-  network: EthNetwork;
-  provider: providers.BaseProvider;
-  signer?: ethers.Signer;
-  contracts?: ContractConfig;
-};
-
-export default class DWEBRegistry {
-  network: EthNetwork;
-  provider: providers.BaseProvider;
-  private readonly contract: ethers.Contract;
-  readonly contractConfig: ContractConfig;
-  signer?: ethers.Signer;
-
-  constructor(options: RegistryConfig) {
-    const { network, provider, signer } = options;
-    this.provider = provider;
-    this.signer = signer;
-    this.network = network;
-    this.contractConfig = options.contracts || getContractConfig(network);
-    this.contract = getContract({
-      address: this.contractConfig.DWEBRegistry,
-      name: 'DWEBRegistry',
-      provider: provider
-    });
-  }
-
-  private getWritableContract() {
-    if (!this.signer) {
-      throw new Error(
-        'DWEBRegistry is initialized in read-only mode. Provide signer to write data.'
-      );
-    }
-    return getContract({
-      address: this.contractConfig.DWEBRegistry,
-      name: 'DWEBRegistry',
-      provider: this.signer
-    });
+export default class DWEBRegistry extends DwebContractWrapper {
+  constructor(options: DwebConfig) {
+    super(options, 'DWEBRegistry');
   }
 
   /**
@@ -54,21 +20,20 @@ export default class DWEBRegistry {
     return new DWEBName({
       name,
       registry: this.contract,
-      provider: this.provider,
-      signer: this.signer
+      provider: this.provider
     });
   }
 
+  @requiresSigner
   async assignDefaultResolver(name: string): Promise<providers.TransactionResponse> {
-    const contract = this.getWritableContract();
     const hash = namehash(name);
-    return contract.setResolverAndTTL(hash, this.contractConfig.PublicResolver, DEFAULT_TTL);
+    return this.contract.setResolverAndTTL(hash, this.contractConfig.PublicResolver, DEFAULT_TTL);
   }
 
+  @requiresSigner
   async setResolver(name: string, address: string): Promise<providers.TransactionResponse> {
-    const contract = this.getWritableContract();
     const hash = namehash(name);
-    return contract.setResolver(hash, address);
+    return this.contract.setResolver(hash, address);
   }
 
   async getReverseRecord(address: string, skipForwardCheck = false): Promise<string | null> {
@@ -97,16 +62,12 @@ export default class DWEBRegistry {
     return domain;
   }
 
+  @requiresSigner
   async setReverseRecord(name: string) {
-    if (!this.signer) {
-      throw new Error(
-        'DWEBRegistry is initialized in read-only mode. Provide signer to write data.'
-      );
-    }
     const reverseRegistrar = getContract({
       address: this.contractConfig.ReverseRegistrar,
       name: 'ReverseRegistrar',
-      provider: this.signer
+      provider: this.provider
     });
     return reverseRegistrar.setName(name);
   }
