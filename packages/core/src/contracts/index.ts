@@ -1,13 +1,13 @@
 import { ContractInterface, ethers } from 'ethers';
 import { ContractConfig, ContractOptions, DwebContract, EthNetwork } from './interfaces';
-import DWEBRegistry from './abi/DWEBRegistry.json';
-import DefaultReverseResolver from './abi/DefaultReverseResolver.json';
-import PublicResolver from './abi/PublicResolver.json';
-import ReverseRegistrar from './abi/ReverseRegistrar.json';
-import DWEBRegistry_polygon from './abi/DWEBRegistry_polygon.json';
-import DefaultReverseResolver_polygon from './abi/DefaultReverseResolver_polygon.json';
-import PublicResolver_polygon from './abi/PublicResolver_polygon.json';
-import ReverseRegistrar_polygon from './abi/ReverseRegistrar_polygon.json';
+import DWEBRegistry from './abi/ethereum/DWEBRegistry.json';
+import DefaultReverseResolver from './abi/ethereum/DefaultReverseResolver.json';
+import PublicResolver from './abi/ethereum/PublicResolver.json';
+import ReverseRegistrar from './abi/ethereum/ReverseRegistrar.json';
+import DWEBRegistry_polygon from './abi/polygon/DWEBRegistry.json';
+import DefaultReverseResolver_polygon from './abi/polygon/DefaultReverseResolver.json';
+import PublicResolver_polygon from './abi/polygon/PublicResolver.json';
+import ReverseRegistrar_polygon from './abi/polygon/ReverseRegistrar.json';
 
 const CONTRACT_ADDRESSES: Record<EthNetwork, ContractConfig> = {
   mainnet: {
