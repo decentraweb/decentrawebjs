@@ -2,7 +2,7 @@
   "name": "@decentraweb/resolver",
   "version": "2.0.0-alpha.0",
   "engines": {
-    "node": ">=14"
+    "node": ">=16.0.0"
   },
   "description": "DNS resolver for Decentraweb",
   "main": "build/index.js",
@@ -20,17 +20,17 @@
   "dependencies": {
     "@decentraweb/core": "^2.0.0-alpha.0",
     "@decentraweb/toolkit": "^2.0.0-alpha.0",
-    "bs58": "^4.0.1",
-    "dns-packet": "^5.3.1",
-    "dotenv": "^10.0.0",
-    "ethers": "^5.7.0",
-    "punycode": "^2.1.1"
+    "bs58": "^5.0.0",
+    "dns-packet": "^5.6.0",
+    "dotenv": "^16.0.3",
+    "ethers": "^5.7.2",
+    "punycode": "^2.3.0"
   },
   "devDependencies": {
     "@types/dns-packet": "^5.2.4",
-    "@types/node": "^14.14.31",
+    "@types/node": "^16.18.31",
     "@types/punycode": "^2.1.0",
-    "nodemon": "^2.0.15",
-    "typescript": "^4.5.4"
+    "nodemon": "^2.0.22",
+    "typescript": "^5.0.4"
   }
 }

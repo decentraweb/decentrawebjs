@@ -6,8 +6,9 @@
   "main": "packages/resolver/src/index.js",
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "resolver": "npm run start --workspace=resolver",
-    "manage": "npm run start --workspace=cli"
+    "gateway": "npm run start --workspace=@decentraweb/http-gateway",
+    "resolver": "npm run start --workspace=@decentraweb/resolver",
+    "manage": "npm run start --workspace=@decentraweb/cli"
   },
   "workspaces": [
     "./packages/*"
@@ -16,9 +17,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "14.14.31",
-    "lerna": "^6.4.1",
-    "prettier": "2.7.1",
-    "typescript": "^4.5.2"
+    "@types/node": "^16.18.31",
+    "lerna": "^6.6.2",
+    "prettier": "^2.8.8",
+    "typescript": "^5.0.4"
   }
 }
