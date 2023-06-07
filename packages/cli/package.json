@@ -1,6 +1,6 @@
 {
   "name": "@decentraweb/cli",
-  "version": "1.2.1",
+  "version": "2.0.0-alpha.0",
   "description": "Decentraweb javascript library",
   "bin": {
     "decentraweb": "build/index.js"
@@ -16,7 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@decentraweb/core": "^1.2.1",
+    "@decentraweb/core": "^2.0.0-alpha.0",
     "chalk": "^4.1.2",
     "ethers": "^5.7.0",
     "prompts": "^2.4.2"
