@@ -20,7 +20,8 @@ export default class DWEBRegistry extends DwebContractWrapper {
     return new DWEBName({
       name,
       registry: this.contract,
-      provider: this.provider
+      provider: this.provider,
+      signer: this.signer
     });
   }
 
