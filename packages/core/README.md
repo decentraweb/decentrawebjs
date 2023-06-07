@@ -1,5 +1,9 @@
 # Decentraweb Core library
 
+### Version 2 is in early development stage. **Please use [V1](https://www.npmjs.com/package/@decentraweb/core/v/1.2.1) for now.**
+
+---
+
 This is a library for interacting with the Decentraweb smart contracts. It contains tools for resolving DNS, getting/setting records, and more. It contains Decentraweb's latest ABIs and can be used directly or embedded in other projects such as the Decentraweb Resolver and CLI.
 
 This library is using [ethers.js](https://docs.ethers.io/v5/) to interact with Ethereum blockchain. `ethers.js` is included as peer dependency, so don't forget to add it to your `package.json`

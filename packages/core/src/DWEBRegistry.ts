@@ -8,8 +8,39 @@ import { DwebConfig } from './types/common';
 import DwebContractWrapper, { requiresSigner } from './DwebContractWrapper';
 
 export default class DWEBRegistry extends DwebContractWrapper {
-  constructor(options: DwebConfig) {
+  network: EthNetwork;
+  provider: providers.BaseProvider;
+  private readonly contract: ethers.Contract;
+  readonly contractConfig: ContractConfig;
+  signer?: ethers.Signer;
+
+  constructor(options: RegistryConfig) {
     super(options, 'DWEBRegistry');
+    const { network, provider, signer } = options;
+    this.provider = provider;
+    this.signer = signer;
+    this.network = network;
+    this.contractConfig = options.contracts || getContractConfig(network);
+    this.contract = getContract({
+      address: this.contractConfig.DWEBRegistry,
+      name: 'DWEBRegistry',
+      provider: provider,
+      network: this.network
+    });
+  }
+
+  private getWritableContract() {
+    if (!this.signer) {
+      throw new Error(
+        'DWEBRegistry is initialized in read-only mode. Provide signer to write data.'
+      );
+    }
+    return getContract({
+      address: this.contractConfig.DWEBRegistry,
+      name: 'DWEBRegistry',
+      provider: this.signer,
+      network: this.network
+    });
   }
 
   /**
@@ -21,6 +52,7 @@ export default class DWEBRegistry extends DwebContractWrapper {
       name,
       registry: this.contract,
       provider: this.provider,
+      network: this.network,
       signer: this.signer
     });
   }
@@ -47,7 +79,8 @@ export default class DWEBRegistry extends DwebContractWrapper {
     const resolver = getContract({
       address: resolverAddr,
       name: 'DefaultReverseResolver',
-      provider: this.provider
+      provider: this.provider,
+      network: this.network
     });
     const domain = await resolver.name(reverseHash);
     if (!domain || !isValidDomain(domain)) {
@@ -68,7 +101,8 @@ export default class DWEBRegistry extends DwebContractWrapper {
     const reverseRegistrar = getContract({
       address: this.contractConfig.ReverseRegistrar,
       name: 'ReverseRegistrar',
-      provider: this.provider
+      provider: this.signer,
+      network: this.network
     });
     return reverseRegistrar.setName(name);
   }

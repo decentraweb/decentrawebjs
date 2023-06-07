@@ -2,7 +2,9 @@
 node_modules
 build
 dist
+*.env
 .env
 .npmrc
+.greenlockrc
 playground.ts
 /certs/

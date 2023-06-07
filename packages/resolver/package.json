@@ -1,6 +1,6 @@
 {
   "name": "@decentraweb/resolver",
-  "version": "1.2.3",
+  "version": "2.0.0-alpha.1",
   "engines": {
     "node": ">=16.0.0"
   },
@@ -18,8 +18,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@decentraweb/core": "^1.2.1",
-    "@decentraweb/toolkit": "^1.2.3",
+    "@decentraweb/core": "^2.0.0-alpha.1",
+    "@decentraweb/toolkit": "^2.0.0-alpha.1",
     "bs58": "^5.0.0",
     "dns-packet": "^5.6.0",
     "dotenv": "^16.0.3",
