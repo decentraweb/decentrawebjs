@@ -4,7 +4,7 @@ import DwebContractWrapper, { requiresSigner } from '../DwebContractWrapper';
 import { normalize } from '@ensdomains/eth-ens-namehash';
 import DecentrawebAPI from '../utils/DecentrawebAPI';
 import { increaseByPercent } from '../utils/misc';
-import { getContract, getContractConfig } from '../contracts';
+import { getContract } from '../contracts';
 import {
   ApprovedRegistration,
   BalanceVerificationResult,
@@ -47,11 +47,11 @@ export class DWEBRegistrar extends DwebContractWrapper {
   constructor(options: DwebConfig) {
     super(options, 'RootRegistrarController');
     this.api = new DecentrawebAPI(this.network);
-    const contractConfig = getContractConfig(this.network);
     this.tokenContract = getContract({
-      address: contractConfig.DecentraWebToken,
+      address: this.contractConfig.DecentraWebToken,
       name: 'DecentraWebToken',
-      provider: this.provider
+      provider: this.provider,
+      network: this.network
     });
   }
 
@@ -233,8 +233,7 @@ export class DWEBRegistrar extends DwebContractWrapper {
    * @returns DWEB token amount in wei
    */
   async getDwebAllowance(account?: string): Promise<BigNumber> {
-    const contractConfig = getContractConfig(this.network);
-    return this.tokenContract.allowance(account, contractConfig.RootRegistrarController);
+    return this.tokenContract.allowance(account, this.contractConfig.RootRegistrarController);
   }
 
   /**
@@ -243,8 +242,7 @@ export class DWEBRegistrar extends DwebContractWrapper {
    */
   @requiresSigner
   async approveDwebUsageAmount(amount: BigNumber): Promise<providers.TransactionReceipt> {
-    const contractConfig = getContractConfig(this.network);
-    return this.tokenContract.approve(contractConfig.RootRegistrarController, amount, {
+    return this.tokenContract.approve(this.contractConfig.RootRegistrarController, amount, {
       value: '0x00'
     });
   }

@@ -35,7 +35,8 @@ abstract class DwebContractWrapper {
     this.contract = getContract({
       address: this.contractConfig[contractName],
       name: contractName,
-      provider: signer || provider
+      provider: signer || provider,
+      network: this.network
     });
   }
 }

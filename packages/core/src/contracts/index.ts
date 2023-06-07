@@ -30,16 +30,20 @@ const CONTRACT_ADDRESSES: Record<EthNetwork, ContractConfig> = {
     RootRegistrarController: '0x94281bc70d6D62cc1DEb81A44b62cc7Fa22B10be'
   },
   polygon: {
+    DecentraWebToken: '',
     DWEBRegistry: '',
     DefaultReverseResolver: '',
     PublicResolver: '',
-    ReverseRegistrar: ''
+    ReverseRegistrar: '',
+    RootRegistrarController: ''
   },
   mumbai: {
+    DecentraWebToken: '',
     DWEBRegistry: '0x7aB6409511bb3b530d18705f401588Ac5CD76E96',
     DefaultReverseResolver: '0x55122e57540624f993E58DaB17d4c78252825841',
     PublicResolver: '0x096b7e364A6BDA0EF747a4d08ffe6534818EbB94',
-    ReverseRegistrar: '0x3147754Fe7eBC052a46FD73683e338467B0C4160'
+    ReverseRegistrar: '0x3147754Fe7eBC052a46FD73683e338467B0C4160',
+    RootRegistrarController: ''
   }
 };
 
@@ -53,10 +57,12 @@ const ABI: Record<DwebContract, ContractInterface> = {
 };
 
 const POLYGON_ABI: Record<DwebContract, ContractInterface> = {
+  DecentraWebToken: '',
   DWEBRegistry: DWEBRegistry_polygon,
   DefaultReverseResolver: DefaultReverseResolver_polygon,
   PublicResolver: PublicResolver_polygon,
-  ReverseRegistrar: ReverseRegistrar_polygon
+  ReverseRegistrar: ReverseRegistrar_polygon,
+  RootRegistrarController: ''
 };
 
 export function getContractConfig(network: EthNetwork): ContractConfig {
