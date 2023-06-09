@@ -1,11 +1,11 @@
 import DWEBName from './DWEBName';
 import DWEBRegistry from './DWEBRegistry';
-import * as registration from './DWEBRegistrar';
+import * as registration from './EthereumTLDRegistrar';
 import { DNSRecord, Record, RecordSet, RecordType, RecordClass } from './RecordSet';
 import { EthNetwork } from './contracts/interfaces';
 import * as contentHash from './utils/content';
 
-export const DWEBRegistrar = registration.DWEBRegistrar;
+export const EthereumTLDRegistrar = registration.EthereumTLDRegistrar;
 
 
 export {

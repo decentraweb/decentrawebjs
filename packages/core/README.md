@@ -8,7 +8,96 @@ This is a library for interacting with the Decentraweb smart contracts. It conta
 
 This library is using [ethers.js](https://docs.ethers.io/v5/) to interact with Ethereum blockchain. `ethers.js` is included as peer dependency, so don't forget to add it to your `package.json`
 
-## Usage
+## Registering domain name
+Domain name can be registered on Ethereum or Polygon networks. After registration, domain name will be available for
+resolution on network where it was registered. Later owner can move domain name between networks.
+
+### Registration fees
+Registration fee can be paid either in ETH or DWEB tokens. If you want to pay in DWEB tokens, you need to allow
+`RootRegistrarController` contract to spend tokens from your account. You can either approve amount enough to pay for
+specific registration or approve unlimited amount.
+#### Ethereum network
+```typescript
+import {ethers, providers, Wallet} from "ethers";
+import {registration} from "@decentraweb/core";
+
+const ETH_NETWORK = 'mainnet';
+const JSONRPC_URL = 'https://mainnet.infura.io/v3/00000000000000000000000000000000';
+const PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000000';
+
+const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
+const signer = new Wallet(PRIVATE_KEY, provider);
+const registrar = new registration.EthereumTLDRegistrar({network: ETH_NETWORK, provider, signer});
+
+//Approve usage of unlimited amount of DWEB tokens
+registrar.approveDwebUsage().then((receipt)=>{
+  // receipt is instance of ethers.js TransactionReceipt class
+  // https://docs.ethers.org/v5/api/providers/types/#providers-TransactionReceipt
+  console.log(receipt);
+});
+
+//Approve usage for upt to 50 DWEB tokens
+registrar.approveDwebUsageAmount(ethers.utils.parseEther('50')).then((receipt)=>{
+  // receipt is instance of ethers.js TransactionReceipt class
+  // https://docs.ethers.org/v5/api/providers/types/#providers-TransactionReceipt
+  console.log(receipt);
+});
+```
+#### Polygon network
+**WIP**
+
+### Registering TLD on Ehthereum
+Registration of TLD on Ethereum consists of three steps:
+1. Getting approval from Decentraweb API
+2. Submitting commitment to register domain name
+3. Wait for 1 minute and submit registration transaction
+
+Since process includes multiple steps it is recommended to save result of each step, to be able to resume registration
+if it fails on some step (ie because of insufficient balance).
+```typescript
+import {ethers, providers, Wallet} from "ethers";
+import {registration} from "@decentraweb/core";
+
+const ETH_NETWORK = 'mainnet';
+const JSONRPC_URL = 'https://mainnet.infura.io/v3/00000000000000000000000000000000';
+const PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000000';
+
+const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
+const signer = new Wallet(PRIVATE_KEY, provider);
+const registrar = new registration.EthereumTLDRegistrar({network: ETH_NETWORK, provider, signer});
+
+async function wait(seconds: number) {
+  await new Promise(resolve => setTimeout(resolve, seconds * 1000));
+}
+
+async function registerDomains(){
+  const approvedRequest = await registrar.requestApproval([
+    {name: 'foo', duration: registration.DURATION.ONE_YEAR},
+    {name: 'bar', duration: registration.DURATION.ONE_YEAR},
+    {name: '🙂🙂🙂', duration: registration.DURATION.ONE_YEAR}
+  ]);
+  const commitedRequest = await registrar.sendCommitment(approvedRequest);
+  //Wait for 1 minute before registering domain name
+  await wait(60);
+  //If paying registration fee in ETH 
+  const receipt = await registrar.register(commitedRequest);
+  // If paying registration fee in DWEB tokens
+  //const receipt = await registrar.register(commitedRequest, true);
+  return receipt;  
+}
+
+registerDomains().then((receipt)=>{
+  // receipt is instance of ethers.js TransactionReceipt class
+  // https://docs.ethers.org/v5/api/providers/types/#providers-TransactionReceipt
+  console.log(receipt);
+});
+```
+
+
+
+ 
+
+## Reading and writing domain records
 ### Initialization
 ```typescript
 import {providers, Wallet} from "ethers";
