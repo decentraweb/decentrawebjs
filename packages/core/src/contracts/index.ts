@@ -31,10 +31,10 @@ const CONTRACT_ADDRESSES: Record<EthNetwork, ContractConfig> = {
   },
   polygon: {
     DecentraWebToken: '',
-    DWEBRegistry: '',
-    DefaultReverseResolver: '',
-    PublicResolver: '',
-    ReverseRegistrar: '',
+    DWEBRegistry: '0x9f3eadf2360Dc4432a003699398169A2c7C10211',
+    DefaultReverseResolver: '0xeEc93022ec031d6AD2E35AA36edFE80d73F8808a',
+    PublicResolver: '0xEF2a00dc4ecA8174Bcf59dd8e124ba8f99307FF8',
+    ReverseRegistrar: '0x662b0b6253e44F56DF387aCabd86A69D1e2A8cA9',
     RootRegistrarController: ''
   },
   mumbai: {
