@@ -1,18 +1,20 @@
 import { ContractInterface, ethers } from 'ethers';
 import { ContractConfig, ContractOptions, DwebContract, EthNetwork } from './interfaces';
+//Ethereum ABI
 import DecentraWebToken from './abi/DecentraWebToken.json';
 import DWEBRegistry from './abi/ethereum/DWEBRegistry.json';
 import DefaultReverseResolver from './abi/ethereum/DefaultReverseResolver.json';
 import PublicResolver from './abi/ethereum/PublicResolver.json';
 import ReverseRegistrar from './abi/ethereum/ReverseRegistrar.json';
-import DWEBRegistry_polygon from './abi/polygon/DWEBRegistry.json';
-import DefaultReverseResolver_polygon from './abi/polygon/DefaultReverseResolver.json';
-import PublicResolver_polygon from './abi/polygon/PublicResolver.json';
-import ReverseRegistrar_polygon from './abi/polygon/ReverseRegistrar.json';
 import RootRegistrarController from './abi/RootRegistrarController.json';
+//Polygon ABI
+import DWEBRegistryPolygon from './abi/polygon/DWEBRegistry.json';
+import DefaultReverseResolverPolygon from './abi/polygon/DefaultReverseResolver.json';
+import PublicResolverPolygon from './abi/polygon/PublicResolver.json';
+import ReverseRegistrarPolygon from './abi/polygon/ReverseRegistrar.json';
+import RootRegistrarControllerPolygon from './abi/polygon/RootRegistrarController.json';
 
-
-const CONTRACT_ADDRESSES: Record<EthNetwork, ContractConfig> = {
+export const CONTRACT_ADDRESSES: Record<EthNetwork, ContractConfig> = {
   mainnet: {
     DecentraWebToken: '0xE7f58A92476056627f9FdB92286778aBd83b285F',
     DWEBRegistry: '0x8eb93AB94A6Afa8d416aB1884Ebb5A3f00920a7A',
@@ -38,16 +40,16 @@ const CONTRACT_ADDRESSES: Record<EthNetwork, ContractConfig> = {
     RootRegistrarController: '0x38CcdB2660C63374e475090aAbE4F8339Cf4232E'
   },
   mumbai: {
-    DecentraWebToken: '',
-    DWEBRegistry: '0x7aB6409511bb3b530d18705f401588Ac5CD76E96',
-    DefaultReverseResolver: '0x55122e57540624f993E58DaB17d4c78252825841',
-    PublicResolver: '0x096b7e364A6BDA0EF747a4d08ffe6534818EbB94',
-    ReverseRegistrar: '0x3147754Fe7eBC052a46FD73683e338467B0C4160',
-    RootRegistrarController: ''
+    DecentraWebToken: '0x2Bdd2aC5329579FE1E4110b88Cbb9c43445D13ac',
+    DWEBRegistry: '0x7237E2188Ce96925E28654AF34Fa6b0937Ef4575',
+    DefaultReverseResolver: '0x73a29347BFECa3fDDD5354B75E02A10B2E718407',
+    PublicResolver: '0xfCea3D3353CFD21861D1dC1caE8aD39Db017ee73',
+    ReverseRegistrar: '0x36E8A0f10c5C2d1ccE81974133cAE4F583daE3e9',
+    RootRegistrarController: '0x957B1254c0944531C2fcE5a4d2C80Bf239574f1f'
   }
 };
 
-const ABI: Record<DwebContract, ContractInterface> = {
+export const ABI: Record<DwebContract, ContractInterface> = {
   DecentraWebToken,
   DWEBRegistry,
   DefaultReverseResolver,
@@ -56,13 +58,13 @@ const ABI: Record<DwebContract, ContractInterface> = {
   RootRegistrarController
 };
 
-const POLYGON_ABI: Record<DwebContract, ContractInterface> = {
-  DecentraWebToken: '',
-  DWEBRegistry: DWEBRegistry_polygon,
-  DefaultReverseResolver: DefaultReverseResolver_polygon,
-  PublicResolver: PublicResolver_polygon,
-  ReverseRegistrar: ReverseRegistrar_polygon,
-  RootRegistrarController: ''
+export const POLYGON_ABI: Record<DwebContract, ContractInterface> = {
+  DecentraWebToken,
+  DWEBRegistry: DWEBRegistryPolygon,
+  DefaultReverseResolver: DefaultReverseResolverPolygon,
+  PublicResolver: PublicResolverPolygon,
+  ReverseRegistrar: ReverseRegistrarPolygon,
+  RootRegistrarController: RootRegistrarControllerPolygon
 };
 
 export function getContractConfig(network: EthNetwork): ContractConfig {
@@ -72,7 +74,12 @@ export function getContractConfig(network: EthNetwork): ContractConfig {
   return CONTRACT_ADDRESSES[network];
 }
 
-export function getContract({ address, name, provider, network }: ContractOptions) {
+export function getContract({
+  address,
+  name,
+  provider,
+  network
+}: ContractOptions): ethers.Contract {
   if (!CONTRACT_ADDRESSES[network]) {
     throw new Error('Unknown network name');
   }
