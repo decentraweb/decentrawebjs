@@ -31,7 +31,7 @@ export const CONTRACT_ADDRESSES: Record<EthNetwork, ContractConfig> = {
     ReverseRegistrar: '0xA6E4607755F1cbF45E6f9e0840d3Be3075F3d729',
     RootRegistrarController: '0x94281bc70d6D62cc1DEb81A44b62cc7Fa22B10be'
   },
-  polygon: {
+  matic: {
     DecentraWebToken: '0x8839e639F210B80ffea73AedF51baed8DAc04499',
     DWEBRegistry: '0x9f3eadf2360Dc4432a003699398169A2c7C10211',
     DefaultReverseResolver: '0xeEc93022ec031d6AD2E35AA36edFE80d73F8808a',
@@ -39,7 +39,7 @@ export const CONTRACT_ADDRESSES: Record<EthNetwork, ContractConfig> = {
     ReverseRegistrar: '0x662b0b6253e44F56DF387aCabd86A69D1e2A8cA9',
     RootRegistrarController: '0x38CcdB2660C63374e475090aAbE4F8339Cf4232E'
   },
-  mumbai: {
+  maticmum: {
     DecentraWebToken: '0x2Bdd2aC5329579FE1E4110b88Cbb9c43445D13ac',
     DWEBRegistry: '0x7237E2188Ce96925E28654AF34Fa6b0937Ef4575',
     DefaultReverseResolver: '0x73a29347BFECa3fDDD5354B75E02A10B2E718407',
@@ -83,7 +83,7 @@ export function getContract({
   if (!CONTRACT_ADDRESSES[network]) {
     throw new Error('Unknown network name');
   }
-  if (network === 'polygon' || network === 'mumbai') {
+  if (network === 'matic' || network === 'maticmum') {
     return new ethers.Contract(address, POLYGON_ABI[name], provider);
   } else {
     return new ethers.Contract(address, ABI[name], provider);

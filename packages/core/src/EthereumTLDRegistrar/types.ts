@@ -1,6 +1,10 @@
 import { BigNumber } from 'ethers';
-import {Approval} from "../utils/DecentrawebAPI";
-import {DomainEntry} from "./index";
+import { TLDApproval } from '../DecentrawebAPI/types';
+
+export interface DomainEntry {
+  name: string;
+  duration: number;
+}
 
 export interface BalanceVerificationResult {
   success: boolean;
@@ -9,7 +13,7 @@ export interface BalanceVerificationResult {
   dwebAmount: BigNumber;
 }
 
-export interface BaseRegistrationContext extends Approval {
+export interface BaseRegistrationContext extends TLDApproval {
   domains: DomainEntry[];
   owner: string;
   expiresAt: Date;
@@ -17,7 +21,6 @@ export interface BaseRegistrationContext extends Approval {
 
 export interface ApprovedRegistration extends BaseRegistrationContext {
   status: 'approved';
-
 }
 
 export interface CommittedRegistration extends BaseRegistrationContext {

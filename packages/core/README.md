@@ -30,14 +30,14 @@ const signer = new Wallet(PRIVATE_KEY, provider);
 const registrar = new registration.EthereumTLDRegistrar({network: ETH_NETWORK, provider, signer});
 
 //Approve usage of unlimited amount of DWEB tokens
-registrar.approveDwebUsage().then((receipt)=>{
+registrar.approveDwebUsage().then((receipt) => {
   // receipt is instance of ethers.js TransactionReceipt class
   // https://docs.ethers.org/v5/api/providers/types/#providers-TransactionReceipt
   console.log(receipt);
 });
 
-//Approve usage for upt to 50 DWEB tokens
-registrar.approveDwebUsageAmount(ethers.utils.parseEther('50')).then((receipt)=>{
+//Approve usage for up to 50 DWEB tokens
+registrar.approveDwebUsageAmount(ethers.utils.parseEther('50')).then((receipt) => {
   // receipt is instance of ethers.js TransactionReceipt class
   // https://docs.ethers.org/v5/api/providers/types/#providers-TransactionReceipt
   console.log(receipt);
@@ -56,7 +56,8 @@ Since process includes multiple steps it is recommended to save result of each s
 if it fails on some step (ie because of insufficient balance).
 ```typescript
 import {ethers, providers, Wallet} from "ethers";
-import {registration} from "@decentraweb/core";
+import {tld} from "@decentraweb/core";
+
 
 const ETH_NETWORK = 'mainnet';
 const JSONRPC_URL = 'https://mainnet.infura.io/v3/00000000000000000000000000000000';
@@ -64,7 +65,7 @@ const PRIVATE_KEY = '00000000000000000000000000000000000000000000000000000000000
 
 const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
 const signer = new Wallet(PRIVATE_KEY, provider);
-const registrar = new registration.EthereumTLDRegistrar({network: ETH_NETWORK, provider, signer});
+const registrar = new tld.EthereumTLDRegistrar({network: ETH_NETWORK, provider, signer});
 
 async function wait(seconds: number) {
   await new Promise(resolve => setTimeout(resolve, seconds * 1000));
@@ -72,9 +73,9 @@ async function wait(seconds: number) {
 
 async function registerDomains(){
   const approvedRequest = await registrar.requestApproval([
-    {name: 'foo', duration: registration.DURATION.ONE_YEAR},
-    {name: 'bar', duration: registration.DURATION.ONE_YEAR},
-    {name: '🙂🙂🙂', duration: registration.DURATION.ONE_YEAR}
+    {name: 'foo', duration: tld.DURATION.ONE_YEAR},
+    {name: 'bar', duration: tld.DURATION.ONE_YEAR},
+    {name: '🙂🙂🙂', duration: tld.DURATION.ONE_YEAR}
   ]);
   const commitedRequest = await registrar.sendCommitment(approvedRequest);
   //Wait for 1 minute before registering domain name
@@ -92,10 +93,71 @@ registerDomains().then((receipt)=>{
   console.log(receipt);
 });
 ```
+### Registering subdomain on Ethereum
+There are two type of subdomain registrations:
+1. Registering subdomain for domain name owned by you. We call it **self-registration**
+2. Registering subdomain for staked domain name that belong to other owner. We call it **on-demand registration**
+#### Self-registration
+In case of self-registration, you have to pay service fee. As of now, service fee is $2 per subdomain and is paid in ETH.
+```typescript
+import {ethers, providers, Wallet} from "ethers";
+import {sld} from "@decentraweb/core";
 
+const ETH_NETWORK = 'mainnet';
+const JSONRPC_URL = 'https://mainnet.infura.io/v3/00000000000000000000000000000000';
+const PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000000';
 
+const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
+const signer = new Wallet(PRIVATE_KEY, provider);
+const registrar = new sld.EthereumSLDRegistrar({network: ETH_NETWORK, provider, signer});
+async function registerSuddomains() {
+  const approvedRegistration = await registrar.approveSelfRegistration([
+    {name: '🙂🙂🙂', label: 'public'},
+    {name: 'foobar', label: 'api'}
+  ]);
+  //It is recommended to cache approvedRegistration object, so you can resume registration if next step fails
+  const receipt = await registrar.registerSubdomains(approvedRegistration);
+  console.log('Registered, TX hash', receipt.transactionHash);
+}
 
- 
+registerSuddomains().then(() => {
+  console.log('Done');
+}).catch(err => {
+  console.error(err);
+});
+
+```
+
+### On-demand registration
+Any user can set registration fee and stake their domain. This would allow other users to register subdomains for that 
+domain name. 
+```typescript
+import {ethers, providers, Wallet} from "ethers";
+import {sld} from "@decentraweb/core";
+
+const ETH_NETWORK = 'mainnet';
+const JSONRPC_URL = 'https://mainnet.infura.io/v3/00000000000000000000000000000000';
+const PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000000';
+
+const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
+const signer = new Wallet(PRIVATE_KEY, provider);
+const registrar = new sld.EthereumSLDRegistrar({network: ETH_NETWORK, provider, signer});
+async function registerSuddomains() {
+  const approvedRegistration = await registrar.approveOndemandRegistration([
+    {name: '🙂🙂🙂', label: 'public'},
+    {name: 'foobar', label: 'api'}
+  ]);
+  //It is recommended to cache approvedRegistration object, so you can resume registration if next step fails
+  const receipt = await registrar.registerSubdomains(approvedRegistration);
+  console.log('Registered, TX hash', receipt.transactionHash);
+}
+
+registerSuddomains().then(() => {
+  console.log('Done');
+}).catch(err => {
+  console.error(err);
+});
+``` 
 
 ## Reading and writing domain records
 ### Initialization

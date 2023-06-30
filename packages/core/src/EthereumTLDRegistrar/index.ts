@@ -1,17 +1,26 @@
-import { BigNumber, ethers, providers, Signer } from 'ethers';
+import { BigNumber, ethers, providers } from 'ethers';
 import { normalize } from '@ensdomains/eth-ens-namehash';
-import { DwebConfig } from '../types/common';
-import DwebContractWrapper, { requiresSigner } from '../DwebContractWrapper';
-import DecentrawebAPI from '../utils/DecentrawebAPI';
 import { increaseByPercent } from '../utils/misc';
-import { getContract } from '../contracts';
 import {
   ApprovedRegistration,
   BalanceVerificationResult,
   CommittedRegistration,
+  DomainEntry,
   RegistrationContext
 } from './types';
+import EthereumRegistrar from '../EthereumRegistrar';
 
+export {
+  ApprovedRegistration,
+  BalanceVerificationResult,
+  CommittedRegistration,
+  DomainEntry,
+  RegistrationContext
+}
+
+/**
+ * Standard duration values for registration.
+ */
 export const DURATION = {
   ONE_YEAR: 31556926,
   TWO_YEARS: 63113852,
@@ -24,29 +33,19 @@ export const MIN_DURATION = 31556926; // 1 year
 export const MAX_DURATION = 157784630; // 5 years
 export const MAX_NAMES_PER_TX = 20;
 
+/**
+ * Time to live for registration approval.
+ */
 export const APPROVAL_TTL = 30 * 60; // 30 minutes
+/**
+ * Time to wait before calling `register` after `sendCommitment` call.
+ */
 export const REGISTRATION_WAIT = 60 * 1000; // 1 minute
 
-export interface DomainEntry {
-  name: string;
-  duration: number;
-}
-
-export class EthereumTLDRegistrar extends DwebContractWrapper {
-  readonly api: DecentrawebAPI;
-  readonly tokenContract: ethers.Contract;
-
-  constructor(options: DwebConfig) {
-    super(options, 'RootRegistrarController');
-    this.api = new DecentrawebAPI(this.network);
-    this.tokenContract = getContract({
-      address: this.contractConfig.DecentraWebToken,
-      name: 'DecentraWebToken',
-      provider: this.provider,
-      network: this.network
-    });
-  }
-
+/**
+ * Ethereum TLD Registrar class. Provides methods to register top level domains.
+ */
+export class EthereumTLDRegistrar extends EthereumRegistrar {
   /**
    * Step 1. Normalizes domain names, calls the API to check if they are available and returns approval for registration.
    * Approved request is valid for 30 minutes.
@@ -54,17 +53,15 @@ export class EthereumTLDRegistrar extends DwebContractWrapper {
    * @param owner
    * @returns {Promise<ApprovedRegistration>} ApprovedRegistration object that can be used to commit and register
    */
-  @requiresSigner
   async requestApproval(
     request: DomainEntry | Array<DomainEntry>,
     owner?: string
   ): Promise<ApprovedRegistration> {
-    const signer = this.signer as Signer;
-    const signerAddress = await signer.getAddress();
+    const signerAddress = await this.signer.getAddress();
     const nameOwner = owner ? ethers.utils.getAddress(owner) : signerAddress;
     const requests = this.normalizeDomainEntries(request);
     const normalizedNames = requests.map((item) => item.name);
-    const approval = await this.api.approveRegistration(nameOwner, normalizedNames);
+    const approval = await this.api.approveTLDRegistration(nameOwner, normalizedNames);
     return {
       ...approval,
       domains: requests,
@@ -79,7 +76,6 @@ export class EthereumTLDRegistrar extends DwebContractWrapper {
    * @param {ApprovedRegistration} request - data returned from `requestApproval` step
    * @returns {Promise<CommittedRegistration>} CommittedRegistration object that can be used to register TLD
    */
-  @requiresSigner
   async sendCommitment(request: ApprovedRegistration): Promise<CommittedRegistration> {
     const signature = ethers.utils.splitSignature(request.signature);
     const commitmentTx = await this.contract.commit(
@@ -104,7 +100,6 @@ export class EthereumTLDRegistrar extends DwebContractWrapper {
    * @param {boolean} isFeesInDweb - if true, fees will be paid in DWEB tokens, otherwise in ETH
    * @returns {Promise<providers.TransactionReceipt>} Transaction receipt for registration
    */
-  @requiresSigner
   async register(
     request: CommittedRegistration,
     isFeesInDweb: boolean
@@ -120,11 +115,9 @@ export class EthereumTLDRegistrar extends DwebContractWrapper {
     const domains = request.domains;
     const normalizedNames = domains.map((item) => item.name);
     const durationArray = domains.map((item) => item.duration);
-    const signer = this.signer as Signer;
     const { error: priceError, ethAmount } = await this.verifySignerBalance(
       request,
-      isFeesInDweb,
-      await signer.getAddress()
+      isFeesInDweb
     );
 
     if (priceError) {
@@ -149,13 +142,12 @@ export class EthereumTLDRegistrar extends DwebContractWrapper {
    * Returns the price of registration in ETH and DWEB tokens and verifies if signer has enough balance to pay for registration.
    * @param request
    * @param isFeesInDweb
-   * @param signerAddress
    */
   async verifySignerBalance(
     request: RegistrationContext,
     isFeesInDweb: boolean,
-    signerAddress: string
   ): Promise<BalanceVerificationResult> {
+    const signerAddress = await this.signer.getAddress();
     const rentPrice = await this.getRentPriceBatch(request.domains, isFeesInDweb);
     const [ethBalance, dwebBalance, dwebAllowance] = await Promise.all([
       this.provider.getBalance(signerAddress),
@@ -258,34 +250,6 @@ export class EthereumTLDRegistrar extends DwebContractWrapper {
     }
     return totalPrice;
   }
-
-  /**
-   * Get the DWEB token amount that registrar is allowed to spend
-   * @param account - ETH address of the account
-   * @returns DWEB token amount in wei
-   */
-  async getDwebAllowance(account?: string): Promise<BigNumber> {
-    return this.tokenContract.allowance(account, this.contractConfig.RootRegistrarController);
-  }
-
-  /**
-   * Approve the DWEB token amount that can be used by the registrar
-   * @param amount - amount of DWEB in wei
-   */
-  @requiresSigner
-  async approveDwebUsageAmount(amount: BigNumber): Promise<providers.TransactionReceipt> {
-    const tx = this.tokenContract.approve(this.contractConfig.RootRegistrarController, amount, {
-      value: '0x00'
-    });
-    return tx.wait(1);
-  }
-
-  /**
-   * Approve unlimited DWEB token usage by the registrar, so no further approvals are needed
-   */
-  approveDwebUsage() {
-    return this.approveDwebUsageAmount(
-      ethers.utils.parseUnits(Number.MAX_SAFE_INTEGER.toString(), 'ether')
-    );
-  }
 }
+
+export default EthereumTLDRegistrar;

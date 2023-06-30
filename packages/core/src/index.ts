@@ -1,12 +1,12 @@
 import DWEBName from './DWEBName';
 import DWEBRegistry from './DWEBRegistry';
 import * as contracts from './contracts';
-import * as registration from './EthereumTLDRegistrar';
+import * as tld from './EthereumTLDRegistrar';
+import * as sld from './EthereumSubdomainRegistrar';
+import EthereumSLDRegistrar from './EthereumSubdomainRegistrar';
 import { DNSRecord, Record, RecordSet, RecordType, RecordClass } from './RecordSet';
 import { EthNetwork } from './contracts/interfaces';
 import * as contentHash from './utils/content';
-
-export const EthereumTLDRegistrar = registration.EthereumTLDRegistrar;
 
 
 export {
@@ -15,7 +15,9 @@ export {
   Record,
   DWEBName,
   DWEBRegistry,
-  registration,
+  EthereumSLDRegistrar,
+  tld,
+  sld,
   contracts,
   RecordSet,
   RecordType,
