@@ -76,7 +76,6 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
     const ownerAddress = owner ? ethers.utils.getAddress(owner) : signerAddress;
     const normalizedEntries = await this.normalizeEntries(entry);
     const approval = await this.api.approveSLDRegistration(
-      signerAddress,
       ownerAddress,
       normalizedEntries,
       isFeeInDWEB
@@ -119,7 +118,7 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
       s,
       ethAmount
     ];
-    const tx = await this.contract.createSubnodeBatch(args);
+    const tx = await this.contract.createSubnodeBatch(args, { value: ethAmount });
     return tx.wait(1);
   }
 
@@ -190,12 +189,10 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
     const serviceFeeUSD = await this.getServiceFee();
     const { eth: serviceFee } = await this.api.convertPrice(serviceFeeUSD.toNumber());
     const totalServiceFee = BigNumber.from(serviceFee).mul(approval.labels.length);
-    const totalFeeUSD = approval.fee.reduce((a, b) => a + parseFloat(b), 0);
-    const { eth: totalFeeEth, dweb: totalFeeDweb } = await this.api.convertPrice(totalFeeUSD);
-
+    const totalFee = approval.fee.reduce((a, b) => a.add(b), BigNumber.from(0));
     return {
-      eth: isFeeInDWEB ? totalServiceFee : totalServiceFee.add(totalFeeEth),
-      dweb: isFeeInDWEB ? BigNumber.from(totalFeeDweb) : BigNumber.from(0)
+      eth: isFeeInDWEB ? totalServiceFee : totalServiceFee.add(totalFee),
+      dweb: isFeeInDWEB ? totalFee : BigNumber.from(0)
     };
   }
 

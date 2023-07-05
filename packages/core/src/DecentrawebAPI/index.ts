@@ -125,7 +125,6 @@ class DecentrawebAPI {
   }
 
   async approveSLDRegistration(
-    sender: string,
     owner: string,
     entries: Array<SubdomainEntry>,
     isFeesInDweb = false
@@ -135,7 +134,7 @@ class DecentrawebAPI {
       label: entries.map((e) => e.label),
       owner: ethers.utils.getAddress(owner),
       chainid: this.chainId,
-      sender: ethers.utils.getAddress(sender),
+      sender: '',
       isfeeindwebtoken: isFeesInDweb ? 1 : 0,
       signature: ''
     };
