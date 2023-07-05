@@ -22,13 +22,15 @@ export interface ApprovedSLDRegistration {
   isFeeInDWEB: boolean;
 }
 
-export const SERVICE_FEE_USD = 2;
-
 export class EthereumSLDRegistrar extends EthereumRegistrar {
+  /**
+   * Get subdomain registration approval for domain names owned by signer
+   * @param {Entry | Array<Entry>} entry - list of domains and subdomains to register
+   * @param {string} owner - ETH address of the owner of created subdomains, defaults to signer address
+   */
   async approveSelfRegistration(
     entry: Entry | Array<Entry>,
-    owner?: string | null,
-    isFeeInDWEB?: boolean
+    owner?: string | null
   ): Promise<ApprovedSLDRegistration> {
     const signerAddress = await this.signer.getAddress();
     const ownerAddress = owner ? ethers.utils.getAddress(owner) : signerAddress;
@@ -45,7 +47,7 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
       signerAddress,
       ownerAddress,
       normalizedEntries,
-      isFeeInDWEB
+      false
     );
     const signature = await signTypedData(this.signer, typedData);
     const approval = await this.api.approveSelfSLDRegistration({
@@ -55,10 +57,16 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
     return {
       approval,
       owner: ownerAddress,
-      isFeeInDWEB: !!isFeeInDWEB
+      isFeeInDWEB: false
     };
   }
 
+  /**
+   * Get subdomain registration approval for staked domain names
+   * @param entry
+   * @param owner
+   * @param isFeeInDWEB - if true, registration fee will be paid in DWEB tokens, otherwise in ETH
+   */
   async approveOndemandRegistration(
     entry: Entry | Array<Entry>,
     owner?: string | null,
@@ -80,6 +88,10 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
     };
   }
 
+  /**
+   * Register subdomains
+   * @param approvedSLDRegistration - result of approveSelfRegistration or approveOndemandRegistration
+   */
   async registerSubdomains({
     approval,
     owner,
@@ -175,7 +187,8 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
     eth: BigNumber;
     dweb: BigNumber;
   }> {
-    const { eth: serviceFee } = await this.api.convertPrice(SERVICE_FEE_USD);
+    const serviceFeeUSD = await this.getServiceFee();
+    const { eth: serviceFee } = await this.api.convertPrice(serviceFeeUSD.toNumber());
     const totalServiceFee = BigNumber.from(serviceFee).mul(approval.labels.length);
     const totalFeeUSD = approval.fee.reduce((a, b) => a + parseFloat(b), 0);
     const { eth: totalFeeEth, dweb: totalFeeDweb } = await this.api.convertPrice(totalFeeUSD);
@@ -184,6 +197,11 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
       eth: isFeeInDWEB ? totalServiceFee : totalServiceFee.add(totalFeeEth),
       dweb: isFeeInDWEB ? BigNumber.from(totalFeeDweb) : BigNumber.from(0)
     };
+  }
+
+  async getServiceFee(): Promise<BigNumber> {
+    const fee: BigNumber = await this.contract.subdomainFee();
+    return fee.div(1000000);
   }
 }
 
