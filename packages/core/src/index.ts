@@ -3,23 +3,18 @@ import DWEBRegistry from './DWEBRegistry';
 import * as contracts from './contracts';
 import * as tld from './EthereumTLDRegistrar';
 import * as sld from './EthereumSubdomainRegistrar';
-import EthereumSLDRegistrar from './EthereumSubdomainRegistrar';
-import { DNSRecord, Record, RecordClass, RecordSet, RecordType } from './RecordSet';
-import { EthNetwork } from './contracts/interfaces';
+import RecordSet from './RecordSet';
 import * as contentHash from './utils/content';
 
+export  type { EthNetwork } from './contracts/interfaces';
+export  type { DNSRecord, Record, RecordClass, RecordType } from './RecordSet/DNSRecord';
+
 export {
-  EthNetwork,
-  DNSRecord,
-  Record,
   DWEBName,
   DWEBRegistry,
-  EthereumSLDRegistrar,
+  RecordSet,
+  contentHash,
   tld,
   sld,
   contracts,
-  RecordSet,
-  RecordType,
-  RecordClass,
-  contentHash
 };

@@ -1,9 +1,7 @@
 import { answer as answerCoder } from 'dns-packet';
 import * as recordType from './type';
 import { Buffer } from 'buffer';
-import { DNSRecord, Record, RecordClass, RecordType } from './DNSRecord';
-
-export { DNSRecord, Record, RecordType, RecordClass };
+import { DNSRecord } from './DNSRecord';
 
 export class RecordSet {
   static recordType = recordType;

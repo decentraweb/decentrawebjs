@@ -10,7 +10,7 @@ import {
 } from './types';
 import EthereumRegistrar from '../EthereumRegistrar';
 
-export {
+export type {
   ApprovedRegistration,
   BalanceVerificationResult,
   CommittedRegistration,

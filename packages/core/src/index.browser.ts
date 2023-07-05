@@ -1,7 +1,17 @@
 import DWEBName from './DWEBName';
 import DWEBRegistry from './DWEBRegistry';
-import { RecordSet } from './RecordSet';
+import * as contracts from './contracts';
+import * as tld from './EthereumTLDRegistrar';
+import * as sld from './EthereumSubdomainRegistrar';
+import RecordSet from './RecordSet';
 import * as contentHash from './utils/content';
-import EthereumSLDRegistrar from './EthereumSubdomainRegistrar';
 
-export { DWEBName, DWEBRegistry, RecordSet, contentHash, EthereumSLDRegistrar };
+export {
+  DWEBName,
+  DWEBRegistry,
+  RecordSet,
+  contentHash,
+  tld,
+  sld,
+  contracts,
+};
