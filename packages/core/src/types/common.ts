@@ -1,5 +1,5 @@
-import {ContractConfig, EthNetwork} from "../contracts/interfaces";
-import {ethers, providers} from "ethers";
+import { ContractConfig, EthNetwork } from '../contracts/interfaces';
+import { ethers, providers } from 'ethers';
 
 export type DwebConfig = {
   network: EthNetwork;

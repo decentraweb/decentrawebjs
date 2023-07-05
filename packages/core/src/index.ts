@@ -4,10 +4,9 @@ import * as contracts from './contracts';
 import * as tld from './EthereumTLDRegistrar';
 import * as sld from './EthereumSubdomainRegistrar';
 import EthereumSLDRegistrar from './EthereumSubdomainRegistrar';
-import { DNSRecord, Record, RecordSet, RecordType, RecordClass } from './RecordSet';
+import { DNSRecord, Record, RecordClass, RecordSet, RecordType } from './RecordSet';
 import { EthNetwork } from './contracts/interfaces';
 import * as contentHash from './utils/content';
-
 
 export {
   EthNetwork,

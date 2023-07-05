@@ -1,11 +1,13 @@
 import { answer as answerCoder } from 'dns-packet';
 import * as recordType from './type';
 import { Buffer } from 'buffer';
-import { DNSRecord, Record, RecordType, RecordClass } from './DNSRecord';
+import { DNSRecord, Record, RecordClass, RecordType } from './DNSRecord';
 
 export { DNSRecord, Record, RecordType, RecordClass };
 
 export class RecordSet {
+  static recordType = recordType;
+
   static decode(buf: Buffer): DNSRecord[] {
     let offset = 0;
     const result = [];
@@ -23,8 +25,6 @@ export class RecordSet {
     });
     return Buffer.concat(buffers);
   }
-
-  static recordType = recordType;
 }
 
 export default RecordSet;

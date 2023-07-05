@@ -16,7 +16,7 @@ export {
   CommittedRegistration,
   DomainEntry,
   RegistrationContext
-}
+};
 
 /**
  * Standard duration values for registration.
@@ -115,10 +115,7 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
     const domains = request.domains;
     const normalizedNames = domains.map((item) => item.name);
     const durationArray = domains.map((item) => item.duration);
-    const { error: priceError, ethAmount } = await this.verifySignerBalance(
-      request,
-      isFeesInDweb
-    );
+    const { error: priceError, ethAmount } = await this.verifySignerBalance(request, isFeesInDweb);
 
     if (priceError) {
       throw new Error(priceError);
@@ -145,7 +142,7 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
    */
   async verifySignerBalance(
     request: RegistrationContext,
-    isFeesInDweb: boolean,
+    isFeesInDweb: boolean
   ): Promise<BalanceVerificationResult> {
     const signerAddress = await this.signer.getAddress();
     const rentPrice = await this.getRentPriceBatch(request.domains, isFeesInDweb);

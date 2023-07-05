@@ -1,4 +1,4 @@
-import {ChainId} from "../contracts/interfaces";
+import { ChainId } from '../contracts/interfaces';
 
 export interface TLDApprovalPayload {
   name: Array<string>;
@@ -59,7 +59,6 @@ export interface SLDApprovalPayload {
   isfeeindwebtoken: 0 | 1;
   signature?: string; //Signature is required for self registration. Empty string for on-demand registration
 }
-
 
 export interface SLDApproval {
   commitment: string; //Commitment value.

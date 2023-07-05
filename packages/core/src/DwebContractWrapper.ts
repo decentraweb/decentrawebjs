@@ -18,12 +18,8 @@ abstract class DwebContractWrapper {
   readonly chainId: number;
   readonly provider: providers.BaseProvider;
   readonly signer?: ethers.Signer;
-  protected readonly contract: ethers.Contract;
   readonly contractConfig: ContractConfig;
-
-  get readonly(): boolean {
-    return !this.signer;
-  }
+  protected readonly contract: ethers.Contract;
 
   protected constructor(options: DwebConfig, contractName: DwebContract) {
     const { network, provider, signer } = options;
@@ -38,6 +34,10 @@ abstract class DwebContractWrapper {
       provider: signer || provider,
       network: this.network
     });
+  }
+
+  get readonly(): boolean {
+    return !this.signer;
   }
 }
 

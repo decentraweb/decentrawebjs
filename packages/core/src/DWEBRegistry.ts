@@ -1,4 +1,4 @@
-import {ethers, providers} from 'ethers';
+import { ethers, providers } from 'ethers';
 import { hash as namehash } from '@ensdomains/eth-ens-namehash';
 import DWEBName from './DWEBName';
 import { DEFAULT_TTL } from './utils/contracts';

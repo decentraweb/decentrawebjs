@@ -2,7 +2,7 @@ import DecentrawebAPI from '../DecentrawebAPI';
 import { BigNumber, ethers, providers, Wallet } from 'ethers';
 import DwebContractWrapper, { requiresSigner } from '../DwebContractWrapper';
 import { getContract } from '../contracts';
-import {DwebConfig} from "../types/common";
+import { DwebConfig } from '../types/common';
 
 export interface RegistrarConfig extends DwebConfig {
   signer: Wallet;
