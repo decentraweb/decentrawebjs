@@ -19,4 +19,3 @@ export interface TypedData {
   domain: TypedDataDomain;
   message: object;
 }
-
