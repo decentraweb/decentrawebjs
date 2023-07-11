@@ -78,13 +78,17 @@ async function registerDomains(){
     {name: '🙂🙂🙂', duration: tld.DURATION.ONE_YEAR}
   ]);
   const commitedRequest = await registrar.sendCommitment(approvedRequest);
+  //Wait for 1st confirmation of commitment transaction
+  await commitedRequest.commitmentTx.wait(1);
   //Wait for 1 minute before registering domain name
   await wait(60);
   //If paying registration fee in ETH 
-  const receipt = await registrar.register(commitedRequest);
+  const tx = await registrar.register(commitedRequest);
   // If paying registration fee in DWEB tokens
-  //const receipt = await registrar.register(commitedRequest, true);
-  return receipt;  
+  //const tx = await registrar.register(commitedRequest, true);
+  
+  //Wait for 1st confirmation
+  return tx.wait(1);  
 }
 
 registerDomains().then((receipt)=>{
@@ -116,7 +120,8 @@ async function registerSuddomains() {
     {name: 'foobar', label: 'api'}
   ]);
   //It is recommended to cache approvedRegistration object, so you can resume registration if next step fails
-  const receipt = await registrar.registerSubdomains(approvedRegistration);
+  const tx = await registrar.registerSubdomains(approvedRegistration);
+  const receipt = await tx.wait(1);
   console.log('Registered, TX hash', receipt.transactionHash);
 }
 
@@ -148,7 +153,8 @@ async function registerSuddomains() {
     {name: 'foobar', label: 'api'}
   ]);
   //It is recommended to cache approvedRegistration object, so you can resume registration if next step fails
-  const receipt = await registrar.registerSubdomains(approvedRegistration);
+  const tx = await registrar.registerSubdomains(approvedRegistration);
+  const receipt = await tx.wait(1);
   console.log('Registered, TX hash', receipt.transactionHash);
 }
 

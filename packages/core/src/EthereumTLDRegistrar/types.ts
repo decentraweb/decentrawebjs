@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import {BigNumber, providers} from 'ethers';
 import { TLDApproval } from '../DecentrawebAPI/types';
 
 export interface DomainEntry {
@@ -25,6 +25,7 @@ export interface ApprovedRegistration extends BaseRegistrationContext {
 
 export interface CommittedRegistration extends BaseRegistrationContext {
   status: 'committed';
+  commitmentTx: providers.TransactionResponse;
   committedAt: Date;
 }
 

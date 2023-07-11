@@ -95,7 +95,7 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
     approval,
     owner,
     isFeeInDWEB
-  }: ApprovedSLDRegistration): Promise<providers.TransactionReceipt> {
+  }: ApprovedSLDRegistration): Promise<providers.TransactionResponse> {
     const { error: priceError, ethAmount } = await this.verifySignerBalance(approval, isFeeInDWEB);
 
     if (priceError) {
@@ -118,8 +118,7 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
       s,
       ethAmount
     ];
-    const tx = await this.contract.createSubnodeBatch(args, { value: ethAmount });
-    return tx.wait(1);
+    return this.contract.createSubnodeBatch(args, { value: ethAmount });
   }
 
   async normalizeEntries(entry: Entry | Array<Entry>): Promise<Array<NormalizedEntry>> {

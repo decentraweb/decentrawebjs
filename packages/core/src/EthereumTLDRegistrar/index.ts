@@ -84,10 +84,10 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
       signature.r,
       signature.s
     );
-    await commitmentTx.wait(1);
     return {
       ...request,
       status: 'committed',
+      commitmentTx,
       committedAt: new Date()
     };
   }
@@ -98,15 +98,17 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
    * successful after 1st confirmation received.
    * @param {CommittedRegistration} request - data returned from `sendCommitment` step
    * @param {boolean} isFeesInDweb - if true, fees will be paid in DWEB tokens, otherwise in ETH
-   * @returns {Promise<providers.TransactionReceipt>} Transaction receipt for registration
+   * @returns {Promise<providers.TransactionResponse>} Transaction response for registration
    */
   async register(
     request: CommittedRegistration,
     isFeesInDweb: boolean
-  ): Promise<providers.TransactionReceipt> {
+  ): Promise<providers.TransactionResponse> {
     if (request.status !== 'committed') {
       throw new Error('Registration is not committed, call `sendCommitment` first');
     }
+    // Make sure that commitment transaction has at least 1 confirmation
+    await request.commitmentTx.wait(1);
 
     if (request.committedAt.getTime() + REGISTRATION_WAIT > Date.now()) {
       throw new Error('Registration is not ready, wait for 1 minute after commitment');
@@ -115,13 +117,13 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
     const domains = request.domains;
     const normalizedNames = domains.map((item) => item.name);
     const durationArray = domains.map((item) => item.duration);
-    const { error: priceError, ethAmount } = await this.verifySignerBalance(request, isFeesInDweb);
+    const { error: priceError, ethAmount, dwebAmount } = await this.verifySignerBalance(request, isFeesInDweb);
 
     if (priceError) {
       throw new Error(priceError);
     }
 
-    const registerTx = await this.contract.registerWithConfigBatch(
+    return this.contract.registerWithConfigBatch(
       normalizedNames,
       request.owner,
       durationArray,
@@ -129,10 +131,9 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
       this.chainId,
       request.timestamp,
       isFeesInDweb,
-      ethAmount,
+      isFeesInDweb ? dwebAmount : ethAmount,
       { value: ethAmount }
     );
-    return registerTx.wait(1);
   }
 
   /**
