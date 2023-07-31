@@ -1,8 +1,16 @@
 import { ethers, providers } from 'ethers';
 
-export type EthNetwork = 'mainnet' | 'goerli' | 'matic' | 'maticmum';
+export type EthereumNetwork = 'mainnet' | 'goerli';
 
-export type ChainId = 1 | 5 | 137 | 80001;
+export type PolygonNetwork = 'matic' | 'maticmum';
+
+export type EthNetwork = EthereumNetwork | PolygonNetwork;
+
+export type EthChainId = 1 | 5;
+
+export type PolygonChainId = 137 | 80001;
+
+export type ChainId = EthChainId | PolygonChainId;
 
 export type DwebContract =
   | 'DecentraWebToken'

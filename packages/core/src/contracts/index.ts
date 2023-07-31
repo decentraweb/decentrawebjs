@@ -1,5 +1,11 @@
-import { ContractInterface, ethers } from 'ethers';
-import { ContractConfig, ContractOptions, DwebContract, EthNetwork } from './interfaces';
+import { ContractInterface, ethers, providers } from 'ethers';
+import {
+  ContractConfig,
+  ContractOptions,
+  DwebContract,
+  EthNetwork,
+  PolygonNetwork
+} from './interfaces';
 //Ethereum ABI
 import DecentraWebToken from './abi/DecentraWebToken.json';
 import DWEBRegistry from './abi/ethereum/DWEBRegistry.json';
@@ -8,6 +14,7 @@ import PublicResolver from './abi/ethereum/PublicResolver.json';
 import ReverseRegistrar from './abi/ethereum/ReverseRegistrar.json';
 import RootRegistrarController from './abi/RootRegistrarController.json';
 //Polygon ABI
+import WrappedEthToken from './abi/WrappedEthToken.json';
 import DWEBRegistryPolygon from './abi/polygon/DWEBRegistry.json';
 import DefaultReverseResolverPolygon from './abi/polygon/DefaultReverseResolver.json';
 import PublicResolverPolygon from './abi/polygon/PublicResolver.json';
@@ -49,6 +56,13 @@ export const CONTRACT_ADDRESSES: Record<EthNetwork, ContractConfig> = {
   }
 };
 
+const WETH_ADDRESSES: Record<PolygonNetwork, string> = {
+  matic: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
+  //maticmum: '0xa6fa4fb5f76172d178d61b04b0ecd319c5d1c0aa'
+  maticmum: '0x602e78C34Da5208090B5A1d49db07F17737E5b11'
+  //maticmum: '0xd087ff96281dcf722aea82aca57e8545ea9e6c96'
+};
+
 export const ABI: Record<DwebContract, ContractInterface> = {
   DecentraWebToken,
   DWEBRegistry,
@@ -88,4 +102,14 @@ export function getContract({
   } else {
     return new ethers.Contract(address, ABI[name], provider);
   }
+}
+
+export function getWethContract(
+  network: PolygonNetwork,
+  provider: ethers.Signer | providers.Provider
+): ethers.Contract {
+  if (!CONTRACT_ADDRESSES[network]) {
+    throw new Error('Unknown network name');
+  }
+  return new ethers.Contract(WETH_ADDRESSES[network], WrappedEthToken, provider);
 }

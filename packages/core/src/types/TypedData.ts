@@ -1,9 +1,12 @@
-export type TypedDataTypes = { [key: string]: TypedDataArgument[] };
-
 export interface TypedDataArgument {
   name: string;
   type: string;
 }
+
+export type TypedDataTypes = {
+  EIP712Domain: TypedDataArgument[];
+  [key: string]: TypedDataArgument[]
+};
 
 export interface TypedDataDomain {
   name?: string;

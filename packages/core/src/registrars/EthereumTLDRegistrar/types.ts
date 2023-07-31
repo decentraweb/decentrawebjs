@@ -1,17 +1,6 @@
-import {BigNumber, providers} from 'ethers';
-import { TLDApproval } from '../DecentrawebAPI/types';
-
-export interface DomainEntry {
-  name: string;
-  duration: number;
-}
-
-export interface BalanceVerificationResult {
-  success: boolean;
-  error: string | null;
-  ethAmount: BigNumber;
-  dwebAmount: BigNumber;
-}
+import { providers } from 'ethers';
+import { TLDApproval } from '../../DecentrawebAPI/types';
+import { DomainEntry } from '../types';
 
 export interface BaseRegistrationContext extends TLDApproval {
   domains: DomainEntry[];

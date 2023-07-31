@@ -1,11 +1,10 @@
-import { getContract } from '../contracts';
+import { getContract } from '../../contracts';
 import { BigNumber, ethers, providers } from 'ethers';
 import { hash as hashName, normalize } from '@ensdomains/eth-ens-namehash';
-import signTypedData from '../utils/signTypedData';
-import { SLDApproval } from '../DecentrawebAPI/types';
+import signTypedData from '../../utils/signTypedData';
+import { SLDApproval } from '../../DecentrawebAPI/types';
 import EthereumRegistrar from '../EthereumRegistrar';
-import { BalanceVerificationResult } from '../EthereumTLDRegistrar';
-import { increaseByPercent } from '../utils/misc';
+import { increaseByPercent } from '../../utils/misc';
 
 export interface Entry {
   name: string;
@@ -20,6 +19,13 @@ export interface ApprovedSLDRegistration {
   approval: SLDApproval;
   owner: string;
   isFeeInDWEB: boolean;
+}
+
+export interface BalanceVerificationResult {
+  success: boolean;
+  error: string | null;
+  ethAmount: BigNumber;
+  dwebAmount: BigNumber;
 }
 
 export class EthereumSLDRegistrar extends EthereumRegistrar {

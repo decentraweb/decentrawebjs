@@ -1,3 +1,6 @@
+/**
+ * Generate a random hex string n bytes long
+ */
 const getRandomHex: (n: number) => string =
   typeof window !== 'undefined'
     ? function getRandomHex(n: number): string {

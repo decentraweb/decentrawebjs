@@ -1,14 +1,15 @@
 import { BigNumber, ethers, providers } from 'ethers';
-import { normalize } from '@ensdomains/eth-ens-namehash';
-import { increaseByPercent } from '../utils/misc';
+
+import { increaseByPercent } from '../../utils/misc';
 import {
   ApprovedRegistration,
-  BalanceVerificationResult,
   CommittedRegistration,
-  DomainEntry,
   RegistrationContext
 } from './types';
 import EthereumRegistrar from '../EthereumRegistrar';
+import {BalanceVerificationResult, DomainEntry} from '../types';
+import { normalizeDomainEntries, normalizeDuration, normalizeName } from '../utils';
+import { APPROVAL_TTL, REGISTRATION_WAIT } from '../constants';
 
 export type {
   ApprovedRegistration,
@@ -17,30 +18,6 @@ export type {
   DomainEntry,
   RegistrationContext
 };
-
-/**
- * Standard duration values for registration.
- */
-export const DURATION = {
-  ONE_YEAR: 31556926,
-  TWO_YEARS: 63113852,
-  THREE_YEARS: 94670778,
-  FOUR_YEARS: 126227704,
-  FIVE_YEARS: 157784630
-};
-
-export const MIN_DURATION = 31556926; // 1 year
-export const MAX_DURATION = 157784630; // 5 years
-export const MAX_NAMES_PER_TX = 20;
-
-/**
- * Time to live for registration approval.
- */
-export const APPROVAL_TTL = 30 * 60; // 30 minutes
-/**
- * Time to wait before calling `register` after `sendCommitment` call.
- */
-export const REGISTRATION_WAIT = 60 * 1000; // 1 minute
 
 /**
  * Ethereum TLD Registrar class. Provides methods to register top level domains.
@@ -59,7 +36,7 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
   ): Promise<ApprovedRegistration> {
     const signerAddress = await this.signer.getAddress();
     const nameOwner = owner ? ethers.utils.getAddress(owner) : signerAddress;
-    const requests = this.normalizeDomainEntries(request);
+    const requests = normalizeDomainEntries(request);
     const normalizedNames = requests.map((item) => item.name);
     const approval = await this.api.approveTLDRegistration(nameOwner, normalizedNames);
     return {
@@ -117,7 +94,10 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
     const domains = request.domains;
     const normalizedNames = domains.map((item) => item.name);
     const durationArray = domains.map((item) => item.duration);
-    const { error: priceError, ethAmount, dwebAmount } = await this.verifySignerBalance(request, isFeesInDweb);
+    const {
+      error: priceError,
+      safePrice
+    } = await this.verifySignerBalance(request, isFeesInDweb);
 
     if (priceError) {
       throw new Error(priceError);
@@ -131,8 +111,8 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
       this.chainId,
       request.timestamp,
       isFeesInDweb,
-      isFeesInDweb ? dwebAmount : ethAmount,
-      { value: ethAmount }
+      safePrice,
+      { value: isFeesInDweb ? BigNumber.from(0) : safePrice }
     );
   }
 
@@ -152,14 +132,14 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
       this.tokenContract.balanceOf(signerAddress),
       this.getDwebAllowance(signerAddress)
     ]);
-
+    const safePrice = increaseByPercent(rentPrice, 10);
     const result: BalanceVerificationResult = {
       success: true,
       error: null,
-      ethAmount: isFeesInDweb ? BigNumber.from(0) : rentPrice,
-      dwebAmount: isFeesInDweb ? rentPrice : BigNumber.from(0)
+      price: rentPrice,
+      safePrice,
+      currency: isFeesInDweb ? 'DWEB' : 'ETH',
     };
-    const safePrice = increaseByPercent(rentPrice, 10);
 
     if (isFeesInDweb) {
       if (dwebBalance.lt(safePrice)) {
@@ -170,51 +150,12 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
         result.success = false;
         result.error = `Insufficient DWEB allowance. ${safePrice} wei needed, ${dwebAllowance} wei approved.`;
       }
-    }
-
-    if (!isFeesInDweb && ethBalance.lt(safePrice)) {
+    } else if (ethBalance.lt(safePrice)) {
       result.success = false;
       result.error = `Insufficient Ethereum funds. ${safePrice.toString()} wei needed, ${ethBalance.toString()} wei found.`;
     }
 
     return result;
-  }
-
-  /**
-   * Validates and normalizes domain names and durations for registration.
-   * @param requests
-   */
-  normalizeDomainEntries(requests: DomainEntry | Array<DomainEntry>): Array<DomainEntry> {
-    const reqArray: Array<DomainEntry> = Array.isArray(requests) ? requests : [requests];
-    if (reqArray.length > MAX_NAMES_PER_TX) {
-      throw new Error(`Maximum number of names per transaction is ${MAX_NAMES_PER_TX}`);
-    }
-    return reqArray.map((item) => {
-      let result: DomainEntry;
-      try {
-        result = {
-          name: this.normalizeName(item.name),
-          duration: this.normalizeDuration(item.duration)
-        };
-      } catch (e: any) {
-        throw new Error(`Invalid mint request ${JSON.stringify(item)}: ${e.message}`);
-      }
-      return result;
-    });
-  }
-
-  normalizeName(name: string): string {
-    return normalize(name);
-  }
-
-  normalizeDuration(duration: any): number {
-    if (!Number.isFinite(duration)) {
-      throw new Error(`Duration must be a number`);
-    }
-    if (duration < MIN_DURATION || duration > MAX_DURATION) {
-      throw new Error(`Duration must be between ${MIN_DURATION} and ${MAX_DURATION}`);
-    }
-    return duration;
   }
 
   /**
@@ -228,8 +169,8 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
     isFeesInDweb: boolean = false
   ): Promise<BigNumber> {
     return await this.contract.rentPrice(
-      this.normalizeName(name),
-      this.normalizeDuration(duration),
+      normalizeName(name),
+      normalizeDuration(duration),
       isFeesInDweb
     );
   }

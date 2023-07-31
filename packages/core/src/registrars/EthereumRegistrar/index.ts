@@ -1,8 +1,8 @@
-import DecentrawebAPI from '../DecentrawebAPI';
+import DecentrawebAPI from '../../DecentrawebAPI';
 import { BigNumber, ethers, providers, Wallet } from 'ethers';
-import DwebContractWrapper, { requiresSigner } from '../DwebContractWrapper';
-import { getContract } from '../contracts';
-import { DwebConfig } from '../types/common';
+import DwebContractWrapper, { requiresSigner } from '../../DwebContractWrapper';
+import { getContract } from '../../contracts';
+import { DwebConfig } from '../../types/common';
 
 export interface RegistrarConfig extends DwebConfig {
   signer: Wallet;
@@ -31,7 +31,7 @@ abstract class EthereumRegistrar extends DwebContractWrapper {
    * @returns DWEB token amount in wei
    */
   async getDwebAllowance(account?: string): Promise<BigNumber> {
-    return this.tokenContract.allowance(account, this.contractConfig.RootRegistrarController);
+    return this.tokenContract.allowance(account, this.contract.address);
   }
 
   /**
@@ -39,7 +39,7 @@ abstract class EthereumRegistrar extends DwebContractWrapper {
    * @param amount - amount of DWEB in wei
    */
   @requiresSigner
-  async approveDwebUsageAmount(amount: BigNumber): Promise<providers.TransactionReceipt> {
+  async setDwebAllowance(amount: BigNumber): Promise<providers.TransactionReceipt> {
     const tx = this.tokenContract.approve(this.contractConfig.RootRegistrarController, amount, {
       value: '0x00'
     });
@@ -49,8 +49,8 @@ abstract class EthereumRegistrar extends DwebContractWrapper {
   /**
    * Approve unlimited DWEB token usage by the registrar, so no further approvals are needed
    */
-  approveDwebUsage() {
-    return this.approveDwebUsageAmount(
+  allowDwebUsage() {
+    return this.setDwebAllowance(
       ethers.utils.parseUnits(Number.MAX_SAFE_INTEGER.toString(), 'ether')
     );
   }

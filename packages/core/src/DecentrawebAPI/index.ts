@@ -1,5 +1,3 @@
-import fetchPonyfill from 'fetch-ponyfill';
-import { ChainId, EthNetwork } from '../contracts/interfaces';
 import { ethers } from 'ethers';
 import {
   PriceConversionResponse,
@@ -14,51 +12,9 @@ import {
 } from './types';
 import { TypedData } from '../types/TypedData';
 import getRandomHex from '../utils/getRandomHex';
-import { getChainId } from '../utils/ethereum';
+import ApiWrapper from "./ApiWrapper";
 
-const { fetch } = fetchPonyfill();
-
-class DecentrawebAPI {
-  readonly network: EthNetwork;
-  readonly baseUrl: string;
-  readonly chainId: ChainId;
-
-  constructor(network: EthNetwork) {
-    this.network = network;
-    this.chainId = getChainId(network);
-    switch (network) {
-      case 'mainnet':
-        this.baseUrl = 'https://api.decentraweb.org';
-        break;
-      case 'goerli':
-        this.baseUrl = 'https://dns-api-goerli.decentraweb.org';
-        break;
-      default:
-        throw new Error(`Unsupported network: ${network}`);
-    }
-  }
-
-  async get<R>(path: string, query: Record<string, string>): Promise<R> {
-    const url = new URL(this.baseUrl);
-    url.pathname = path;
-    url.search = new URLSearchParams(query).toString();
-    const response = await fetch(url.toString());
-    return response.json();
-  }
-
-  async post<R>(path: string, query: Record<string, string>, data: any): Promise<R> {
-    const url = new URL(this.baseUrl);
-    url.pathname = path;
-    url.search = new URLSearchParams(query).toString();
-    const response = await fetch(url.toString(), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
-    return response.json();
-  }
+class DecentrawebAPI extends ApiWrapper {
 
   async approveTLDRegistration(owner: string, names: Array<string>): Promise<TLDApproval> {
     const payload: TLDApprovalPayload = {
