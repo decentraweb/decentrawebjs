@@ -1,13 +1,9 @@
 import { BigNumber, ethers, providers } from 'ethers';
 
 import { increaseByPercent } from '../../utils/misc';
-import {
-  ApprovedRegistration,
-  CommittedRegistration,
-  RegistrationContext
-} from './types';
+import { ApprovedRegistration, CommittedRegistration, RegistrationContext } from './types';
 import EthereumRegistrar from '../EthereumRegistrar';
-import {BalanceVerificationResult, DomainEntry} from '../types/TLD';
+import { BalanceVerificationResult, DomainEntry } from '../types/TLD';
 import { normalizeDomainEntries, normalizeDuration, normalizeName } from '../utils';
 import { APPROVAL_TTL, REGISTRATION_WAIT } from '../constants';
 
@@ -94,10 +90,7 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
     const domains = request.domains;
     const normalizedNames = domains.map((item) => item.name);
     const durationArray = domains.map((item) => item.duration);
-    const {
-      error: priceError,
-      safePrice
-    } = await this.verifySignerBalance(request, isFeesInDweb);
+    const { error: priceError, safePrice } = await this.verifySignerBalance(request, isFeesInDweb);
 
     if (priceError) {
       throw new Error(priceError);
@@ -138,7 +131,7 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
       error: null,
       price: rentPrice,
       safePrice,
-      currency: isFeesInDweb ? 'DWEB' : 'ETH',
+      currency: isFeesInDweb ? 'DWEB' : 'ETH'
     };
 
     if (isFeesInDweb) {

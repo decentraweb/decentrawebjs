@@ -72,12 +72,16 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
     owner,
     isFeeInDWEB
   }: ApprovedRegistration): Promise<providers.TransactionResponse> {
-    const { error: priceError, ownerFee, serviceFee } = await this.verifySignerBalance(approval, isFeeInDWEB);
+    const {
+      error: priceError,
+      ownerFee,
+      serviceFee
+    } = await this.verifySignerBalance(approval, isFeeInDWEB);
 
     if (priceError) {
       throw new Error(priceError);
     }
-    const ethAmount = isFeeInDWEB ? serviceFee.amount : serviceFee.amount.add(ownerFee.amount)
+    const ethAmount = isFeeInDWEB ? serviceFee.amount : serviceFee.amount.add(ownerFee.amount);
     const safeEthAmount = increaseByPercent(ethAmount, 10);
 
     const { v, r, s } = ethers.utils.splitSignature(approval.signature);
@@ -108,10 +112,7 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
   }
 
   async verifySignerBalance(approval: Approval, isFeeInDWEB?: boolean) {
-    const { serviceFee, ownerFee } = await this.calculateTotalFee(
-      approval,
-      isFeeInDWEB
-    );
+    const { serviceFee, ownerFee } = await this.calculateTotalFee(approval, isFeeInDWEB);
     const signerAddress = await this.signer.getAddress();
     const [ethBalance, dwebBalance, dwebAllowance] = await Promise.all([
       this.provider.getBalance(signerAddress),
@@ -124,7 +125,7 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
       serviceFee,
       ownerFee
     };
-    const ethAmount = isFeeInDWEB ? serviceFee.amount : serviceFee.amount.add(ownerFee.amount)
+    const ethAmount = isFeeInDWEB ? serviceFee.amount : serviceFee.amount.add(ownerFee.amount);
     const safeEthAmount = increaseByPercent(ethAmount, 10);
     if (isFeeInDWEB) {
       const safeDwebAmount = increaseByPercent(ownerFee.amount, 10);

@@ -1,4 +1,4 @@
-import { BigNumber, ethers, providers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { normalizeDomainEntries, normalizeDuration, normalizeName } from '../utils';
 import getRandomHex from '../../utils/getRandomHex';
 import { BalanceVerificationResult, DomainEntry } from '../types/TLD';

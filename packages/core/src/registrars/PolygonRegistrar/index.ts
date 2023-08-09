@@ -3,7 +3,7 @@ import { PolygonNetwork } from '../../contracts/interfaces';
 import { BigNumber, ethers, providers, Wallet } from 'ethers';
 import { getContract, getWethContract } from '../../contracts';
 import { RegistrarConfig } from '../EthereumRegistrar';
-import DecentrawebAPI from "../../DecentrawebAPI";
+import DecentrawebAPI from '../../DecentrawebAPI';
 
 interface PolygonRegistrarConfig extends RegistrarConfig {
   network: PolygonNetwork;

@@ -1,4 +1,4 @@
-import {EthChainId, PolygonChainId} from "../../contracts/interfaces";
+import { EthChainId, PolygonChainId } from '../../contracts/interfaces';
 
 export interface PayloadBase {
   name: string[];

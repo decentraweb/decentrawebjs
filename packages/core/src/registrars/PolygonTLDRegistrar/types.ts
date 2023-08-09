@@ -14,12 +14,12 @@ export interface CommittedRegistration extends BaseRegistrationContext {
   data: {
     secret: string;
     timestamp: number;
-  }
+  };
 }
 
 export interface DoneRegistration extends BaseRegistrationContext {
   status: 'done';
   data: {
     txid: string;
-  }
+  };
 }

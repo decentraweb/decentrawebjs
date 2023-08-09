@@ -1,6 +1,5 @@
 import { Approval } from '../../DecentrawebAPI/types/SubdomainApproval';
-import { BigNumber } from 'ethers';
-import {Price} from "./common";
+import { Price } from './common';
 
 export interface Entry {
   name: string;

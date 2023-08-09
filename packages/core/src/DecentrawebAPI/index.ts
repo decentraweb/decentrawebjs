@@ -10,15 +10,16 @@ import * as ISubdomainApproval from './types/SubdomainApproval';
 import { TypedData } from '../types/TypedData';
 import getRandomHex from '../utils/getRandomHex';
 import ApiWrapper from './ApiWrapper';
-import {getDwebAddress, getWethAddress} from '../contracts';
+import { getDwebAddress, getWethAddress } from '../contracts';
 import { Entry as SubdomainEntry } from '../registrars/types/Subdomain';
 import {
   RegistrationResponse,
   RequestRegistrationPayload,
   RequestRegistrationResponse,
   SendCommitmentPayload,
-  SendCommitmentResponse, SubmitRegistrationPayload
-} from "./types/PolygonTLD";
+  SendCommitmentResponse,
+  SubmitRegistrationPayload
+} from './types/PolygonTLD';
 
 class DecentrawebAPI extends ApiWrapper {
   async approveTLDRegistration(owner: string, names: Array<string>): Promise<TLDApproval> {
@@ -48,34 +49,6 @@ class DecentrawebAPI extends ApiWrapper {
     };
   }
 
-  private getSLDApprovalPayload(
-    owner: string,
-    entries: Array<SubdomainEntry>,
-    isFeesInDweb = false,
-    sender = ''
-  ): ISubdomainApproval.Payload {
-    const base: ISubdomainApproval.PayloadBase = {
-      name: entries.map((e) => e.name),
-      label: entries.map((e) => e.label),
-      owner: ethers.utils.getAddress(owner),
-      chainid: this.chainId,
-      sender: ethers.utils.getAddress(sender)
-    };
-    switch (this.network) {
-      case 'matic':
-      case 'maticmum':
-        return {
-          ...base,
-          feeTokenAddress: isFeesInDweb ? getDwebAddress(this.network) : getWethAddress(this.network)
-        } as ISubdomainApproval.PolygonPayload;
-      default:
-        return  {
-          ...base,
-          isfeeindwebtoken: isFeesInDweb ? 1 : 0
-        } as ISubdomainApproval.EthereumPayload;
-    }
-  }
-
   async requestSelfSLDRegistration(
     sender: string,
     owner: string,
@@ -94,7 +67,9 @@ class DecentrawebAPI extends ApiWrapper {
     };
   }
 
-  async approveSelfSLDRegistration(payload: ISubdomainApproval.Payload): Promise<ISubdomainApproval.Approval> {
+  async approveSelfSLDRegistration(
+    payload: ISubdomainApproval.Payload
+  ): Promise<ISubdomainApproval.Approval> {
     const res = await this.post<ISubdomainApproval.Response>(
       '/api/v1/approve-subdomain-registration',
       {},
@@ -138,28 +113,68 @@ class DecentrawebAPI extends ApiWrapper {
   }
 
   sendPolygonTLDCommitment(payload: SendCommitmentPayload): Promise<SendCommitmentResponse> {
-    return this.post<SendCommitmentResponse>('/api/v1/send-commitment-tx', {}, {
-      ...payload,
-      chainid: this.chainId
-    });
+    return this.post<SendCommitmentResponse>(
+      '/api/v1/send-commitment-tx',
+      {},
+      {
+        ...payload,
+        chainid: this.chainId
+      }
+    );
   }
 
   requestPolygonTLDRegistration(
     payload: RequestRegistrationPayload
   ): Promise<RequestRegistrationResponse> {
-    return this.post<RequestRegistrationResponse>('/api/v1/get-registration-tx', {}, {
-      ...payload,
-      chainid: this.chainId
-    });
+    return this.post<RequestRegistrationResponse>(
+      '/api/v1/get-registration-tx',
+      {},
+      {
+        ...payload,
+        chainid: this.chainId
+      }
+    );
   }
 
-  submitPolygonTLDRegistration(
-    payload: SubmitRegistrationPayload
-  ): Promise<RegistrationResponse> {
-    return this.post<RegistrationResponse>('/api/v1/send-registration-tx', {}, {
-      ...payload,
-      chainid: this.chainId
-    });
+  submitPolygonTLDRegistration(payload: SubmitRegistrationPayload): Promise<RegistrationResponse> {
+    return this.post<RegistrationResponse>(
+      '/api/v1/send-registration-tx',
+      {},
+      {
+        ...payload,
+        chainid: this.chainId
+      }
+    );
+  }
+
+  private getSLDApprovalPayload(
+    owner: string,
+    entries: Array<SubdomainEntry>,
+    isFeesInDweb = false,
+    sender = ''
+  ): ISubdomainApproval.Payload {
+    const base: ISubdomainApproval.PayloadBase = {
+      name: entries.map((e) => e.name),
+      label: entries.map((e) => e.label),
+      owner: ethers.utils.getAddress(owner),
+      chainid: this.chainId,
+      sender: ethers.utils.getAddress(sender)
+    };
+    switch (this.network) {
+      case 'matic':
+      case 'maticmum':
+        return {
+          ...base,
+          feeTokenAddress: isFeesInDweb
+            ? getDwebAddress(this.network)
+            : getWethAddress(this.network)
+        } as ISubdomainApproval.PolygonPayload;
+      default:
+        return {
+          ...base,
+          isfeeindwebtoken: isFeesInDweb ? 1 : 0
+        } as ISubdomainApproval.EthereumPayload;
+    }
   }
 }
 

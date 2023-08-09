@@ -103,7 +103,7 @@ export function getContract({
 }
 
 export function getDwebAddress(network: EthNetwork): string {
-  if(!CONTRACT_ADDRESSES[network]) {
+  if (!CONTRACT_ADDRESSES[network]) {
     throw new Error('Unknown network name');
   }
   return CONTRACT_ADDRESSES[network].DecentraWebToken;

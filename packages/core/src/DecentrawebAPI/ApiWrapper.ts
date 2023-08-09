@@ -1,6 +1,6 @@
-import {ChainId, EthNetwork} from "../contracts/interfaces";
-import {getChainId} from "../utils/ethereum";
-import fetchPonyfill from "fetch-ponyfill";
+import { ChainId, EthNetwork } from '../contracts/interfaces';
+import { getChainId } from '../utils/ethereum';
+import fetchPonyfill from 'fetch-ponyfill';
 
 const { fetch } = fetchPonyfill();
 

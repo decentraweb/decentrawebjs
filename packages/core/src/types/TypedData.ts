@@ -5,7 +5,7 @@ export interface TypedDataArgument {
 
 export type TypedDataTypes = {
   EIP712Domain: TypedDataArgument[];
-  [key: string]: TypedDataArgument[]
+  [key: string]: TypedDataArgument[];
 };
 
 export interface TypedDataDomain {
