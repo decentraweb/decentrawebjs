@@ -1,21 +1,26 @@
 import { ethers } from 'ethers';
 import {
   PriceConversionResponse,
-  SLDApproval,
-  SLDApprovalPayload,
-  SLDApprovalResponse,
   StakedDomain,
-  SubdomainEntry,
   TLDApproval,
   TLDApprovalPayload,
   TLDApprovalResponse
 } from './types';
+import * as ISubdomainApproval from './types/SubdomainApproval';
 import { TypedData } from '../types/TypedData';
 import getRandomHex from '../utils/getRandomHex';
-import ApiWrapper from "./ApiWrapper";
+import ApiWrapper from './ApiWrapper';
+import {getDwebAddress, getWethAddress} from '../contracts';
+import { Entry as SubdomainEntry } from '../registrars/types/Subdomain';
+import {
+  RegistrationResponse,
+  RequestRegistrationPayload,
+  RequestRegistrationResponse,
+  SendCommitmentPayload,
+  SendCommitmentResponse, SubmitRegistrationPayload
+} from "./types/PolygonTLD";
 
 class DecentrawebAPI extends ApiWrapper {
-
   async approveTLDRegistration(owner: string, names: Array<string>): Promise<TLDApproval> {
     const payload: TLDApprovalPayload = {
       name: names,
@@ -43,20 +48,41 @@ class DecentrawebAPI extends ApiWrapper {
     };
   }
 
+  private getSLDApprovalPayload(
+    owner: string,
+    entries: Array<SubdomainEntry>,
+    isFeesInDweb = false,
+    sender = ''
+  ): ISubdomainApproval.Payload {
+    const base: ISubdomainApproval.PayloadBase = {
+      name: entries.map((e) => e.name),
+      label: entries.map((e) => e.label),
+      owner: ethers.utils.getAddress(owner),
+      chainid: this.chainId,
+      sender: ethers.utils.getAddress(sender)
+    };
+    switch (this.network) {
+      case 'matic':
+      case 'maticmum':
+        return {
+          ...base,
+          feeTokenAddress: isFeesInDweb ? getDwebAddress(this.network) : getWethAddress(this.network)
+        } as ISubdomainApproval.PolygonPayload;
+      default:
+        return  {
+          ...base,
+          isfeeindwebtoken: isFeesInDweb ? 1 : 0
+        } as ISubdomainApproval.EthereumPayload;
+    }
+  }
+
   async requestSelfSLDRegistration(
     sender: string,
     owner: string,
     entries: Array<SubdomainEntry>,
     isFeesInDweb = false
-  ): Promise<{ payload: SLDApprovalPayload; typedData: TypedData }> {
-    const payload: SLDApprovalPayload = {
-      name: entries.map((e) => e.name),
-      label: entries.map((e) => e.label),
-      owner: ethers.utils.getAddress(owner),
-      chainid: this.chainId,
-      sender: ethers.utils.getAddress(sender),
-      isfeeindwebtoken: isFeesInDweb ? 1 : 0
-    };
+  ): Promise<{ payload: ISubdomainApproval.Payload; typedData: TypedData }> {
+    const payload = this.getSLDApprovalPayload(owner, entries, isFeesInDweb, sender);
     const typedData = await this.post<TypedData>(
       '/api/v1/get-approve-subdomain-registration',
       {},
@@ -68,8 +94,8 @@ class DecentrawebAPI extends ApiWrapper {
     };
   }
 
-  async approveSelfSLDRegistration(payload: SLDApprovalPayload): Promise<SLDApproval> {
-    const res = await this.post<SLDApprovalResponse>(
+  async approveSelfSLDRegistration(payload: ISubdomainApproval.Payload): Promise<ISubdomainApproval.Approval> {
+    const res = await this.post<ISubdomainApproval.Response>(
       '/api/v1/approve-subdomain-registration',
       {},
       payload
@@ -84,20 +110,11 @@ class DecentrawebAPI extends ApiWrapper {
     owner: string,
     entries: Array<SubdomainEntry>,
     isFeesInDweb = false
-  ): Promise<SLDApproval> {
-    const payload: SLDApprovalPayload = {
-      name: entries.map((e) => e.name),
-      label: entries.map((e) => e.label),
-      owner: ethers.utils.getAddress(owner),
-      chainid: this.chainId,
-      sender: '',
-      isfeeindwebtoken: isFeesInDweb ? 1 : 0,
-      signature: ''
-    };
-    const res = await this.post<SLDApprovalResponse>(
+  ): Promise<ISubdomainApproval.Approval> {
+    const res = await this.post<ISubdomainApproval.Response>(
       '/api/v1/approve-subdomain-registration',
       {},
-      payload
+      this.getSLDApprovalPayload(owner, entries, isFeesInDweb)
     );
     if ('error' in res) {
       throw new Error(res.errorMessage || res.error);
@@ -118,6 +135,31 @@ class DecentrawebAPI extends ApiWrapper {
       chainid: this.chainId
     };
     return this.post<PriceConversionResponse>('/api/v1/convert-price', {}, payload);
+  }
+
+  sendPolygonTLDCommitment(payload: SendCommitmentPayload): Promise<SendCommitmentResponse> {
+    return this.post<SendCommitmentResponse>('/api/v1/send-commitment-tx', {}, {
+      ...payload,
+      chainid: this.chainId
+    });
+  }
+
+  requestPolygonTLDRegistration(
+    payload: RequestRegistrationPayload
+  ): Promise<RequestRegistrationResponse> {
+    return this.post<RequestRegistrationResponse>('/api/v1/get-registration-tx', {}, {
+      ...payload,
+      chainid: this.chainId
+    });
+  }
+
+  submitPolygonTLDRegistration(
+    payload: SubmitRegistrationPayload
+  ): Promise<RegistrationResponse> {
+    return this.post<RegistrationResponse>('/api/v1/send-registration-tx', {}, {
+      ...payload,
+      chainid: this.chainId
+    });
   }
 }
 

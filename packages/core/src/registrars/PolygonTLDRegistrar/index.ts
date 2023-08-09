@@ -1,42 +1,14 @@
-import DwebContractWrapper from '../../DwebContractWrapper';
-import {BigNumber, ethers, providers, Wallet} from 'ethers';
-import { getContract, getWethContract } from '../../contracts';
-import { RegistrarConfig } from '../EthereumRegistrar';
-import PolygonApi from '../../PolygonAPI';
+import { BigNumber, ethers, providers } from 'ethers';
 import { normalizeDomainEntries, normalizeDuration, normalizeName } from '../utils';
 import getRandomHex from '../../utils/getRandomHex';
-import { BalanceVerificationResult, DomainEntry } from '../types';
-import { PolygonNetwork } from '../../contracts/interfaces';
+import { BalanceVerificationResult, DomainEntry } from '../types/TLD';
 import { increaseByPercent } from '../../utils/misc';
 import { CommittedRegistration, DoneRegistration } from './types';
 import { APPROVAL_TTL } from '../constants';
 import signTypedData from '../../utils/signTypedData';
+import PolygonRegistrar from '../PolygonRegistrar';
 
-interface PolygonRegistrarConfig extends RegistrarConfig {
-  network: PolygonNetwork;
-}
-
-class PolygonTLDRegistrar extends DwebContractWrapper {
-  readonly network: PolygonNetwork;
-  readonly api: PolygonApi;
-  readonly signer: Wallet;
-  readonly dwebToken: ethers.Contract;
-  readonly wethToken: ethers.Contract;
-
-  constructor(options: PolygonRegistrarConfig) {
-    super(options, 'RootRegistrarController');
-    this.network = options.network;
-    this.api = new PolygonApi(this.network);
-    this.signer = options.signer;
-    this.dwebToken = getContract({
-      address: this.contractConfig.DecentraWebToken,
-      name: 'DecentraWebToken',
-      provider: this.signer,
-      network: this.network
-    });
-    this.wethToken = getWethContract(this.network, this.signer);
-  }
-
+class PolygonTLDRegistrar extends PolygonRegistrar {
   async sendCommitment(
     request: DomainEntry | Array<DomainEntry>,
     isFeesInDweb: boolean = false,
@@ -56,7 +28,7 @@ class PolygonTLDRegistrar extends DwebContractWrapper {
     );
     const signature = await this.signer.signMessage(ethers.utils.arrayify(hash));
 
-    const result = await this.api.sendTLDCommitment({
+    const result = await this.api.sendPolygonTLDCommitment({
       name: names,
       owner: nameOwner,
       secret,
@@ -87,9 +59,9 @@ class PolygonTLDRegistrar extends DwebContractWrapper {
       feeTokenAddress: request.isFeesInDweb ? this.dwebToken.address : this.wethToken.address,
       fee: request.fee.toString()
     };
-    const typedData = await this.api.requestTLDRegistration(registrationPayload);
+    const typedData = await this.api.requestPolygonTLDRegistration(registrationPayload);
     const signature = await signTypedData(this.signer, typedData);
-    const result = await this.api.submitTLDRegistration({
+    const result = await this.api.submitPolygonTLDRegistration({
       ...registrationPayload,
       signature
     });
@@ -165,42 +137,6 @@ class PolygonTLDRegistrar extends DwebContractWrapper {
       totalPrice = totalPrice.add(price);
     }
     return totalPrice;
-  }
-
-  /**
-   * Approve the DWEB token amount that can be used by the registrar
-   * @param {'WETH' | 'DWEB'} token - token name
-   * @param {BigNumber} amount - amount in wei
-   * @returns {Promise<providers.TransactionReceipt>}
-   */
-  async setTokenAllowance(
-    token: 'WETH' | 'DWEB',
-    amount: BigNumber
-  ): Promise<providers.TransactionReceipt> {
-    switch (token) {
-      case 'DWEB': {
-        const tx = await this.dwebToken.approve(this.contract.address, amount, {
-          value: '0x00'
-        });
-        return tx.wait(1);
-      }
-      case 'WETH': {
-        const tx = await this.wethToken.approve(this.contract.address, amount, {
-          value: '0x00'
-        });
-        return tx.wait(1);
-      }
-    }
-  }
-
-  /**
-   * Approve unlimited token usage by the registrar, so no further approvals are needed
-   */
-  async allowTokenUsage(token: 'WETH' | 'DWEB') {
-    return this.setTokenAllowance(
-      token,
-      ethers.utils.parseUnits(Number.MAX_SAFE_INTEGER.toString(), 'ether')
-    );
   }
 }
 

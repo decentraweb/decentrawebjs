@@ -1,4 +1,4 @@
-import { DomainEntry } from '../types';
+import { DomainEntry } from '../types/TLD';
 import { BigNumber } from 'ethers';
 
 export interface BaseRegistrationContext {

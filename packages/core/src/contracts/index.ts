@@ -58,9 +58,7 @@ export const CONTRACT_ADDRESSES: Record<EthNetwork, ContractConfig> = {
 
 const WETH_ADDRESSES: Record<PolygonNetwork, string> = {
   matic: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
-  //maticmum: '0xa6fa4fb5f76172d178d61b04b0ecd319c5d1c0aa'
   maticmum: '0x602e78C34Da5208090B5A1d49db07F17737E5b11'
-  //maticmum: '0xd087ff96281dcf722aea82aca57e8545ea9e6c96'
 };
 
 export const ABI: Record<DwebContract, ContractInterface> = {
@@ -102,6 +100,20 @@ export function getContract({
   } else {
     return new ethers.Contract(address, ABI[name], provider);
   }
+}
+
+export function getDwebAddress(network: EthNetwork): string {
+  if(!CONTRACT_ADDRESSES[network]) {
+    throw new Error('Unknown network name');
+  }
+  return CONTRACT_ADDRESSES[network].DecentraWebToken;
+}
+
+export function getWethAddress(network: PolygonNetwork): string {
+  if (!WETH_ADDRESSES[network]) {
+    throw new Error('Unknown network name');
+  }
+  return WETH_ADDRESSES[network];
 }
 
 export function getWethContract(

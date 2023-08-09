@@ -7,7 +7,7 @@ import {
   RegistrationContext
 } from './types';
 import EthereumRegistrar from '../EthereumRegistrar';
-import {BalanceVerificationResult, DomainEntry} from '../types';
+import {BalanceVerificationResult, DomainEntry} from '../types/TLD';
 import { normalizeDomainEntries, normalizeDuration, normalizeName } from '../utils';
 import { APPROVAL_TTL, REGISTRATION_WAIT } from '../constants';
 

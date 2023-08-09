@@ -1,12 +1,12 @@
-import { BigNumber, ethers, providers } from 'ethers';
+import PolygonRegistrar from '../PolygonRegistrar';
 import { hash as hashName, normalize } from '@ensdomains/eth-ens-namehash';
+import { ApprovedRegistration, BalanceVerificationResult, Entry, Fees } from '../types/Subdomain';
+import { BigNumber, ethers, providers } from 'ethers';
 import signTypedData from '../../utils/signTypedData';
 import { Approval } from '../../DecentrawebAPI/types/SubdomainApproval';
-import { ApprovedRegistration, BalanceVerificationResult, Entry, Fees } from '../types/Subdomain';
-import EthereumRegistrar from '../EthereumRegistrar';
 import { increaseByPercent } from '../../utils/misc';
 
-export class EthereumSLDRegistrar extends EthereumRegistrar {
+class PolygonSubdomainRegistrar extends PolygonRegistrar {
   /**
    * Get subdomain registration approval for domain names owned by signer
    * @param {Entry | Array<Entry>} entry - list of domains and subdomains to register
@@ -72,16 +72,15 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
     owner,
     isFeeInDWEB
   }: ApprovedRegistration): Promise<providers.TransactionResponse> {
-    const { error: priceError, ownerFee, serviceFee } = await this.verifySignerBalance(approval, isFeeInDWEB);
+    const { error: priceError, serviceFee } = await this.verifySignerBalance(approval, isFeeInDWEB);
 
     if (priceError) {
       throw new Error(priceError);
     }
-    const ethAmount = isFeeInDWEB ? serviceFee.amount : serviceFee.amount.add(ownerFee.amount)
-    const safeEthAmount = increaseByPercent(ethAmount, 10);
 
     const { v, r, s } = ethers.utils.splitSignature(approval.signature);
     const enc = new TextEncoder();
+    const safeServiceFee = increaseByPercent(serviceFee.amount, 10);
     const args = [
       approval.names.map((name) => hashName(name)),
       approval.labels.map((label) => ethers.utils.keccak256(enc.encode(label))),
@@ -90,13 +89,13 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
       this.chainId,
       approval.expiry,
       isFeeInDWEB,
-      approval.fee.map((i) => ethers.BigNumber.from(i)),
+      approval.fee.map((i) => BigNumber.from(i)),
       v,
       r,
       s,
-      safeEthAmount
+      safeServiceFee
     ];
-    return this.contract.createSubnodeBatch(args, { value: safeEthAmount });
+    return this.contract.createSubnodeBatch(args, { value: safeServiceFee });
   }
 
   async normalizeEntries(entry: Entry | Array<Entry>): Promise<Array<Entry>> {
@@ -108,15 +107,13 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
   }
 
   async verifySignerBalance(approval: Approval, isFeeInDWEB?: boolean) {
-    const { serviceFee, ownerFee } = await this.calculateTotalFee(
-      approval,
-      isFeeInDWEB
-    );
+    const { serviceFee, ownerFee } = await this.calculateTotalFee(approval, isFeeInDWEB);
     const signerAddress = await this.signer.getAddress();
-    const [ethBalance, dwebBalance, dwebAllowance] = await Promise.all([
+    const tokenContract = isFeeInDWEB ? this.dwebToken : this.wethToken;
+    const [maticBalance, feeTokenBalance, feeTokenAllowance] = await Promise.all([
       this.provider.getBalance(signerAddress),
-      this.tokenContract.balanceOf(signerAddress),
-      this.getDwebAllowance(signerAddress)
+      tokenContract.balanceOf(signerAddress),
+      tokenContract.allowance(signerAddress)
     ]);
     const result: BalanceVerificationResult = {
       success: true,
@@ -124,23 +121,19 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
       serviceFee,
       ownerFee
     };
-    const ethAmount = isFeeInDWEB ? serviceFee.amount : serviceFee.amount.add(ownerFee.amount)
-    const safeEthAmount = increaseByPercent(ethAmount, 10);
-    if (isFeeInDWEB) {
-      const safeDwebAmount = increaseByPercent(ownerFee.amount, 10);
-      if (dwebBalance.lt(safeDwebAmount)) {
-        result.success = false;
-        result.error = `Insufficient DWEB balance. ${safeDwebAmount} wei needed, ${dwebBalance} wei found.`;
-      }
-      if (dwebAllowance.lt(safeDwebAmount)) {
-        result.success = false;
-        result.error = `Insufficient DWEB allowance. ${safeDwebAmount} wei needed, ${dwebAllowance} wei approved.`;
-      }
+    const safeServiceFee = increaseByPercent(serviceFee.amount, 10);
+    if (feeTokenBalance.lt(ownerFee.amount)) {
+      result.success = false;
+      result.error = `Insufficient ${ownerFee.currency} balance. ${ownerFee.amount} wei needed, ${feeTokenBalance} wei found.`;
+    }
+    if (feeTokenAllowance.lt(ownerFee.amount)) {
+      result.success = false;
+      result.error = `Insufficient ${ownerFee.currency} allowance. ${ownerFee.amount} wei needed, ${feeTokenAllowance} wei approved.`;
     }
 
-    if (ethBalance.lt(safeEthAmount)) {
+    if (maticBalance.lt(safeServiceFee)) {
       result.success = false;
-      result.error = `Insufficient Ethereum funds. ${safeEthAmount.toString()} wei needed, ${ethBalance.toString()} wei found.`;
+      result.error = `Insufficient MATIC funds. ${safeServiceFee} wei needed, ${maticBalance} wei found.`;
     }
 
     return result;
@@ -148,12 +141,12 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
 
   async calculateTotalFee(approval: Approval, isFeeInDWEB?: boolean): Promise<Fees> {
     const serviceFeeUSD = await this.getServiceFee();
-    const { eth: serviceFee } = await this.api.convertPrice(serviceFeeUSD.toNumber());
+    const { matic: serviceFee } = await this.api.convertPrice(serviceFeeUSD.toNumber());
     const totalServiceFee = BigNumber.from(serviceFee).mul(approval.labels.length);
     const totalFee = approval.fee.reduce((a, b) => a.add(b), BigNumber.from(0));
     return {
-      serviceFee: { currency: 'ETH', amount: totalServiceFee },
-      ownerFee: { currency: isFeeInDWEB ? 'DWEB' : 'ETH', amount: totalFee }
+      serviceFee: { currency: 'MATIC', amount: totalServiceFee },
+      ownerFee: { currency: isFeeInDWEB ? 'DWEB' : 'WETH', amount: totalFee }
     };
   }
 
@@ -163,4 +156,4 @@ export class EthereumSLDRegistrar extends EthereumRegistrar {
   }
 }
 
-export default EthereumSLDRegistrar;
+export default PolygonSubdomainRegistrar;

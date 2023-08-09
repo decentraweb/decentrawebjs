@@ -1,5 +1,5 @@
 import { normalize } from '@ensdomains/eth-ens-namehash';
-import { DomainEntry } from './types';
+import { DomainEntry } from './types/TLD';
 import { MAX_DURATION, MAX_NAMES_PER_TX, MIN_DURATION } from './constants';
 
 /**

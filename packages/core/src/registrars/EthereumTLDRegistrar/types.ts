@@ -1,6 +1,6 @@
 import { providers } from 'ethers';
 import { TLDApproval } from '../../DecentrawebAPI/types';
-import { DomainEntry } from '../types';
+import { DomainEntry } from '../types/TLD';
 
 export interface BaseRegistrationContext extends TLDApproval {
   domains: DomainEntry[];

@@ -1,5 +1,5 @@
-import { PolygonChainId } from '../contracts/interfaces';
-import { TypedData } from '../types/TypedData';
+import { PolygonChainId } from '../../contracts/interfaces';
+import { TypedData } from '../../types/TypedData';
 
 export interface SendCommitmentPayload {
   name: string[];
@@ -15,7 +15,7 @@ export interface SendCommitmentResponse {
   timestamp: number;
 }
 
-export interface RequestTLDRegistrationPayload {
+export interface RequestRegistrationPayload {
   name: string[];
   duration: number[];
   secret: string;
@@ -25,12 +25,12 @@ export interface RequestTLDRegistrationPayload {
   fee: string;
 }
 
-export type RequestTLDRegistrationResponse = TypedData;
+export type RequestRegistrationResponse = TypedData;
 
-export interface SubmitTLDRegistrationPayload extends RequestTLDRegistrationPayload {
+export interface SubmitRegistrationPayload extends RequestRegistrationPayload {
   signature: string;
 }
 
-export interface SubmitTLDRegistrationResponse {
+export interface RegistrationResponse {
   txid: string;
 }

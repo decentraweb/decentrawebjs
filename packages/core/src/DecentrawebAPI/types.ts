@@ -45,38 +45,6 @@ export type StakedDomain =
       staked: false;
     };
 
-export interface SubdomainEntry {
-  name: string;
-  label: string;
-}
-
-export interface SLDApprovalPayload {
-  name: string[];
-  label: string[];
-  owner: string;
-  chainid: number;
-  sender: string;
-  isfeeindwebtoken: 0 | 1;
-  signature?: string; //Signature is required for self registration. Empty string for on-demand registration
-}
-
-export interface SLDApproval {
-  commitment: string; //Commitment value.
-  signature: string; //Signature value. It is used in contract call
-  expiry: number; //User has to complete within this timestamp. The duration is 30 min from the response generation timestamp
-  names: string[]; //Array of parent domains
-  labels: string[]; //Array of labels.
-  fee: string[]; //Fee for SLD mint. It is the array of price that user has to pay for each sld
-  domainowner: string[]; //tld owner to which the sld fee will be paid. There can be multiple different owner in single tx
-}
-
-export interface SLDApprovalError {
-  error: string;
-  errorMessage?: string;
-}
-
-export type SLDApprovalResponse = SLDApproval | SLDApprovalError;
-
 export interface PriceConversionResponse {
   eth: string;
   dweb: string;
