@@ -88,7 +88,7 @@ class PolygonSubdomainRegistrar extends PolygonRegistrar {
       owner,
       this.chainId,
       approval.expiry,
-      isFeeInDWEB,
+      isFeeInDWEB ? this.dwebToken.address : this.wethToken.address,
       approval.fee.map((i) => BigNumber.from(i)),
       v,
       r,
@@ -113,7 +113,7 @@ class PolygonSubdomainRegistrar extends PolygonRegistrar {
     const [maticBalance, feeTokenBalance, feeTokenAllowance] = await Promise.all([
       this.provider.getBalance(signerAddress),
       tokenContract.balanceOf(signerAddress),
-      tokenContract.allowance(signerAddress)
+      tokenContract.allowance(signerAddress, this.contract.address)
     ]);
     const result: BalanceVerificationResult = {
       success: true,

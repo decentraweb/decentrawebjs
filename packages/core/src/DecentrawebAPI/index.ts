@@ -86,10 +86,11 @@ class DecentrawebAPI extends ApiWrapper {
     entries: Array<SubdomainEntry>,
     isFeesInDweb = false
   ): Promise<ISubdomainApproval.Approval> {
+    const payload = this.getSLDApprovalPayload(owner, entries, isFeesInDweb);
     const res = await this.post<ISubdomainApproval.Response>(
       '/api/v1/approve-subdomain-registration',
       {},
-      this.getSLDApprovalPayload(owner, entries, isFeesInDweb)
+      payload
     );
     if ('error' in res) {
       throw new Error(res.errorMessage || res.error);
@@ -158,7 +159,7 @@ class DecentrawebAPI extends ApiWrapper {
       label: entries.map((e) => e.label),
       owner: ethers.utils.getAddress(owner),
       chainid: this.chainId,
-      sender: ethers.utils.getAddress(sender)
+      sender: sender ? ethers.utils.getAddress(sender) : ''
     };
     switch (this.network) {
       case 'matic':
