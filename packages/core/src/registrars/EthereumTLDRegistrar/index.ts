@@ -45,7 +45,7 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
   }
 
   /**
-   * Step 2. Creates a commitment for registration. Commitment is valid for 1 minute.
+   * Step 2. Creates a commitment for registration. Commitment is valid after 1 minute.
    * @param {ApprovedRegistration} request - data returned from `requestApproval` step
    * @returns {Promise<CommittedRegistration>} CommittedRegistration object that can be used to register TLD
    */

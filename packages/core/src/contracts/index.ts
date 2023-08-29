@@ -12,7 +12,7 @@ import DWEBRegistry from './abi/ethereum/DWEBRegistry.json';
 import DefaultReverseResolver from './abi/ethereum/DefaultReverseResolver.json';
 import PublicResolver from './abi/ethereum/PublicResolver.json';
 import ReverseRegistrar from './abi/ethereum/ReverseRegistrar.json';
-import RootRegistrarController from './abi/RootRegistrarController.json';
+import RootRegistrarController from './abi/ethereum/RootRegistrarController.json';
 //Polygon ABI
 import WrappedEthToken from './abi/WrappedEthToken.json';
 import DWEBRegistryPolygon from './abi/polygon/DWEBRegistry.json';

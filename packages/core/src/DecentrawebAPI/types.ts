@@ -1,4 +1,5 @@
 import { ChainId } from '../contracts/interfaces';
+import {BigNumber} from "ethers";
 
 export interface TLDApprovalPayload {
   name: Array<string>;
@@ -29,9 +30,14 @@ export interface TLDApproval {
 
 export enum StakingType {
   Public = 0,
-  ADDRESS = 1,
+  Address = 1,
   NFT = 2,
   ERC20 = 3
+}
+
+export enum RenewalType {
+  Permanent = 0,
+  Renewed = 1
 }
 
 export type StakedDomain =
@@ -40,13 +46,22 @@ export type StakedDomain =
       price: number;
       sldPerWallet: number;
       stakingType: StakingType;
-    }
+      renewalType: RenewalType;
+      renewalFee: number;
+}
   | {
       staked: false;
     };
 
 export interface PriceConversionResponse {
-  eth: string;
-  dweb: string;
-  matic?: string;
+  eth: string[];
+  dweb: string[];
+  matic?: string[];
+}
+
+export interface PriceConversionResult {
+  usd: number;
+  eth: BigNumber;
+  dweb: BigNumber;
+  matic?: BigNumber;
 }

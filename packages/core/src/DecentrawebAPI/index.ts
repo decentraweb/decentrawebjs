@@ -1,6 +1,6 @@
-import { ethers } from 'ethers';
+import {BigNumber, ethers} from 'ethers';
 import {
-  PriceConversionResponse,
+  PriceConversionResponse, PriceConversionResult,
   StakedDomain,
   TLDApproval,
   TLDApprovalPayload,
@@ -105,12 +105,24 @@ class DecentrawebAPI extends ApiWrapper {
     return this.post<Array<StakedDomain>>('/api/v1/get-stake-domains', {}, payload);
   }
 
-  async convertPrice(priceUSD: number): Promise<PriceConversionResponse> {
+  async convertPrice(priceUSD: number): Promise<PriceConversionResult> {
+    const result = await this.convertPriceBatch([priceUSD]);
+    return result[0];
+  }
+  async convertPriceBatch(pricesUSD: number[]): Promise<PriceConversionResult[]> {
     const payload = {
-      price: priceUSD,
+      price: pricesUSD,
       chainid: this.chainId
     };
-    return this.post<PriceConversionResponse>('/api/v1/convert-price', {}, payload);
+    const res = await this.post<PriceConversionResponse>('/api/v1/convert-price', {}, payload);
+    return pricesUSD.map((price, i) => {
+      return {
+        usd: price,
+        eth: BigNumber.from(res.eth[i]),
+        dweb:  BigNumber.from(res.dweb[i]),
+        matic: res.matic ?  BigNumber.from(res.matic[i]) : undefined
+      };
+    });
   }
 
   sendPolygonTLDCommitment(payload: SendCommitmentPayload): Promise<SendCommitmentResponse> {
@@ -152,14 +164,17 @@ class DecentrawebAPI extends ApiWrapper {
     owner: string,
     entries: Array<SubdomainEntry>,
     isFeesInDweb = false,
-    sender = ''
+    sender = '',
   ): ISubdomainApproval.Payload {
+
     const base: ISubdomainApproval.PayloadBase = {
       name: entries.map((e) => e.name),
       label: entries.map((e) => e.label),
       owner: ethers.utils.getAddress(owner),
       chainid: this.chainId,
-      sender: sender ? ethers.utils.getAddress(sender) : ''
+      sender: sender ? ethers.utils.getAddress(sender) : '',
+      duration: entries.map((e) => (e.duration || 0)),
+      renewalFee: entries.map((e) => ('renewalFee' in e && e.renewalFee ? e.renewalFee.toString() : "0"))
     };
     switch (this.network) {
       case 'matic':
@@ -173,10 +188,11 @@ class DecentrawebAPI extends ApiWrapper {
       default:
         return {
           ...base,
-          isfeeindwebtoken: isFeesInDweb ? 1 : 0
+          isFeeInDWEBToken: isFeesInDweb
         } as ISubdomainApproval.EthereumPayload;
     }
   }
+
 }
 
 export default DecentrawebAPI;

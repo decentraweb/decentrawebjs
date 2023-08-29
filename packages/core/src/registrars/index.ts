@@ -1,13 +1,10 @@
 import EthereumTLDRegistrar from './EthereumTLDRegistrar';
-import EthereumSubdomainRegistrar from './EthereumSubdomainRegistrar';
 import PolygonTLDRegistrar from './PolygonTLDRegistrar';
-import PolygonSubdomainRegistrar from './PolygonSubdomainRegistrar';
+import SubdomainRegistrar from './SubdomainRegistrar';
 
 export * from './constants';
-export * from './types/TLD';
 export {
   EthereumTLDRegistrar,
-  EthereumSubdomainRegistrar,
   PolygonTLDRegistrar,
-  PolygonSubdomainRegistrar
+  SubdomainRegistrar
 };
