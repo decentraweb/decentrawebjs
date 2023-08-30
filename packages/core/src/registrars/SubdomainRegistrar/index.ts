@@ -239,6 +239,7 @@ class SubdomainRegistrar extends DwebContractWrapper {
   async normalizeEntries(entry: Entry | Array<Entry>): Promise<Array<Entry>> {
     const entries = Array.isArray(entry) ? entry : [entry];
     return entries.map((entry) => ({
+      ...entry,
       name: normalize(entry.name),
       label: normalize(entry.label)
     }));
