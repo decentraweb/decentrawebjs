@@ -16,6 +16,7 @@ import signTypedData from '../../utils/signTypedData';
 import { getContract, getWethContract } from '../../contracts';
 import { Approval } from '../../DecentrawebAPI/types/SubdomainApproval';
 import { increaseByPercent } from '../../utils/misc';
+import { DURATION } from '../constants';
 
 class SubdomainRegistrar extends DwebContractWrapper {
   readonly network: EthNetwork;
@@ -203,25 +204,35 @@ class SubdomainRegistrar extends DwebContractWrapper {
 
   async calculateTotalFee(approval: Approval, isFeeInDWEB: boolean = false): Promise<Fees> {
     const serviceFeeUSD = await this.getServiceFee();
-    const converted = await this.api.convertPrice(serviceFeeUSD);
-    const totalFee = approval.fee.reduce((a, b) => a.add(b), BigNumber.from(0));
-    if (this.isMatic) {
-      const amount = converted.matic as BigNumber;
-      return {
-        serviceFee: {
-          currency: 'MATIC',
-          amount: amount.mul(approval.labels.length)
-        },
-        ownerFee: { currency: isFeeInDWEB ? 'DWEB' : 'WETH', amount: totalFee }
-      };
-    }
+    const serviceFee = await this.api.convertPrice(serviceFeeUSD);
+    const renewalServiceFeeUSD = await this.getRenewalServiceFee();
+    const renewalServiceFee = await this.api.convertPrice(renewalServiceFeeUSD);
+
+    const totalOwnerFee = approval.fee.reduce((a, b) => a.add(b), BigNumber.from(0));
+    const totalOwnerRenewalFee = approval.renewalFee.reduce((a, b) => a.add(b), BigNumber.from(0));
+
+    const serviceFeeCurrency = this.isMatic ? 'MATIC' : 'ETH';
+    const ownerFeeCurrency = isFeeInDWEB ? 'DWEB' : this.isMatic ? 'WETH' : 'ETH';
+    const serviceFeeAmount = BigNumber.from(this.isMatic ? serviceFee.matic : serviceFee.eth);
+    const renewalServiceFeeAmount = BigNumber.from(
+      this.isMatic ? renewalServiceFee.matic : renewalServiceFee.eth
+    );
+
+    const totalServiceFee = serviceFeeAmount.mul(approval.labels.length);
+    const totalRenewalServiceFee = approval.durations.reduce((total, duration) => {
+      const renewalYears = duration > DURATION.ONE_YEAR ? duration / DURATION.ONE_YEAR - 1 : 0;
+      return total.add(renewalServiceFeeAmount.mul(renewalYears));
+    }, BigNumber.from(0));
 
     return {
       serviceFee: {
-        currency: 'ETH',
-        amount: BigNumber.from(converted.eth).mul(approval.labels.length)
+        currency: serviceFeeCurrency,
+        amount: totalServiceFee.add(totalRenewalServiceFee)
       },
-      ownerFee: { currency: isFeeInDWEB ? 'DWEB' : 'ETH', amount: totalFee }
+      ownerFee: {
+        currency: ownerFeeCurrency,
+        amount: totalOwnerFee.add(totalOwnerRenewalFee)
+      }
     };
   }
 
