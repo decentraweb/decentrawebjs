@@ -8,7 +8,7 @@
     "prepare": "npm run build",
     "build": "tsc",
     "build:browser": "webpack --progress --config webpack.config.js",
-    "test:integration": "mocha test/integration/**/*.test.ts",
+    "test:e2e": "mocha test/e2e/**/*.test.ts",
     "watch": "tsc --watch",
     "watch:browser": "webpack --watch --progress --config webpack.config.js --mode development"
   },

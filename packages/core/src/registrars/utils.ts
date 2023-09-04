@@ -1,6 +1,6 @@
 import {normalize} from '@ensdomains/eth-ens-namehash';
 import {DomainEntry} from './types/TLD';
-import {MAX_DURATION, MAX_NAMES_PER_TX, MIN_DURATION} from './constants';
+import {DURATION, MAX_NAMES_PER_TX} from './constants';
 
 /**
  * Validates and normalizes domain names and durations for registration.
@@ -31,12 +31,14 @@ export function normalizeName(name: string): string {
   return normalize(name);
 }
 
+const VALID_DURATIONS: number[] = Object.values(DURATION);
+
 export function normalizeDuration(duration: any): number {
   if (!Number.isFinite(duration)) {
     throw new Error(`Duration must be a number`);
   }
-  if (duration < MIN_DURATION || duration > MAX_DURATION) {
-    throw new Error(`Duration must be between ${MIN_DURATION} and ${MAX_DURATION}`);
+  if (!VALID_DURATIONS.includes(duration)) {
+    throw new Error(`Duration must be one of ${VALID_DURATIONS.join(', ')}`);
   }
   return duration;
 }

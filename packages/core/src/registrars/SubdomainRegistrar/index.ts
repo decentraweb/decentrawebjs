@@ -17,6 +17,7 @@ import { getContract, getWethContract } from '../../contracts';
 import { Approval } from '../../DecentrawebAPI/types/SubdomainApproval';
 import { increaseByPercent } from '../../utils/misc';
 import { DURATION } from '../constants';
+import { normalizeDuration } from "../utils";
 
 class SubdomainRegistrar extends DwebContractWrapper {
   readonly network: EthNetwork;
@@ -241,7 +242,8 @@ class SubdomainRegistrar extends DwebContractWrapper {
     return entries.map((entry) => ({
       ...entry,
       name: normalize(entry.name),
-      label: normalize(entry.label)
+      label: normalize(entry.label),
+      duration: entry.duration ? normalizeDuration(entry.duration) : 0,
     }));
   }
 
