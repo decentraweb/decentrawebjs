@@ -9,8 +9,6 @@ export const DURATION = {
   FIVE_YEARS: 157784630
 };
 
-export const MIN_DURATION = 31556926; // 1 year
-export const MAX_DURATION = 157784630; // 5 years
 export const MAX_NAMES_PER_TX = 20;
 
 /**

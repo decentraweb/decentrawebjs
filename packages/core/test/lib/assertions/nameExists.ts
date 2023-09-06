@@ -1,9 +1,10 @@
 import { DWEBRegistry } from '../../../src';
-import { network, provider } from '../provider';
+import {getProvider} from '../provider';
 import { expect } from 'chai';
 
-async function nameExists(domain: string) {
-  const dweb = new DWEBRegistry({ provider: provider, network: network });
+async function nameExists(domain: string, chain: 'ethereum' | 'polygon' = 'ethereum') {
+  const { provider, network } = getProvider(chain);
+  const dweb = new DWEBRegistry({ provider, network });
   let owner: string | null;
   try {
     const name = dweb.name(domain);

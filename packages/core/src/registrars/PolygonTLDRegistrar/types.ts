@@ -29,17 +29,3 @@ export interface CommittedRegistration extends BaseRegistrationContext {
     timestamp: number;
   };
 }
-
-/**
- * @typedef {Object} DoneRegistration
- * @extends BaseRegistrationContext
- * @property {string} status - 'done'
- * @property {Object} data - registration data
- * @property {string} data.txid - registration transaction id on Polygon
- */
-export interface DoneRegistration extends BaseRegistrationContext {
-  status: 'done';
-  data: {
-    txid: string;
-  };
-}

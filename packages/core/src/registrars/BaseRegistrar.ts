@@ -1,22 +1,22 @@
-import DwebContractWrapper from '../../DwebContractWrapper';
-import { PolygonNetwork } from '../../contracts/interfaces';
-import { BigNumber, ethers, providers, Wallet } from 'ethers';
-import { getContract, getWethContract } from '../../contracts';
-import { RegistrarConfig } from '../EthereumRegistrar';
-import DecentrawebAPI from '../../DecentrawebAPI';
+import DwebContractWrapper from '../DwebContractWrapper';
+import {EthNetwork} from '../contracts/interfaces';
+import {BigNumber, ethers, providers, Signer} from 'ethers';
+import { getContract, getWethContract } from '../contracts';
+import DecentrawebAPI from '../DecentrawebAPI';
+import {DwebConfig} from "../types/common";
 
-interface PolygonRegistrarConfig extends RegistrarConfig {
-  network: PolygonNetwork;
+export interface RegistrarConfig extends DwebConfig {
+  signer: Signer;
 }
 
-class PolygonRegistrar extends DwebContractWrapper {
-  readonly network: PolygonNetwork;
+abstract class BaseRegistrar extends DwebContractWrapper {
+  readonly network: EthNetwork;
   readonly api: DecentrawebAPI;
-  readonly signer: Wallet;
+  readonly signer: Signer;
   readonly dwebToken: ethers.Contract;
-  readonly wethToken: ethers.Contract;
+  readonly wethToken?: ethers.Contract;
 
-  constructor(options: PolygonRegistrarConfig) {
+  constructor(options: RegistrarConfig) {
     super(options, 'RootRegistrarController');
     this.network = options.network;
     this.api = new DecentrawebAPI(this.network);
@@ -27,7 +27,15 @@ class PolygonRegistrar extends DwebContractWrapper {
       provider: this.signer,
       network: this.network
     });
-    this.wethToken = getWethContract(this.network, this.signer);
+    switch (this.network) {
+      case 'matic':
+      case 'maticmum':
+        this.wethToken = getWethContract(this.network, this.signer);
+    }
+  }
+
+  get isMatic() {
+    return this.network === 'matic' || this.network === 'maticmum';
   }
 
   /**
@@ -48,7 +56,10 @@ class PolygonRegistrar extends DwebContractWrapper {
         return tx.wait(1);
       }
       case 'WETH': {
-        const tx = await this.wethToken.approve(this.contract.address, amount, {
+        if(!this.isMatic){
+          throw new Error('WETH is only supported on the Polygon network');
+        }
+        const tx = await this.wethToken?.approve(this.contract.address, amount, {
           value: '0x00'
         });
         return tx.wait(1);
@@ -67,4 +78,4 @@ class PolygonRegistrar extends DwebContractWrapper {
   }
 }
 
-export default PolygonRegistrar;
+export default BaseRegistrar;

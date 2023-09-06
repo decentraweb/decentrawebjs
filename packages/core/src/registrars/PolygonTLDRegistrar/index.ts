@@ -1,14 +1,35 @@
-import { BigNumber, ethers } from 'ethers';
+import {BigNumber, ethers, providers} from 'ethers';
 import { normalizeDomainEntries, normalizeDuration, normalizeName } from '../utils';
 import getRandomHex from '../../utils/getRandomHex';
 import { BalanceVerificationResult, DomainEntry } from '../types/TLD';
 import { increaseByPercent } from '../../utils/misc';
-import { CommittedRegistration, DoneRegistration } from './types';
+import { CommittedRegistration } from './types';
 import { APPROVAL_TTL } from '../constants';
 import signTypedData from '../../utils/signTypedData';
-import PolygonRegistrar from '../PolygonRegistrar';
+import BaseRegistrar, {RegistrarConfig} from '../BaseRegistrar';
+import {PolygonNetwork} from "../../contracts/interfaces";
+import {getWethContract} from "../../contracts";
 
-class PolygonTLDRegistrar extends PolygonRegistrar {
+interface Config extends RegistrarConfig {
+  network: PolygonNetwork;
+}
+
+class PolygonTLDRegistrar extends BaseRegistrar {
+  readonly network: PolygonNetwork;
+  readonly wethToken: ethers.Contract;
+
+  constructor(options: Config) {
+    super(options);
+    this.network = options.network;
+    this.wethToken = getWethContract(this.network, this.signer);
+  }
+
+  /**
+   * Step 1. Normalizes domain names, calls the API to check if they are available and returns approval for registration.
+   * @param request - domain name and duration pairs
+   * @param isFeesInDweb - if true, registration fee will be paid in DWEB tokens, otherwise in WETH
+   * @param owner - ETH address of the owner of created subdomains, defaults to signer address
+   */
   async sendCommitment(
     request: DomainEntry | Array<DomainEntry>,
     isFeesInDweb: boolean = false,
@@ -49,7 +70,11 @@ class PolygonTLDRegistrar extends PolygonRegistrar {
     };
   }
 
-  async register(request: CommittedRegistration): Promise<DoneRegistration> {
+  /**
+   * Step 2. Finish TLD registration. This step must be called 1 minute after `sendCommitment` step was completed.
+   * @param request - data returned from `sendCommitment` step
+   */
+  async register(request: CommittedRegistration): Promise<providers.TransactionResponse> {
     const registrationPayload = {
       name: request.domains.map((e) => e.name),
       duration: request.domains.map((e) => e.duration),
@@ -65,17 +90,7 @@ class PolygonTLDRegistrar extends PolygonRegistrar {
       ...registrationPayload,
       signature
     });
-    return {
-      domains: request.domains,
-      owner: request.owner,
-      expiresAt: request.expiresAt,
-      isFeesInDweb: request.isFeesInDweb,
-      fee: request.fee,
-      status: 'done',
-      data: {
-        txid: result.txid
-      }
-    };
+    return this.provider.getTransaction(result.txid);
   }
 
   async verifySignerBalance(

@@ -3,11 +3,23 @@ import { providers, Wallet } from 'ethers';
 import {EthNetwork} from "../../src";
 
 config({path: '.env.test'});
-export const network = process.env.ETH_NETWORK as EthNetwork;
 
-export const provider = new providers.JsonRpcProvider(
-  process.env.JSONRPC_URL,
-  process.env.ETH_NETWORK
-);
-//Signer only required if you want to write data to blockchain
-export const signer = new Wallet(process.env.PRIVATE_KEY as string, provider);
+const API_KEY = process.env.INFURA_API_KEY as string;
+const PRIVATE_KEY = process.env.PRIVATE_KEY as string;
+
+export function getProvider(chain: 'ethereum' | 'polygon') {
+  let network: EthNetwork
+  let provider: providers.BaseProvider;
+  if(chain === 'ethereum') {
+    network = 'goerli';
+    provider = new providers.JsonRpcProvider(`https://goerli.infura.io/v3/${API_KEY}`, 'goerli');
+  } else {
+    network = 'maticmum';
+    provider = new providers.JsonRpcProvider(`https://polygon-mumbai.infura.io/v3/${API_KEY}`, 'maticmum');
+  }
+  return {
+    network,
+    provider,
+    signer: new Wallet(PRIVATE_KEY, provider)
+  }
+}

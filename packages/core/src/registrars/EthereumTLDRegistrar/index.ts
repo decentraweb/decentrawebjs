@@ -2,10 +2,10 @@ import { BigNumber, ethers, providers } from 'ethers';
 
 import { increaseByPercent } from '../../utils/misc';
 import { ApprovedRegistration, CommittedRegistration, RegistrationContext } from './types';
-import EthereumRegistrar from '../EthereumRegistrar';
 import { BalanceVerificationResult, DomainEntry } from '../types/TLD';
 import { normalizeDomainEntries, normalizeDuration, normalizeName } from '../utils';
 import { APPROVAL_TTL, REGISTRATION_WAIT } from '../constants';
+import BaseRegistrar from "../BaseRegistrar";
 
 export type {
   ApprovedRegistration,
@@ -18,7 +18,7 @@ export type {
 /**
  * Ethereum TLD Registrar class. Provides methods to register top level domains.
  */
-export class EthereumTLDRegistrar extends EthereumRegistrar {
+export class EthereumTLDRegistrar extends BaseRegistrar {
   /**
    * Step 1. Normalizes domain names, calls the API to check if they are available and returns approval for registration.
    * Approved request is valid for 30 minutes.
@@ -60,7 +60,7 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
     return {
       ...request,
       status: 'committed',
-      commitmentTx,
+      tx: commitmentTx,
       committedAt: new Date()
     };
   }
@@ -75,13 +75,13 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
    */
   async register(
     request: CommittedRegistration,
-    isFeesInDweb: boolean
+    isFeesInDweb: boolean = false
   ): Promise<providers.TransactionResponse> {
     if (request.status !== 'committed') {
       throw new Error('Registration is not committed, call `sendCommitment` first');
     }
     // Make sure that commitment transaction has at least 1 confirmation
-    await request.commitmentTx.wait(1);
+    await request.tx.wait(1);
 
     if (request.committedAt.getTime() + REGISTRATION_WAIT > Date.now()) {
       throw new Error('Registration is not ready, wait for 1 minute after commitment');
@@ -122,8 +122,8 @@ export class EthereumTLDRegistrar extends EthereumRegistrar {
     const rentPrice = await this.getRentPriceBatch(request.domains, isFeesInDweb);
     const [ethBalance, dwebBalance, dwebAllowance] = await Promise.all([
       this.provider.getBalance(signerAddress),
-      this.tokenContract.balanceOf(signerAddress),
-      this.getDwebAllowance(signerAddress)
+      this.dwebToken.balanceOf(signerAddress),
+      this.dwebToken.allowance(signerAddress, this.contract.address)
     ]);
     const safePrice = increaseByPercent(rentPrice, 10);
     const result: BalanceVerificationResult = {

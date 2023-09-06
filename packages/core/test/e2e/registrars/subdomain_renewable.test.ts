@@ -1,10 +1,11 @@
 import {DURATION, SubdomainRegistrar} from '../../../src/registrars';
-import { network, provider, signer } from '../../lib/provider';
+import {getProvider} from '../../lib/provider';
 import { expect } from 'chai';
 import { Chance } from 'chance';
 import nameExists from "../../lib/assertions/nameExists";
 
 const chance = new Chance();
+const { network, provider, signer } = getProvider('polygon');
 
 describe('Renewable subdomain registration', function () {
 
@@ -31,7 +32,7 @@ describe('Renewable subdomain registration', function () {
     const tx = await registrar.finishRegistration(registration);
     expect(tx).to.have.property('hash');
     await tx.wait(1);
-    await nameExists(`${subdomain}.renewable`)
+    await nameExists(`${subdomain}.renewable`, 'polygon')
   });
 
 });

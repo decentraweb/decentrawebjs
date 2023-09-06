@@ -1,8 +1,4 @@
-import DwebContractWrapper from '../../DwebContractWrapper';
-import DecentrawebAPI from '../../DecentrawebAPI';
-import { BigNumber, ethers, providers, Wallet } from 'ethers';
-import { EthNetwork } from '../../contracts/interfaces';
-import { RegistrarConfig } from '../EthereumRegistrar';
+import { BigNumber, ethers, providers } from 'ethers';
 import {
   ApprovedRegistration,
   BalanceVerificationResult,
@@ -13,41 +9,13 @@ import {
 } from '../types/Subdomain';
 import { hash as hashName, normalize } from '@ensdomains/eth-ens-namehash';
 import signTypedData from '../../utils/signTypedData';
-import { getContract, getWethContract } from '../../contracts';
 import { Approval } from '../../DecentrawebAPI/types/SubdomainApproval';
 import { increaseByPercent } from '../../utils/misc';
 import { DURATION } from '../constants';
-import { normalizeDuration } from "../utils";
+import { normalizeDuration } from '../utils';
+import BaseRegistrar from '../BaseRegistrar';
 
-class SubdomainRegistrar extends DwebContractWrapper {
-  readonly network: EthNetwork;
-  readonly api: DecentrawebAPI;
-  readonly signer: Wallet;
-  readonly dwebToken: ethers.Contract;
-  readonly wethToken?: ethers.Contract;
-
-  constructor(options: RegistrarConfig) {
-    super(options, 'RootRegistrarController');
-    this.network = options.network;
-    this.api = new DecentrawebAPI(this.network);
-    this.signer = options.signer;
-    this.dwebToken = getContract({
-      address: this.contractConfig.DecentraWebToken,
-      name: 'DecentraWebToken',
-      provider: this.signer,
-      network: this.network
-    });
-    switch (this.network) {
-      case 'matic':
-      case 'maticmum':
-        this.wethToken = getWethContract(this.network, this.signer);
-    }
-  }
-
-  get isMatic() {
-    return this.network === 'matic' || this.network === 'maticmum';
-  }
-
+class SubdomainRegistrar extends BaseRegistrar {
   /**
    * Get subdomain registration approval for domain names owned by signer
    * @param {SelfRegEntry | Array<SelfRegEntry>} entry - list of domains and subdomains to register
@@ -243,7 +211,7 @@ class SubdomainRegistrar extends DwebContractWrapper {
       ...entry,
       name: normalize(entry.name),
       label: normalize(entry.label),
-      duration: entry.duration ? normalizeDuration(entry.duration) : 0,
+      duration: entry.duration ? normalizeDuration(entry.duration) : 0
     }));
   }
 

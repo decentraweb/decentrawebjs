@@ -1,13 +1,13 @@
 import { SubdomainRegistrar } from '../../../src/registrars';
-import { network, provider, signer } from '../../lib/provider';
+import { getProvider } from '../../lib/provider';
 import { expect } from 'chai';
 import { Chance } from 'chance';
-import nameExists from "../../lib/assertions/nameExists";
+import nameExists from '../../lib/assertions/nameExists';
 
 const chance = new Chance();
+const { network, provider, signer } = getProvider('polygon');
 
 describe('Permanent subdomain registration', function () {
-
   let registrar: SubdomainRegistrar;
   beforeEach(() => {
     registrar = new SubdomainRegistrar({
@@ -17,7 +17,7 @@ describe('Permanent subdomain registration', function () {
     });
   });
 
-  it('should register a subdomain owned by signer and pay in ETH', async function() {
+  it('should register a subdomain owned by signer and pay in ETH', async function () {
     const subdomain = chance.word();
     const registration = await registrar.approveSelfRegistration({
       name: 'mocha',
@@ -29,10 +29,10 @@ describe('Permanent subdomain registration', function () {
     const tx = await registrar.finishRegistration(registration);
     expect(tx).to.have.property('hash');
     await tx.wait(1);
-    await nameExists(`${subdomain}.mocha`)
+    await nameExists(`${subdomain}.mocha`, 'polygon');
   });
 
-  it('should register a subdomain owned by signer and pay in DWEB', async function() {
+  it('should register a subdomain owned by signer and pay in DWEB', async function () {
     const subdomain = chance.word();
     const registration = await registrar.approveSelfRegistration(
       { name: 'mocha', label: subdomain },
@@ -44,10 +44,10 @@ describe('Permanent subdomain registration', function () {
     const tx = await registrar.finishRegistration(registration);
     expect(tx).to.have.property('hash');
     await tx.wait(1);
-    await nameExists(`${subdomain}.mocha`)
+    await nameExists(`${subdomain}.mocha`, 'polygon');
   });
 
-  it('should register subdomain for staked domain and pay in ETH', async function() {
+  it('should register subdomain for staked domain and pay in ETH', async function () {
     const subdomain = chance.word();
     const registration = await registrar.approveOndemandRegistration({
       name: 'staked',
@@ -59,21 +59,24 @@ describe('Permanent subdomain registration', function () {
     const tx = await registrar.finishRegistration(registration);
     expect(tx).to.have.property('hash');
     await tx.wait(1);
-    await nameExists(`${subdomain}.staked`)
+    await nameExists(`${subdomain}.staked`, 'polygon');
   });
 
-  it('should register subdomain for staked domain and pay in DWEB', async function() {
+  it('should register subdomain for staked domain and pay in DWEB', async function () {
     const subdomain = chance.word();
-    const registration = await registrar.approveOndemandRegistration({
-      name: 'staked',
-      label: subdomain
-    }, true);
+    const registration = await registrar.approveOndemandRegistration(
+      {
+        name: 'staked',
+        label: subdomain
+      },
+      true
+    );
     expect(registration).to.have.property('approval');
     expect(registration.owner).to.be.equal(await signer.getAddress());
     expect(registration.isFeeInDWEB).to.be.true;
     const tx = await registrar.finishRegistration(registration);
     expect(tx).to.have.property('hash');
     await tx.wait(1);
-    await nameExists(`${subdomain}.staked`)
+    await nameExists(`${subdomain}.staked`, 'polygon');
   });
 });
