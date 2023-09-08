@@ -5,7 +5,7 @@ import { ApprovedRegistration, CommittedRegistration, RegistrationContext } from
 import { BalanceVerificationResult, DomainEntry } from '../types/TLD';
 import { normalizeDomainEntries, normalizeDuration, normalizeName } from '../utils';
 import { APPROVAL_TTL, REGISTRATION_WAIT } from '../constants';
-import BaseRegistrar from "../BaseRegistrar";
+import BaseRegistrar from '../BaseRegistrar';
 
 export type {
   ApprovedRegistration,

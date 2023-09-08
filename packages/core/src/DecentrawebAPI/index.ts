@@ -1,6 +1,7 @@
-import {BigNumber, ethers} from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import {
-  PriceConversionResponse, PriceConversionResult,
+  PriceConversionResponse,
+  PriceConversionResult,
   StakedDomain,
   TLDApproval,
   TLDApprovalPayload,
@@ -109,6 +110,7 @@ class DecentrawebAPI extends ApiWrapper {
     const result = await this.convertPriceBatch([priceUSD]);
     return result[0];
   }
+
   async convertPriceBatch(pricesUSD: number[]): Promise<PriceConversionResult[]> {
     const payload = {
       price: pricesUSD,
@@ -119,8 +121,8 @@ class DecentrawebAPI extends ApiWrapper {
       return {
         usd: price,
         eth: BigNumber.from(res.eth[i]),
-        dweb:  BigNumber.from(res.dweb[i]),
-        matic: res.matic ?  BigNumber.from(res.matic[i]) : undefined
+        dweb: BigNumber.from(res.dweb[i]),
+        matic: res.matic ? BigNumber.from(res.matic[i]) : undefined
       };
     });
   }
@@ -164,17 +166,18 @@ class DecentrawebAPI extends ApiWrapper {
     owner: string,
     entries: Array<SubdomainEntry>,
     isFeesInDweb = false,
-    sender = '',
+    sender = ''
   ): ISubdomainApproval.Payload {
-
     const base: ISubdomainApproval.PayloadBase = {
       name: entries.map((e) => e.name),
       label: entries.map((e) => e.label),
       owner: ethers.utils.getAddress(owner),
       chainid: this.chainId,
       sender: sender ? ethers.utils.getAddress(sender) : '',
-      duration: entries.map((e) => (e.duration || 0)),
-      renewalFee: entries.map((e) => ('renewalFee' in e && e.renewalFee ? e.renewalFee.toString() : "0"))
+      duration: entries.map((e) => e.duration || 0),
+      renewalFee: entries.map((e) =>
+        'renewalFee' in e && e.renewalFee ? e.renewalFee.toString() : '0'
+      )
     };
     switch (this.network) {
       case 'matic':
@@ -192,7 +195,6 @@ class DecentrawebAPI extends ApiWrapper {
         } as ISubdomainApproval.EthereumPayload;
     }
   }
-
 }
 
 export default DecentrawebAPI;

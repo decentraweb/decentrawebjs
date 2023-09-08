@@ -1,5 +1,5 @@
 import { ChainId } from '../contracts/interfaces';
-import {BigNumber} from "ethers";
+import { BigNumber } from 'ethers';
 
 export interface TLDApprovalPayload {
   name: Array<string>;
@@ -48,7 +48,7 @@ export type StakedDomain =
       stakingType: StakingType;
       renewalType: RenewalType;
       renewalFee: number;
-}
+    }
   | {
       staked: false;
     };

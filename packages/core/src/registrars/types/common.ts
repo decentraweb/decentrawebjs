@@ -12,9 +12,7 @@ export interface Price<C = Currency> {
   currency: C;
 }
 
-
 export interface DomainInfo {
   name: string;
   exsists: boolean;
-
 }

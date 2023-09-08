@@ -1,9 +1,9 @@
 import DwebContractWrapper from '../DwebContractWrapper';
-import {EthNetwork} from '../contracts/interfaces';
-import {BigNumber, ethers, providers, Signer} from 'ethers';
+import { EthNetwork } from '../contracts/interfaces';
+import { BigNumber, ethers, providers, Signer } from 'ethers';
 import { getContract, getWethContract } from '../contracts';
 import DecentrawebAPI from '../DecentrawebAPI';
-import {DwebConfig} from "../types/common";
+import { DwebConfig } from '../types/common';
 
 export interface RegistrarConfig extends DwebConfig {
   signer: Signer;
@@ -56,7 +56,7 @@ abstract class BaseRegistrar extends DwebContractWrapper {
         return tx.wait(1);
       }
       case 'WETH': {
-        if(!this.isMatic){
+        if (!this.isMatic) {
           throw new Error('WETH is only supported on the Polygon network');
         }
         const tx = await this.wethToken?.approve(this.contract.address, amount, {

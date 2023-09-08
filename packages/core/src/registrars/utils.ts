@@ -1,6 +1,6 @@
-import {normalize} from '@ensdomains/eth-ens-namehash';
-import {DomainEntry} from './types/TLD';
-import {DURATION, MAX_NAMES_PER_TX} from './constants';
+import { normalize } from '@ensdomains/eth-ens-namehash';
+import { DomainEntry } from './types/TLD';
+import { DURATION, MAX_NAMES_PER_TX } from './constants';
 
 /**
  * Validates and normalizes domain names and durations for registration.

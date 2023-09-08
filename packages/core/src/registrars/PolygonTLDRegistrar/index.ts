@@ -1,4 +1,4 @@
-import {BigNumber, ethers, providers} from 'ethers';
+import { BigNumber, ethers, providers } from 'ethers';
 import { normalizeDomainEntries, normalizeDuration, normalizeName } from '../utils';
 import getRandomHex from '../../utils/getRandomHex';
 import { BalanceVerificationResult, DomainEntry } from '../types/TLD';
@@ -6,9 +6,9 @@ import { increaseByPercent } from '../../utils/misc';
 import { CommittedRegistration } from './types';
 import { APPROVAL_TTL } from '../constants';
 import signTypedData from '../../utils/signTypedData';
-import BaseRegistrar, {RegistrarConfig} from '../BaseRegistrar';
-import {PolygonNetwork} from "../../contracts/interfaces";
-import {getWethContract} from "../../contracts";
+import BaseRegistrar, { RegistrarConfig } from '../BaseRegistrar';
+import { PolygonNetwork } from '../../contracts/interfaces';
+import { getWethContract } from '../../contracts';
 
 interface Config extends RegistrarConfig {
   network: PolygonNetwork;
