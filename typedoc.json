@@ -1,0 +1,6 @@
+{
+  "entryPoints": ["packages/*"],
+  "name": "Decentraweb Packages",
+  "entryPointStrategy": "packages",
+  "includeVersion": true
+}

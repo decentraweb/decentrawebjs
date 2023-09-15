@@ -1,7 +1,7 @@
 import { providers, utils } from 'ethers';
 import { getDomainProvider } from './lib/getDomainProvider';
 import { DomainProvider, ToolkitConfig } from './types';
-import { DWEBRegistry, EthNetwork } from '@decentraweb/core';
+import { DWEBRegistry, Network } from '@decentraweb/core';
 
 interface ResolutionResult {
   provider: DomainProvider;
@@ -9,7 +9,7 @@ interface ResolutionResult {
 }
 
 export class EthereumAddress {
-  readonly network: EthNetwork;
+  readonly network: Network;
   readonly provider: providers.BaseProvider;
   protected dweb: DWEBRegistry;
 

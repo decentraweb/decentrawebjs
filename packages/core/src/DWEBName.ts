@@ -5,7 +5,8 @@ import { decode, encode } from './utils/content';
 import { dnsWireNameHash } from './utils/dns';
 import { Buffer } from 'buffer';
 import { getContract } from './contracts';
-import { EthNetwork } from './contracts/interfaces';
+
+import { Network } from './types/common';
 
 const NO_DATA = '0x';
 
@@ -13,7 +14,7 @@ type NameConfig = {
   name: string;
   provider: providers.BaseProvider;
   registry: ethers.Contract;
-  network: EthNetwork;
+  network: Network;
   signer?: ethers.Signer;
 };
 
@@ -22,7 +23,7 @@ export default class DWEBName {
   readonly namehash: string;
   private readonly provider: providers.BaseProvider;
   private readonly registryContract: ethers.Contract;
-  private readonly network: EthNetwork;
+  private readonly network: Network;
   private readonly signer?: ethers.Signer;
   private resolverAddress?: string;
 

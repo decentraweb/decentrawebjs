@@ -26,18 +26,38 @@ export default class DWEBRegistry extends DwebContractWrapper {
     });
   }
 
+  /**
+   * Assign default resolver contract to domain name. This is usually done during the registration process, but may be
+   * required if domain has no resolver set or if it is no compatible with Decentraweb.
+   * @param name
+   */
   @requiresSigner
   async assignDefaultResolver(name: string): Promise<providers.TransactionResponse> {
     const hash = namehash(name);
     return this.contract.setResolverAndTTL(hash, this.contractConfig.PublicResolver, DEFAULT_TTL);
   }
 
+  /**
+   * Set resolver contract for domain name. May be used to assign domain custom resolver contract.
+   *
+   * Be careful as this may break domain functionality if resolver contract is not compatible with Decentraweb.
+   * @param name - domain name you would like to work assign resolver to
+   * @param address - address of resolver contract
+   */
   @requiresSigner
   async setResolver(name: string, address: string): Promise<providers.TransactionResponse> {
     const hash = namehash(name);
     return this.contract.setResolver(hash, address);
   }
 
+  /**
+   * Get reverse record for address.
+   *
+   * Important: address owner can set any name for his address, even if he doesn't own it, or it is not registered.
+   * To check that name is valid, we check that it resolves to the same address.
+   * @param address
+   * @param skipForwardCheck -  by default we check that returned name resolves to the same address. Set this to true to skip this check.
+   */
   async getReverseRecord(address: string, skipForwardCheck = false): Promise<string | null> {
     const reverseName = `${address.slice(2)}.addr.reverse`;
     const reverseHash = namehash(reverseName);
@@ -65,8 +85,12 @@ export default class DWEBRegistry extends DwebContractWrapper {
     return domain;
   }
 
+  /**
+   * Set reverse record for signer address. Don't forget to also assign this address to name.
+   * @param name
+   */
   @requiresSigner
-  async setReverseRecord(name: string) {
+  async setReverseRecord(name: string): Promise<providers.TransactionResponse> {
     const signer = this.signer as ethers.Signer;
     const reverseRegistrar = getContract({
       address: this.contractConfig.ReverseRegistrar,

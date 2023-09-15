@@ -16,6 +16,10 @@ export interface TypedDataDomain {
   salt?: string;
 }
 
+/**
+ * EIP-712 typed data object
+ * @see https://eips.ethereum.org/EIPS/eip-712
+ */
 export interface TypedData {
   types: TypedDataTypes;
   primaryType: string;

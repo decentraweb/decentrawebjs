@@ -1,5 +1,5 @@
 import { Buffer } from 'buffer';
-import { DNSRecord, EthNetwork } from '@decentraweb/core';
+import { DNSRecord, Network } from '@decentraweb/core';
 import DwebToolkit from '@decentraweb/toolkit';
 import dgram from 'dgram';
 import * as dnsPacket from 'dns-packet';
@@ -45,7 +45,7 @@ function createLogger(): Logger {
 
 export interface ResolverConfig {
   provider: providers.BaseProvider;
-  network: EthNetwork;
+  network: Network;
   ipfsGateway: {
     A: string[];
     AAAA: string[];

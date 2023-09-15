@@ -31,6 +31,10 @@ export interface Content {
   data: string;
 }
 
+/**
+ * Decode content hash value to readable format
+ * @param encoded
+ */
 export function decode(encoded: string): string {
   let decoded = contentHash.decode(encoded);
   const codec = contentHash.getCodec(encoded) as Codec;
@@ -42,6 +46,10 @@ export function decode(encoded: string): string {
   return CODEC_MAP[codec] ? `${CODEC_MAP[codec]}://${decoded}` : decoded;
 }
 
+/**
+ * Encode content to hash value to store on chain
+ * @param text
+ */
 export function encode(text: string): string | null {
   if (!text) {
     return null;

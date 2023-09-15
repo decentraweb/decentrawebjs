@@ -1,20 +1,38 @@
 import { BigNumber, ethers, providers } from 'ethers';
 import {
   ApprovedRegistration,
-  BalanceVerificationResult,
-  Entry,
-  Fees,
+  SubdomainBalanceVerificationResult,
+  SubdomainEntry,
+  SubdomainFees,
   OnDemandEntry,
   SelfRegEntry
 } from '../types/Subdomain';
 import { hash as hashName, normalize } from '@ensdomains/eth-ens-namehash';
 import signTypedData from '../../utils/signTypedData';
-import { Approval } from '../../DecentrawebAPI/types/SubdomainApproval';
 import { increaseByPercent } from '../../utils/misc';
 import { DURATION } from '../constants';
 import { normalizeDuration } from '../utils';
 import BaseRegistrar from '../BaseRegistrar';
+import { SubdomainApproval } from '../../api';
 
+/**
+ * Class that handles subdomain registration.
+ * Registration is done in 2 steps:
+ * 1. Calling {@link approveSelfRegistration} or {@link approveOndemandRegistration} to get registration approval.
+ * 2. Calling {@link finishRegistration} to finish registration.
+ * @example
+ * Register subdomain "john" for domain "wallet" owned by signer and pay in ETH
+ * ```ts
+ * const subdomainRegistrar = new SubdomainRegistrar({
+ *   network: network,
+ *   provider: provider,
+ *   signer: signer
+ * });
+ * const registration = await subdomainRegistrar.approveSelfRegistration({ name: 'wallet', label: 'john' });
+ * const tx = await subdomainRegistrar.finishRegistration(registration);
+ * await tx.wait(1);
+ *  ```
+ */
 class SubdomainRegistrar extends BaseRegistrar {
   /**
    * Get subdomain registration approval for domain names owned by signer
@@ -115,7 +133,12 @@ class SubdomainRegistrar extends BaseRegistrar {
     return this.contract.createSubnodeBatch(args, { value: safeAmount });
   }
 
-  async verifySignerBalance(approval: Approval, isFeeInDWEB?: boolean) {
+  /**
+   * Verify that signer has enough balance to pay for registration
+   * @param approval
+   * @param isFeeInDWEB
+   */
+  async verifySignerBalance(approval: SubdomainApproval, isFeeInDWEB?: boolean) {
     const { serviceFee, ownerFee } = await this.calculateTotalFee(approval, isFeeInDWEB);
     const signerAddress = await this.signer.getAddress();
     const baseBalance = await this.provider.getBalance(signerAddress);
@@ -131,7 +154,7 @@ class SubdomainRegistrar extends BaseRegistrar {
         feeToken = null;
     }
 
-    const result: BalanceVerificationResult = {
+    const result: SubdomainBalanceVerificationResult = {
       success: true,
       error: null,
       serviceFee,
@@ -171,7 +194,15 @@ class SubdomainRegistrar extends BaseRegistrar {
     return result;
   }
 
-  async calculateTotalFee(approval: Approval, isFeeInDWEB: boolean = false): Promise<Fees> {
+  /**
+   * Calculate total owner and service fee for approved subdomain registration
+   * @param approval
+   * @param isFeeInDWEB
+   */
+  async calculateTotalFee(
+    approval: SubdomainApproval,
+    isFeeInDWEB: boolean = false
+  ): Promise<SubdomainFees> {
     const serviceFeeUSD = await this.getServiceFee();
     const serviceFee = await this.api.convertPrice(serviceFeeUSD);
     const renewalServiceFeeUSD = await this.getRenewalServiceFee();
@@ -205,7 +236,9 @@ class SubdomainRegistrar extends BaseRegistrar {
     };
   }
 
-  async normalizeEntries(entry: Entry | Array<Entry>): Promise<Array<Entry>> {
+  async normalizeEntries(
+    entry: SubdomainEntry | Array<SubdomainEntry>
+  ): Promise<Array<SubdomainEntry>> {
     const entries = Array.isArray(entry) ? entry : [entry];
     return entries.map((entry) => ({
       ...entry,
@@ -215,11 +248,19 @@ class SubdomainRegistrar extends BaseRegistrar {
     }));
   }
 
+  /**
+   * Get service fee for subdomain registration
+   * @returns - fee in USD
+   */
   async getServiceFee(): Promise<number> {
     const fee: BigNumber = await this.contract.subdomainFee();
     return fee.div(1000000).toNumber();
   }
 
+  /**
+   * Get service fee for subdomain renewal.
+   * @returns - fee in USD
+   */
   async getRenewalServiceFee(): Promise<number> {
     const fee: BigNumber = await this.contract.subdomainRenewalFee();
     return fee.div(1000000).toNumber();

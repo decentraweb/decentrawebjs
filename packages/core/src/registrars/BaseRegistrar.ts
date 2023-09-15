@@ -1,19 +1,31 @@
 import DwebContractWrapper from '../DwebContractWrapper';
-import { EthNetwork } from '../contracts/interfaces';
 import { BigNumber, ethers, providers, Signer } from 'ethers';
 import { getContract, getWethContract } from '../contracts';
-import DecentrawebAPI from '../DecentrawebAPI';
-import { DwebConfig } from '../types/common';
+import DecentrawebAPI from '../api';
+import { DwebConfig, Network } from '../types/common';
+import { NotStakedDomain, StakedDomain, StakingState } from './types/StakingState';
 
+/**
+ * Configuration for the registrar
+ * @property signer - Ethers.js Ethereum signer for writing data to the blockchain (required)
+ */
 export interface RegistrarConfig extends DwebConfig {
   signer: Signer;
 }
 
+/**
+ * Base class for all registrars
+ */
 abstract class BaseRegistrar extends DwebContractWrapper {
-  readonly network: EthNetwork;
+  /** Current network name */
+  readonly network: Network;
+  /** DecentraWeb API wrapper instance */
   readonly api: DecentrawebAPI;
+  /** Ethers.js Ethereum signer for writing data to the blockchain */
   readonly signer: Signer;
+  /** DWEB token contract */
   readonly dwebToken: ethers.Contract;
+  /** WETH token contract, only available on the Polygon network */
   readonly wethToken?: ethers.Contract;
 
   constructor(options: RegistrarConfig) {
@@ -34,15 +46,17 @@ abstract class BaseRegistrar extends DwebContractWrapper {
     }
   }
 
+  /**
+   * Is the registrar on the Polygon network
+   */
   get isMatic() {
     return this.network === 'matic' || this.network === 'maticmum';
   }
 
   /**
-   * Approve the DWEB token amount that can be used by the registrar
-   * @param {'WETH' | 'DWEB'} token - token name
-   * @param {BigNumber} amount - amount in wei
-   * @returns {Promise<providers.TransactionReceipt>}
+   * Approve the DWEB token amount that can be used by the registrar contract
+   * @param token - token name. WETH is only supported on the Polygon network
+   * @param amount - amount in wei
    */
   async setTokenAllowance(
     token: 'WETH' | 'DWEB',
@@ -68,13 +82,67 @@ abstract class BaseRegistrar extends DwebContractWrapper {
   }
 
   /**
-   * Approve unlimited token usage by the registrar, so no further approvals are needed
+   * Approve unlimited token usage by the registrar contract, so no further approvals are needed
+   * @param token - token name. WETH is only supported on the Polygon network
    */
   async allowTokenUsage(token: 'WETH' | 'DWEB') {
     return this.setTokenAllowance(
       token,
       ethers.utils.parseUnits(Number.MAX_SAFE_INTEGER.toString(), 'ether')
     );
+  }
+
+  /**
+   * Check staking status of a list of domains
+   * @param domains - list of domains to check
+   */
+  async stakingStatus(domains: string[]): Promise<StakingState[]> {
+    const data = await this.api.getStakedDomains(domains);
+    return data.map((d, index) => {
+      if (!d.staked) {
+        return {
+          name: domains[index],
+          staked: false
+        } as NotStakedDomain;
+      }
+      let stakingType: string;
+      switch (d.stakingType) {
+        case 0:
+          stakingType = 'public';
+          break;
+        case 1:
+          stakingType = 'address';
+          break;
+        case 2:
+          stakingType = 'nft';
+          break;
+        case 3:
+          stakingType = 'erc20';
+          break;
+        default:
+          throw new Error(`Unknown staking type: ${d.stakingType}`);
+      }
+      let renewalType: string;
+      switch (d.renewalType) {
+        case 0:
+          renewalType = 'permanent';
+          break;
+        case 1:
+          renewalType = 'renewed';
+          break;
+        default:
+          throw new Error(`Unknown renewal type: ${d.renewalType}`);
+      }
+      return {
+        name: domains[index],
+        staked: true,
+        price: d.price,
+        sldPerWallet: d.sldPerWallet,
+        stakingType: stakingType,
+        renewalType: renewalType,
+        renewalFee: d.renewalFee
+      } as StakedDomain;
+    });
   }
 }
 

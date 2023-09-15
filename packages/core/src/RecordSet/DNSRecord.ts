@@ -1,5 +1,9 @@
 import { Buffer } from 'buffer';
 
+/**
+ * DNS Record Types
+ * @see https://en.wikipedia.org/wiki/List_of_DNS_record_types
+ */
 export type RecordType =
   | 'A'
   | 'AAAA'
@@ -46,7 +50,10 @@ export type RecordType =
   | 'URI';
 
 export type RecordClass = 'IN' | 'CS' | 'CH' | 'HS' | 'ANY';
-
+/**
+ * DNS Record types
+ * @see https://en.wikipedia.org/wiki/List_of_DNS_record_types
+ */
 export namespace Record {
   export interface Base {
     name: string;
@@ -57,34 +64,40 @@ export namespace Record {
 
   export interface A extends Base {
     type: 'A';
-    /**
-     * IP Address
-     */
+    /** IP Address */
     data: string;
   }
 
   export interface AAAA extends Base {
     type: 'AAAA';
+    /** IPv6 Address */
     data: string; // fx fe80::1
   }
 
   export interface CNAME extends Base {
     type: 'CNAME';
-    data: string; //'cname.to.another.record'
+    /** Canonical Name */
+    data: string;
   }
 
   export interface MX extends Base {
     type: 'MX';
     data: {
+      /** Mail server priority */
       preference: number;
+      /** Mail server hostname */
       exchange: string;
     };
   }
 
   export interface TXT extends Base {
     type: 'TXT';
+    /** Text record data */
     data: string | Buffer | Array<string | Buffer>;
   }
 }
 
+/**
+ * DNS Record type. Currently, we focus on supporting most common types: A, AAAA, CNAME, MX, TXT
+ */
 export type DNSRecord = Record.A | Record.AAAA | Record.CNAME | Record.MX | Record.TXT;

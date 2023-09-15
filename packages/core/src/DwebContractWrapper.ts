@@ -1,6 +1,5 @@
-import { ContractConfig, DwebContract, EthNetwork } from './contracts/interfaces';
 import { ethers, providers } from 'ethers';
-import { DwebConfig } from './types/common';
+import { ContractConfig, DwebConfig, DwebContract, Network } from './types/common';
 import { getContract, getContractConfig } from './contracts';
 import { getChainId } from './utils/ethereum';
 
@@ -14,7 +13,7 @@ export function requiresSigner(target: any, ctx: DecoratorContext): any {
 }
 
 abstract class DwebContractWrapper {
-  readonly network: EthNetwork;
+  readonly network: Network;
   readonly chainId: number;
   readonly provider: providers.BaseProvider;
   readonly signer?: ethers.Signer;

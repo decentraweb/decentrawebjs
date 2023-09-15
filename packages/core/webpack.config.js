@@ -8,7 +8,7 @@ module.exports = {
   mode: 'production',
   devtool: 'source-map',
   entry: {
-    'decentraweb-core': './src/index.browser.ts'
+    'decentraweb-core': './src/index.ts'
   },
   plugins: [
     new CleanWebpackPlugin(),

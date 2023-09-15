@@ -1,19 +1,39 @@
 import { BigNumber, ethers, providers } from 'ethers';
 import { normalizeDomainEntries, normalizeDuration, normalizeName } from '../utils';
 import getRandomHex from '../../utils/getRandomHex';
-import { BalanceVerificationResult, DomainEntry } from '../types/TLD';
+import { TLDBalanceVerificationResult, TLDEntry } from '../types/TLD';
 import { increaseByPercent } from '../../utils/misc';
 import { CommittedRegistration } from './types';
 import { APPROVAL_TTL } from '../constants';
 import signTypedData from '../../utils/signTypedData';
 import BaseRegistrar, { RegistrarConfig } from '../BaseRegistrar';
-import { PolygonNetwork } from '../../contracts/interfaces';
 import { getWethContract } from '../../contracts';
+import { PolygonNetwork } from '../../types/common';
 
 interface Config extends RegistrarConfig {
   network: PolygonNetwork;
 }
 
+/**
+ * Class that handles TLD registration on Polygon network.
+ * Registration is done in 2 steps:
+ * 1. Calling {@link sendCommitment} to get registration approval.
+ * 2. Calling {@link register} to finish registration.
+ * @example
+ * ```ts
+ * import { registration } from '@decentraweb/core';
+ *
+ * const registrar = new registration.PolygonTLDRegistrar({
+ *   network: network as any,
+ *   provider: provider,
+ *   signer: signer
+ * });
+ *
+ * const registration = await registrar.sendCommitment({ name: 'wallet', duration: registration.DURATION.ONE_YEAR });
+ * const tx = await registrar.register(registration);
+ * await tx.wait(1);
+ * ```
+ */
 class PolygonTLDRegistrar extends BaseRegistrar {
   readonly network: PolygonNetwork;
   readonly wethToken: ethers.Contract;
@@ -31,7 +51,7 @@ class PolygonTLDRegistrar extends BaseRegistrar {
    * @param owner - ETH address of the owner of created subdomains, defaults to signer address
    */
   async sendCommitment(
-    request: DomainEntry | Array<DomainEntry>,
+    request: TLDEntry | Array<TLDEntry>,
     isFeesInDweb: boolean = false,
     owner?: string
   ): Promise<CommittedRegistration> {
@@ -93,10 +113,11 @@ class PolygonTLDRegistrar extends BaseRegistrar {
     return this.provider.getTransaction(result.txid);
   }
 
+  /** {@inheritDoc EthereumTLDRegistrar.verifySignerBalance} */
   async verifySignerBalance(
-    request: DomainEntry | Array<DomainEntry>,
+    request: TLDEntry | Array<TLDEntry>,
     isFeesInDweb: boolean = false
-  ): Promise<BalanceVerificationResult> {
+  ): Promise<TLDBalanceVerificationResult> {
     const requests = normalizeDomainEntries(request);
     const signerAddress = await this.signer.getAddress();
     const contract = isFeesInDweb ? this.dwebToken : this.wethToken;
@@ -106,7 +127,7 @@ class PolygonTLDRegistrar extends BaseRegistrar {
       this.getRentPriceBatch(requests, isFeesInDweb)
     ]);
     const safePrice = increaseByPercent(rentPrice, 10);
-    const result: BalanceVerificationResult = {
+    const result: TLDBalanceVerificationResult = {
       success: true,
       error: null,
       price: rentPrice,
@@ -127,12 +148,12 @@ class PolygonTLDRegistrar extends BaseRegistrar {
 
   /**
    * Returns the price of registration in wei
-   * @param {DomainEntry} entry - domain name and duration
-   * @param {boolean} isFeesInDweb - if true, registration fee will be paid in DWEB tokens, otherwise in ETH
+   * @param {TLDEntry} entry - domain name and duration
+   * @param {boolean} isFeesInDweb - if true, registration fee will be paid in DWEB tokens, otherwise in WETH
    * @returns {Promise<BigNumber>} - amount in wei
    */
   async getRentPrice(
-    { name, duration }: DomainEntry,
+    { name, duration }: TLDEntry,
     isFeesInDweb: boolean = false
   ): Promise<BigNumber> {
     const tokenAddress = isFeesInDweb ? this.dwebToken.address : this.wethToken.address;
@@ -141,11 +162,11 @@ class PolygonTLDRegistrar extends BaseRegistrar {
 
   /**
    * Returns the price of registration in wei for multiple domains
-   * @param {Array<DomainEntry>} requests - array of domain names and durations
-   * @param {boolean} isFeesInDweb - if true, registration fee will be paid in DWEB tokens, otherwise in ETH
+   * @param {Array<TLDEntry>} requests - array of domain names and durations
+   * @param {boolean} isFeesInDweb - if true, registration fee will be paid in DWEB tokens, otherwise in WETH
    * @returns {Promise<BigNumber>} - total amount in wei
    */
-  async getRentPriceBatch(requests: Array<DomainEntry>, isFeesInDweb: boolean): Promise<BigNumber> {
+  async getRentPriceBatch(requests: Array<TLDEntry>, isFeesInDweb: boolean): Promise<BigNumber> {
     let totalPrice = BigNumber.from(0);
     for (const name of requests) {
       const price = await this.getRentPrice(name, isFeesInDweb);

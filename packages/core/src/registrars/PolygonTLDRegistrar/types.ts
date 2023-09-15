@@ -1,16 +1,15 @@
-import { DomainEntry } from '../types/TLD';
+import { TLDEntry } from '../types/TLD';
 import { BigNumber } from 'ethers';
 
 /**
- * @typedef {Object} BaseRegistrationContext
- * @property {DomainEntry[]} domains - array of name and duration pairs
- * @property {string} owner - domain owner address
- * @property {Date} expiresAt - date when the approval expires
- * @property {boolean} isFeesInDweb - true if fees are paid in DWEB, false if fees are paid in ETH
- * @property {BigNumber} fee - total fee in wei
+ * @property domains - array of name and duration pairs
+ * @property owner - domain owner address
+ * @property expiresAt - date when the approval expires
+ * @property isFeesInDweb - true if fees are paid in DWEB, false if fees are paid in ETH
+ * @property fee - total fee in wei
  */
 export interface BaseRegistrationContext {
-  domains: DomainEntry[];
+  domains: TLDEntry[];
   owner: string;
   expiresAt: Date;
   isFeesInDweb: boolean;
@@ -18,10 +17,9 @@ export interface BaseRegistrationContext {
 }
 
 /**
- * @typedef {Object} CommittedRegistration
  * @extends BaseRegistrationContext
- * @property {string} status - 'committed'
- * @property {Object} data - data needed to complete the registration
+ * @property status - 'committed'
+ * @property data - data needed to complete the registration
  */
 export interface CommittedRegistration extends BaseRegistrationContext {
   status: 'committed';

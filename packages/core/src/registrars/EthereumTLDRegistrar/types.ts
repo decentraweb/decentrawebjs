@@ -1,9 +1,9 @@
 import { providers } from 'ethers';
-import { TLDApproval } from '../../DecentrawebAPI/types';
-import { DomainEntry } from '../types/TLD';
+import { TLDApproval } from '../../api';
+import { TLDEntry } from '../types/TLD';
 
 export interface BaseRegistrationContext extends TLDApproval {
-  domains: DomainEntry[];
+  domains: TLDEntry[];
   owner: string;
   expiresAt: Date;
 }
@@ -18,8 +18,4 @@ export interface CommittedRegistration extends BaseRegistrationContext {
   committedAt: Date;
 }
 
-export interface DoneRegistration extends BaseRegistrationContext {
-  status: 'done';
-}
-
-export type RegistrationContext = ApprovedRegistration | CommittedRegistration | DoneRegistration;
+export type RegistrationContext = ApprovedRegistration | CommittedRegistration;

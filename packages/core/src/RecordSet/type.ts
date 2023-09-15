@@ -1,5 +1,10 @@
 //Pulled from dns-packet https://github.com/mafintosh/dns-packet/blob/master/types.js
 
+/**
+ * Convert numeric DN record type to string
+ * @see https://en.wikipedia.org/wiki/List_of_DNS_record_types
+ * @param type - numeric DNS record type 1 to 255
+ */
 export function toString(type: number): string {
   switch (type) {
     case 1:
@@ -94,6 +99,11 @@ export function toString(type: number): string {
   return 'UNKNOWN_' + type;
 }
 
+/**
+ * Convert string DNS record type to numeric value used in DNS packets
+ * @see https://en.wikipedia.org/wiki/List_of_DNS_record_types
+ * @param name - string DNS record type
+ */
 export function toType(name: string): number {
   switch (name.toUpperCase()) {
     case 'A':

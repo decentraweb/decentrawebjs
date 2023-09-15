@@ -2,32 +2,55 @@ import { BigNumber, ethers, providers } from 'ethers';
 
 import { increaseByPercent } from '../../utils/misc';
 import { ApprovedRegistration, CommittedRegistration, RegistrationContext } from './types';
-import { BalanceVerificationResult, DomainEntry } from '../types/TLD';
+import { TLDBalanceVerificationResult, TLDEntry } from '../types/TLD';
 import { normalizeDomainEntries, normalizeDuration, normalizeName } from '../utils';
 import { APPROVAL_TTL, REGISTRATION_WAIT } from '../constants';
 import BaseRegistrar from '../BaseRegistrar';
 
 export type {
   ApprovedRegistration,
-  BalanceVerificationResult,
+  TLDBalanceVerificationResult,
   CommittedRegistration,
-  DomainEntry,
+  TLDEntry,
   RegistrationContext
 };
 
 /**
- * Ethereum TLD Registrar class. Provides methods to register top level domains.
+ * Class that handles TLD registration on Ethereum network.
+ * Registration is done in 4 steps:
+ * 1. Calling {@link requestApproval} to get registration approval.
+ * 2. Calling {@link sendCommitment} to create commitment for registration.
+ * 3. Waiting for 1 minute.
+ * 4. Calling {@link register} to finish registration.
+ *
+ * **Note:** After approval is receieved, domain will be reserved for 30 minutes. Since process may fail on one of following steps,
+ * it is recommended to save result of each step to be able to continue in case of failure.
+ * @example
+ * ```ts
+ * import { registration } from '@decentraweb/core';
+ * const registrar = new registration.EthereumTLDRegistrar({
+ *   network: network,
+ *   provider: provider,
+ *   signer: signer
+ * });
+ * const approval = await registrar.requestApproval({ name: 'wallet', duration: registration.DURATION.ONE_YEAR });
+ * const commitment = await registrar.sendCommitment(approval);
+ * await commitment.tx.wait(1);
+ * // Wait for 1 minute
+ * const tx = await registrar.register(commitment);
+ * await tx.wait(1);
+ * ```
  */
 export class EthereumTLDRegistrar extends BaseRegistrar {
   /**
    * Step 1. Normalizes domain names, calls the API to check if they are available and returns approval for registration.
    * Approved request is valid for 30 minutes.
-   * @param request
-   * @param owner
-   * @returns {Promise<ApprovedRegistration>} ApprovedRegistration object that can be used to commit and register
+   * @param request - one or more domain names and durations
+   * @param owner - ETH address of the owner of created TLDs
+   * @returns - ApprovedRegistration object that can be used to commit and register
    */
   async requestApproval(
-    request: DomainEntry | Array<DomainEntry>,
+    request: TLDEntry | Array<TLDEntry>,
     owner?: string
   ): Promise<ApprovedRegistration> {
     const signerAddress = await this.signer.getAddress();
@@ -46,8 +69,8 @@ export class EthereumTLDRegistrar extends BaseRegistrar {
 
   /**
    * Step 2. Creates a commitment for registration. Commitment is valid after 1 minute.
-   * @param {ApprovedRegistration} request - data returned from `requestApproval` step
-   * @returns {Promise<CommittedRegistration>} CommittedRegistration object that can be used to register TLD
+   * @param request - data returned from `requestApproval` step
+   * @returns - object that can be used to register TLD
    */
   async sendCommitment(request: ApprovedRegistration): Promise<CommittedRegistration> {
     const signature = ethers.utils.splitSignature(request.signature);
@@ -69,9 +92,9 @@ export class EthereumTLDRegistrar extends BaseRegistrar {
    * Step 3. Finish TLD registration. This step can be called only 1 minute after `sendCommitment` step was completed.
    * Also, it will throw an error if signer balance is not enough to pay for registration. Registration considered
    * successful after 1st confirmation received.
-   * @param {CommittedRegistration} request - data returned from `sendCommitment` step
-   * @param {boolean} isFeesInDweb - if true, fees will be paid in DWEB tokens, otherwise in ETH
-   * @returns {Promise<providers.TransactionResponse>} Transaction response for registration
+   * @param request - data returned from `sendCommitment` step
+   * @param isFeesInDweb - if true, fees will be paid in DWEB tokens, otherwise in ETH
+   * @returns - Transaction response for registration
    */
   async register(
     request: CommittedRegistration,
@@ -117,7 +140,7 @@ export class EthereumTLDRegistrar extends BaseRegistrar {
   async verifySignerBalance(
     request: RegistrationContext,
     isFeesInDweb: boolean
-  ): Promise<BalanceVerificationResult> {
+  ): Promise<TLDBalanceVerificationResult> {
     const signerAddress = await this.signer.getAddress();
     const rentPrice = await this.getRentPriceBatch(request.domains, isFeesInDweb);
     const [ethBalance, dwebBalance, dwebAllowance] = await Promise.all([
@@ -126,7 +149,7 @@ export class EthereumTLDRegistrar extends BaseRegistrar {
       this.dwebToken.allowance(signerAddress, this.contract.address)
     ]);
     const safePrice = increaseByPercent(rentPrice, 10);
-    const result: BalanceVerificationResult = {
+    const result: TLDBalanceVerificationResult = {
       success: true,
       error: null,
       price: rentPrice,
@@ -153,12 +176,12 @@ export class EthereumTLDRegistrar extends BaseRegistrar {
 
   /**
    * Returns the price of registration in wei
-   * @param {DomainEntry} entry - domain name and duration
-   * @param {boolean} isFeesInDweb - if true, registration fee will be paid in DWEB tokens, otherwise in ETH
-   * @returns {Promise<BigNumber>} - amount in wei
+   * @param entry - domain name and duration
+   * @param isFeesInDweb - if true, registration fee will be paid in DWEB tokens, otherwise in ETH
+   * @returns - amount in wei
    */
   async getRentPrice(
-    { name, duration }: DomainEntry,
+    { name, duration }: TLDEntry,
     isFeesInDweb: boolean = false
   ): Promise<BigNumber> {
     return await this.contract.rentPrice(
@@ -170,11 +193,11 @@ export class EthereumTLDRegistrar extends BaseRegistrar {
 
   /**
    * Returns the price of registration in wei for multiple domains
-   * @param {Array<DomainEntry>} requests - array of domain names and durations
-   * @param {boolean} isFeesInDweb - if true, registration fee will be paid in DWEB tokens, otherwise in ETH
-   * @returns {Promise<BigNumber>} - total amount in wei
+   * @param requests - array of domain names and durations
+   * @param isFeesInDweb - if true, registration fee will be paid in DWEB tokens, otherwise in ETH
+   * @returns - total amount in wei
    */
-  async getRentPriceBatch(requests: Array<DomainEntry>, isFeesInDweb: boolean): Promise<BigNumber> {
+  async getRentPriceBatch(requests: Array<TLDEntry>, isFeesInDweb: boolean): Promise<BigNumber> {
     let totalPrice = BigNumber.from(0);
     for (const name of requests) {
       const price = await this.getRentPrice(name, isFeesInDweb);

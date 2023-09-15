@@ -1,6 +1,6 @@
-import { ChainId, EthNetwork } from '../contracts/interfaces';
+import { ChainId, Network } from '../types/common';
 
-export function getChainId(network: EthNetwork): ChainId {
+export function getChainId(network: Network): ChainId {
   switch (network) {
     case 'mainnet':
       return 1;

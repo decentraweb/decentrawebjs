@@ -1,8 +1,8 @@
-import { EthNetwork } from '@decentraweb/core';
+import { Network } from '@decentraweb/core';
 import { providers } from 'ethers';
 
 export type ToolkitConfig = {
-  network: EthNetwork;
+  network: Network;
   provider: providers.BaseProvider;
   dnsServer?: string;
 };

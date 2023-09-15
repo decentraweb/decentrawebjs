@@ -4,8 +4,9 @@ import { Chance } from 'chance';
 import nameExists from '../../lib/assertions/nameExists';
 import { getProvider } from '../../lib/provider';
 import { wait } from '../../lib/utils';
-import {providers, Signer} from 'ethers';
-import {EthNetwork} from "../../../src";
+import { providers, Signer } from 'ethers';
+
+import { Network } from '../../../src';
 
 const chance = new Chance();
 
@@ -13,7 +14,7 @@ describe('Register TLD', function () {
   let owner: string;
   let provider: providers.BaseProvider;
   let signer: Signer;
-  let network: EthNetwork;
+  let network: Network;
 
   describe('on Ethereum', function () {
     let registrar: EthereumTLDRegistrar;
