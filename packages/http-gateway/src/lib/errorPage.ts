@@ -1,4 +1,4 @@
-export function errorPage(title: string, message: string){
+export function errorPage(title: string, message: string) {
   return `
     <!DOCTYPE html>
     <html lang="en">

@@ -1,5 +1,5 @@
 import * as net from 'net';
-import Cache from "./Cache";
+import Cache from './Cache';
 
 const CACHE = new Cache<boolean>(10 * 60 * 1000);
 

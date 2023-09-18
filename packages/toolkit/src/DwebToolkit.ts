@@ -1,8 +1,8 @@
-import {EthereumAddress} from "./EthereumAddress";
-import {ToolkitConfig} from "./types";
-import ICANNDomain from "./domain/ICANNDomain";
-import ENSDomain from "./domain/ENSDomain";
-import DWEBDomain from "./domain/DWEBDomain";
+import { EthereumAddress } from './EthereumAddress';
+import { ToolkitConfig } from './types';
+import ICANNDomain from './domain/ICANNDomain';
+import ENSDomain from './domain/ENSDomain';
+import DWEBDomain from './domain/DWEBDomain';
 import getDomainProvider from './lib/getDomainProvider';
 
 export class DwebToolkit {

@@ -4,7 +4,7 @@ import { Buffer } from 'buffer';
 import { DNSRecord } from './DNSRecord';
 
 /**
- * Helper class for encoding and decoding DNS records.
+ * Helper class for encoding and decoding DNS records. Record set is an array of DNS records.
  */
 export class RecordSet {
   static recordType = recordType;

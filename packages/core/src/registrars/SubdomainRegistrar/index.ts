@@ -1,11 +1,11 @@
 import { BigNumber, ethers, providers } from 'ethers';
 import {
   ApprovedRegistration,
+  OnDemandEntry,
+  SelfRegEntry,
   SubdomainBalanceVerificationResult,
   SubdomainEntry,
-  SubdomainFees,
-  OnDemandEntry,
-  SelfRegEntry
+  SubdomainFees
 } from '../types/Subdomain';
 import { hash as hashName, normalize } from '@ensdomains/eth-ens-namehash';
 import signTypedData from '../../utils/signTypedData';

@@ -4,4 +4,5 @@ import ICANNDomain from './domain/ICANNDomain';
 import DwebToolkit from './DwebToolkit';
 
 import * as core from '@decentraweb/core';
+
 export { ENSDomain, DWEBDomain, ICANNDomain, DwebToolkit, core };

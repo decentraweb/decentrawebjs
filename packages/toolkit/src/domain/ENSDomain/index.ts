@@ -3,8 +3,7 @@ import { formatsByName } from '@ensdomains/address-encoder';
 import { PublicResolver as publicResolverContract } from '@ensdomains/ens-contracts';
 import { hash as namehash } from '@ensdomains/eth-ens-namehash';
 import BaseDomain from '../BaseDomain';
-import { RecordSet } from '@decentraweb/core';
-import { RecordType } from '@decentraweb/core';
+import { RecordSet, RecordType } from '@decentraweb/core';
 import { dnsWireNameHash } from './utils';
 import { ToolkitConfig } from '../../types';
 

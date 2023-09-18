@@ -4,21 +4,12 @@ interface CacheRecord<V = any> {
 }
 
 export default class Cache<V = any> {
-  private data: Map<string, CacheRecord<V>> = new Map();
   readonly ttl: number;
+  private data: Map<string, CacheRecord<V>> = new Map();
 
   constructor(defaultTTL: number) {
     this.ttl = defaultTTL;
     setInterval(() => this.cleanup(), 10000);
-  }
-
-  private cleanup() {
-    const now = Date.now();
-    this.data.forEach((record, key) => {
-      if (record.exp < now) {
-        this.data.delete(key);
-      }
-    });
   }
 
   async write(key: string, value: V, ttl?: number) {
@@ -31,5 +22,14 @@ export default class Cache<V = any> {
   async read(key: string): Promise<V | undefined> {
     const record = this.data.get(key);
     return record && record.exp > Date.now() ? record.value : undefined;
+  }
+
+  private cleanup() {
+    const now = Date.now();
+    this.data.forEach((record, key) => {
+      if (record.exp < now) {
+        this.data.delete(key);
+      }
+    });
   }
 }
