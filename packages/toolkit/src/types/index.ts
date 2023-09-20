@@ -1,12 +1,16 @@
 import { EthereumNetwork, Network, PolygonNetwork } from '@decentraweb/core';
 import { providers } from 'ethers';
 
-type ApiProvider = 'etherscan' | 'infura' | 'alchemy' | 'cloudflare' | 'pocket' | 'ankr';
+export type ApiProvider = 'etherscan' | 'infura' | 'alchemy' | 'cloudflare' | 'pocket' | 'ankr';
 
 export interface ApiProviderConfig {
+  /** Name of ethereum network provider */
   apiProvider: ApiProvider;
+  /** API key for provider */
   apiKey: string;
+  /** Use production network (mainnet and matic) or testnet (goerli and maticmum) */
   production: boolean;
+  /** DNS server to use for ICANN domains */
   dnsServer?: string;
 }
 
@@ -16,11 +20,15 @@ export function isApiProviderConfig(config: any): config is ApiProviderConfig {
 
 export interface ProviderSet {
   ethereum: {
+    /** Ethereum network name */
     network: EthereumNetwork;
+    /** Ethers.js provider instance */
     provider: providers.BaseProvider;
   };
   polygon: {
+    /** Polygon network name */
     network: PolygonNetwork;
+    /** Ethers.js provider instance */
     provider: providers.BaseProvider;
   };
 }
