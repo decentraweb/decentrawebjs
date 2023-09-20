@@ -5,7 +5,7 @@ import { hash as namehash } from '@ensdomains/eth-ens-namehash';
 import BaseDomain from '../BaseDomain';
 import { RecordSet, RecordType } from '@decentraweb/core';
 import { dnsWireNameHash } from './utils';
-import { ToolkitConfig } from '../../types';
+import { ENSConfig } from '../../types';
 
 export function getResolverContract(address: string, provider: providers.Provider) {
   return new ethers.Contract(address, publicResolverContract, provider);
@@ -20,9 +20,9 @@ export class ENSDomain extends BaseDomain {
     txt: true
   };
   private resolver?: providers.Resolver | null;
-  private config: ToolkitConfig;
+  private config: ENSConfig;
 
-  constructor(name: string, config: ToolkitConfig) {
+  constructor(name: string, config: ENSConfig) {
     super(name);
     this.config = config;
   }

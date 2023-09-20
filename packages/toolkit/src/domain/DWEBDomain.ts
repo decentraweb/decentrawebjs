@@ -1,6 +1,6 @@
 import BaseDomain from './BaseDomain';
 import { DWEBName, DWEBRegistry, RecordSet, RecordType } from '@decentraweb/core';
-import { ToolkitConfig } from '../types';
+import { DwebConfig } from '../types';
 
 export class DWEBDomain extends BaseDomain {
   readonly provider = 'dweb';
@@ -11,9 +11,9 @@ export class DWEBDomain extends BaseDomain {
     txt: true
   };
   private readonly dwebName: DWEBName;
-  private config: ToolkitConfig;
+  private config: DwebConfig;
 
-  constructor(name: string, config: ToolkitConfig) {
+  constructor(name: string, config: DwebConfig) {
     super(name);
     this.config = config;
     const dweb = new DWEBRegistry({ network: config.network, provider: config.provider });

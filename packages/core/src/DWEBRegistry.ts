@@ -27,6 +27,21 @@ export default class DWEBRegistry extends DwebContractWrapper {
   }
 
   /**
+   * Check if domain name exists. Note that name could be located on Ethereum or Polygon network.
+   * If name is currently on Polygon, it will not exist on Ethereum and vice versa.
+   * @param name
+   */
+  async nameExists(name: string): Promise<boolean> {
+    const hash = namehash(name);
+    try {
+      await this.contract.owner(hash);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /**
    * Assign default resolver contract to domain name. This is usually done during the registration process, but may be
    * required if domain has no resolver set or if it is no compatible with Decentraweb.
    * @param name

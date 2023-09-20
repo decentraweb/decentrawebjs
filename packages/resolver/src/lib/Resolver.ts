@@ -1,9 +1,8 @@
 import { Buffer } from 'buffer';
-import { DNSRecord, Network } from '@decentraweb/core';
-import DwebToolkit from '@decentraweb/toolkit';
+import { DNSRecord } from '@decentraweb/core';
+import DwebToolkit, { ToolkitConfig } from '@decentraweb/toolkit';
 import dgram from 'dgram';
 import * as dnsPacket from 'dns-packet';
-import { providers } from 'ethers';
 import * as punycode from 'punycode/';
 
 function getRandomReqId() {
@@ -44,8 +43,7 @@ function createLogger(): Logger {
 }
 
 export interface ResolverConfig {
-  provider: providers.BaseProvider;
-  network: Network;
+  blockchain: ToolkitConfig;
   ipfsGateway: {
     A: string[];
     AAAA: string[];
@@ -60,10 +58,7 @@ class Resolver {
 
   constructor(options: ResolverConfig) {
     this.options = options;
-    this.toolkit = new DwebToolkit({
-      provider: options.provider,
-      network: options.network
-    });
+    this.toolkit = new DwebToolkit(this.options.blockchain);
   }
 
   async processRequest(data: Buffer): Promise<Buffer | null> {
