@@ -8,3 +8,4 @@ dist
 .greenlockrc
 playground.ts
 /certs/
+/docs/
