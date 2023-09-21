@@ -1,12 +1,12 @@
 import { ethers, providers } from 'ethers';
-import { hash as namehash } from '@ensdomains/eth-ens-namehash';
 import { formatsByName } from '@ensdomains/address-encoder';
-import { decode, encode } from './utils/content';
-import { dnsWireNameHash } from './utils/dns';
+import { decode, encode } from './utils/content.js';
+import { dnsWireNameHash } from './utils/dns.js';
 import { Buffer } from 'buffer';
-import { getContract } from './contracts';
+import { getContract } from './contracts/index.js';
 
-import { Network } from './types/common';
+import { Network } from './types/common.js';
+import { hashName } from './utils/name.js';
 
 const NO_DATA = '0x';
 
@@ -31,7 +31,7 @@ export default class DWEBName {
     const { name, registry, provider, network, signer } = options;
     this.registryContract = registry;
     this.name = name;
-    this.namehash = namehash(name);
+    this.namehash = hashName(name);
     this.provider = provider;
     this.network = network;
     this.signer = signer;

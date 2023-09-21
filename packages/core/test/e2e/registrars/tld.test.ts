@@ -1,4 +1,4 @@
-import { DURATION, EthereumTLDRegistrar, PolygonTLDRegistrar } from '../../../src/registrars';
+import { Network, registrars } from '@decentraweb/core';
 import { expect } from 'chai';
 import { Chance } from 'chance';
 import nameExists from '../../lib/assertions/nameExists';
@@ -6,9 +6,8 @@ import { getProvider } from '../../lib/provider';
 import { wait } from '../../lib/utils';
 import { providers, Signer } from 'ethers';
 
-import { Network } from '../../../src';
-
 const chance = new Chance();
+const { DURATION, EthereumTLDRegistrar, PolygonTLDRegistrar } = registrars;
 
 describe('Register TLD', function () {
   let owner: string;
@@ -17,7 +16,7 @@ describe('Register TLD', function () {
   let network: Network;
 
   describe('on Ethereum', function () {
-    let registrar: EthereumTLDRegistrar;
+    let registrar: registrars.EthereumTLDRegistrar;
     beforeEach(async () => {
       const data = getProvider('ethereum');
       network = data.network;
@@ -73,7 +72,7 @@ describe('Register TLD', function () {
   });
 
   describe('on Polygon', function () {
-    let registrar: PolygonTLDRegistrar;
+    let registrar: registrars.PolygonTLDRegistrar;
     beforeEach(async () => {
       const data = getProvider('polygon');
       network = data.network;

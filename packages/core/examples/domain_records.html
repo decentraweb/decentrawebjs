@@ -35,6 +35,15 @@
       provider = new ethers.providers.Web3Provider(window.ethereum);
       provider.send("eth_requestAccounts", []).then(async () => {
         network = await provider.getNetwork();
+        // Check if the current chain is Goerli, and prompt the user to switch if not
+        if (network.chainId !== 5) {
+          try {
+            await provider.send('wallet_switchEthereumChain', [{chainId: '0x5'}])
+            connectWallet();
+          } catch (e) {
+            alert('Please switch to Goerli testnet')
+          }
+        }
         signer = provider.getSigner();
       });
     }

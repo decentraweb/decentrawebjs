@@ -1,6 +1,6 @@
 import { providers } from 'ethers';
-import { TLDApproval } from '../../api';
-import { TLDEntry } from '../types/TLD';
+import { TLDApproval } from '../../api/types.js';
+import { TLDEntry } from '../types/TLD.js';
 
 export interface BaseRegistrationContext extends TLDApproval {
   domains: TLDEntry[];

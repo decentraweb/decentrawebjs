@@ -1,14 +1,15 @@
 import { BigNumber, ethers, providers } from 'ethers';
-import { normalizeDomainEntries, normalizeDuration, normalizeName } from '../utils';
-import getRandomHex from '../../utils/getRandomHex';
-import { TLDBalanceVerificationResult, TLDEntry } from '../types/TLD';
-import { increaseByPercent } from '../../utils/misc';
-import { CommittedRegistration } from './types';
-import { APPROVAL_TTL } from '../constants';
-import signTypedData from '../../utils/signTypedData';
-import BaseRegistrar, { RegistrarConfig } from '../BaseRegistrar';
-import { getWethContract } from '../../contracts';
-import { PolygonNetwork } from '../../types/common';
+import { normalizeDomainEntries, normalizeDuration } from '../utils.js';
+import getRandomHex from '../../utils/getRandomHex.js';
+import { TLDBalanceVerificationResult, TLDEntry } from '../types/TLD.js';
+import { increaseByPercent } from '../../utils/misc.js';
+import { CommittedRegistration } from './types.js';
+import { APPROVAL_TTL } from '../constants.js';
+import signTypedData from '../../utils/signTypedData.js';
+import BaseRegistrar, { RegistrarConfig } from '../BaseRegistrar.js';
+import { getWethContract } from '../../contracts/index.js';
+import { PolygonNetwork } from '../../types/common.js';
+import { normalizeName } from '../../utils/name.js';
 
 interface Config extends RegistrarConfig {
   network: PolygonNetwork;

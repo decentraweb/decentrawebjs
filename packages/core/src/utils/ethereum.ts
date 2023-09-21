@@ -1,4 +1,4 @@
-import { ChainId, Network } from '../types/common';
+import { ChainId, Network } from '../types/common.js';
 
 export function getChainId(network: Network): ChainId {
   switch (network) {

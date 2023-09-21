@@ -1,6 +1,6 @@
-import { normalize } from '@ensdomains/eth-ens-namehash';
-import { TLDEntry } from './types/TLD';
-import { DURATION, MAX_NAMES_PER_TX } from './constants';
+import { TLDEntry } from './types/TLD.js';
+import { DURATION, MAX_NAMES_PER_TX } from './constants.js';
+import { normalizeName } from '../utils/name.js';
 
 /**
  * Validates and normalizes domain names and durations for registration.
@@ -23,10 +23,6 @@ export function normalizeDomainEntries(entries: TLDEntry | Array<TLDEntry>): Arr
     }
     return result;
   });
-}
-
-export function normalizeName(name: string): string {
-  return normalize(name);
 }
 
 const VALID_DURATIONS: number[] = Object.values(DURATION);

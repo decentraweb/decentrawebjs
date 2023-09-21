@@ -65,8 +65,8 @@
     async function registerDomain(event) {
       event.preventDefault();
       const form = event.target;
-      const {EthereumSLDRegistrar} = Decentraweb.sld
-      const registrar = new EthereumSLDRegistrar({network: network.name, provider: provider, signer: signer});
+      const {SubdomainRegistrar} = Decentraweb.registrars
+      const registrar = new SubdomainRegistrar({network: network.name, provider: provider, signer: signer});
 
       const name = form.name.value;
       const subdomain = form.subdomain.value;
@@ -75,12 +75,12 @@
         toggleProgress(true, '1/2 Requesting approval...');
         const approvedRegistration = await registrar.approveOndemandRegistration(
           [{name: name, label: subdomain}], // array of domains and subdomains pairs
-          null, // owner address, if not provided, signer address will be used
-          payInDweb // true to pay in DWEB tokens
+          payInDweb, // true to pay in DWEB tokens
+          null // owner address, if not provided, signer address will be used
         );
         //It is recommended to cache approvedRegistration object, so you can resume registration if next step fails
         toggleProgress(true, '2/2 Registering subdomains...');
-        const tx = await registrar.registerSubdomains(approvedRegistration);
+        const tx = await registrar.finishRegistration(approvedRegistration);
         toggleProgress(true, '2/2 Awaiting transaction confirmation...');
         await tx.wait(1);
         alert(`Domain name ${subdomain}.${name} registered successfully`);

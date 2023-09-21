@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "lib": ["es6", "dom"],
-    "module": "commonjs",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "target": "es6",
     "rootDir": "./src",
     "outDir": "./build",

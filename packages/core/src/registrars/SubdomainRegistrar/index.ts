@@ -6,14 +6,14 @@ import {
   SubdomainBalanceVerificationResult,
   SubdomainEntry,
   SubdomainFees
-} from '../types/Subdomain';
-import { hash as hashName, normalize } from '@ensdomains/eth-ens-namehash';
-import signTypedData from '../../utils/signTypedData';
-import { increaseByPercent } from '../../utils/misc';
-import { DURATION } from '../constants';
-import { normalizeDuration } from '../utils';
-import BaseRegistrar from '../BaseRegistrar';
-import { SubdomainApproval } from '../../api';
+} from '../types/Subdomain.js';
+import signTypedData from '../../utils/signTypedData.js';
+import { increaseByPercent } from '../../utils/misc.js';
+import { DURATION } from '../constants.js';
+import { normalizeDuration } from '../utils.js';
+import BaseRegistrar from '../BaseRegistrar.js';
+import { SubdomainApproval } from '../../api/index.js';
+import { hashName, normalizeName } from '../../utils/name.js';
 
 /**
  * Class that handles subdomain registration.
@@ -242,8 +242,8 @@ class SubdomainRegistrar extends BaseRegistrar {
     const entries = Array.isArray(entry) ? entry : [entry];
     return entries.map((entry) => ({
       ...entry,
-      name: normalize(entry.name),
-      label: normalize(entry.label),
+      name: normalizeName(entry.name),
+      label: normalizeName(entry.label),
       duration: entry.duration ? normalizeDuration(entry.duration) : 0
     }));
   }

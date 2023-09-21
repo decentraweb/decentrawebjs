@@ -1,13 +1,14 @@
-import DWEBName from './DWEBName';
-import DWEBRegistry from './DWEBRegistry';
-import * as api from './api';
-import * as contracts from './contracts';
-import * as registration from './registrars';
-import RecordSet from './RecordSet';
-import * as contentHash from './utils/content';
+import DWEBName from './DWEBName.js';
+import DWEBRegistry from './DWEBRegistry.js';
+import * as api from './api/index.js';
+import * as contracts from './contracts/index.js';
+import * as registrars from './registrars/index.js';
+import RecordSet from './RecordSet/index.js';
+import * as contentHash from './utils/content.js';
+import * as utils from './utils/index.js';
 
-export * from './types/common';
-export * from './types/TypedData';
-export type { DNSRecord, Record, RecordClass, RecordType } from './RecordSet/DNSRecord';
+export * from './types/common.js';
+export * from './types/TypedData.js';
+export type { DNSRecord, Record, RecordClass, RecordType } from './RecordSet/DNSRecord.js';
 
-export { DWEBName, DWEBRegistry, RecordSet, contentHash, registration, contracts, api };
+export { DWEBName, DWEBRegistry, RecordSet, contentHash, registrars, contracts, api, utils };

@@ -1,5 +1,5 @@
 import { Signer } from 'ethers';
-import { TypedData } from '../types/TypedData';
+import { TypedData } from '../types/TypedData.js';
 
 async function signTypedData(signer: Signer, typedData: TypedData): Promise<string> {
   //Ethers.js inserts the EIP712Domain type into the types object, so we need to remove it before signing

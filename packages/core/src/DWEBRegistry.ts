@@ -1,11 +1,11 @@
 import { ethers, providers } from 'ethers';
-import { hash as namehash } from '@ensdomains/eth-ens-namehash';
-import DWEBName from './DWEBName';
-import { DEFAULT_TTL } from './utils/contracts';
-import { getContract } from './contracts';
-import { isValidDomain } from './utils/dns';
-import { DwebConfig } from './types/common';
-import DwebContractWrapper, { requiresSigner } from './DwebContractWrapper';
+import DWEBName from './DWEBName.js';
+import { DEFAULT_TTL } from './utils/contracts.js';
+import { getContract } from './contracts/index.js';
+import { isValidDomain } from './utils/dns.js';
+import { DwebConfig } from './types/common.js';
+import DwebContractWrapper, { requiresSigner } from './DwebContractWrapper.js';
+import { hashName } from './utils/name.js';
 
 export default class DWEBRegistry extends DwebContractWrapper {
   constructor(options: DwebConfig) {
@@ -32,7 +32,7 @@ export default class DWEBRegistry extends DwebContractWrapper {
    * @param name
    */
   async nameExists(name: string): Promise<boolean> {
-    const hash = namehash(name);
+    const hash = hashName(name);
     try {
       await this.contract.owner(hash);
       return true;
@@ -48,7 +48,7 @@ export default class DWEBRegistry extends DwebContractWrapper {
    */
   @requiresSigner
   async assignDefaultResolver(name: string): Promise<providers.TransactionResponse> {
-    const hash = namehash(name);
+    const hash = hashName(name);
     return this.contract.setResolverAndTTL(hash, this.contractConfig.PublicResolver, DEFAULT_TTL);
   }
 
@@ -61,7 +61,7 @@ export default class DWEBRegistry extends DwebContractWrapper {
    */
   @requiresSigner
   async setResolver(name: string, address: string): Promise<providers.TransactionResponse> {
-    const hash = namehash(name);
+    const hash = hashName(name);
     return this.contract.setResolver(hash, address);
   }
 
@@ -75,7 +75,7 @@ export default class DWEBRegistry extends DwebContractWrapper {
    */
   async getReverseRecord(address: string, skipForwardCheck = false): Promise<string | null> {
     const reverseName = `${address.slice(2)}.addr.reverse`;
-    const reverseHash = namehash(reverseName);
+    const reverseHash = hashName(reverseName);
     const resolverAddr = await this.contract.resolver(reverseHash);
     if (parseInt(resolverAddr, 16) === 0) {
       return null;

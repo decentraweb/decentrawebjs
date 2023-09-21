@@ -19,7 +19,7 @@ specific registration or approve unlimited amount.
 #### Ethereum network
 ```typescript
 import {ethers, providers, Wallet} from "ethers";
-import {registration} from "@decentraweb/core";
+import {registrars} from "@decentraweb/core";
 
 const ETH_NETWORK = 'mainnet';
 const JSONRPC_URL = 'https://mainnet.infura.io/v3/00000000000000000000000000000000';
@@ -27,7 +27,7 @@ const PRIVATE_KEY = '00000000000000000000000000000000000000000000000000000000000
 
 const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
 const signer = new Wallet(PRIVATE_KEY, provider);
-const registrar = new registration.EthereumTLDRegistrar({network: ETH_NETWORK, provider, signer});
+const registrar = new registrars.EthereumTLDRegistrar({network: ETH_NETWORK, provider, signer});
 
 //Approve usage of unlimited amount of DWEB tokens
 registrar.allowTokenUsage('DWEB').then((receipt) => {
@@ -48,7 +48,7 @@ On Polygon network registration fees are paid either in DWEB or Wrapped Ether (W
 to be used by `RootRegistrarController` contract.
 ```typescript
 import {ethers, providers, Wallet} from "ethers";
-import {registration} from "@decentraweb/core";
+import {registrars} from "@decentraweb/core";
 
 const ETH_NETWORK = 'matic';
 const JSONRPC_URL = 'https://matic.infura.io/v3/00000000000000000000000000000000';
@@ -56,7 +56,7 @@ const PRIVATE_KEY = '00000000000000000000000000000000000000000000000000000000000
 
 const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
 const signer = new Wallet(PRIVATE_KEY, provider);
-const registrar = new registration.PolygonTLDRegistrar({network: ETH_NETWORK, provider, signer});
+const registrar = new registrars.PolygonTLDRegistrar({network: ETH_NETWORK, provider, signer});
 
 //Approve usage of unlimited amount of DWEB tokens
 registrar.allowTokenUsage('WETH').then((receipt) => {
@@ -83,7 +83,7 @@ Since process includes multiple steps it is recommended to save result of each s
 if it fails on some step (ie because of insufficient balance).
 ```typescript
 import {ethers, providers, Wallet} from "ethers";
-import {registration} from "@decentraweb/core";
+import {registrars} from "@decentraweb/core";
 
 
 const ETH_NETWORK = 'mainnet';
@@ -92,7 +92,7 @@ const PRIVATE_KEY = '00000000000000000000000000000000000000000000000000000000000
 
 const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
 const signer = new Wallet(PRIVATE_KEY, provider);
-const registrar = new registration.EthereumTLDRegistrar({network: ETH_NETWORK, provider, signer});
+const registrar = new registrars.EthereumTLDRegistrar({network: ETH_NETWORK, provider, signer});
 
 async function wait(seconds: number) {
   await new Promise(resolve => setTimeout(resolve, seconds * 1000));
@@ -100,9 +100,9 @@ async function wait(seconds: number) {
 
 async function registerDomains(){
   const approvedRequest = await registrar.requestApproval([
-    {name: 'foo', duration: registration.DURATION.ONE_YEAR},
-    {name: 'bar', duration: registration.DURATION.ONE_YEAR},
-    {name: '🙂🙂🙂', duration: registration.DURATION.ONE_YEAR}
+    {name: 'foo', duration: registrars.DURATION.ONE_YEAR},
+    {name: 'bar', duration: registrars.DURATION.ONE_YEAR},
+    {name: '🙂🙂🙂', duration: registrars.DURATION.ONE_YEAR}
   ]);
   const commitedRequest = await registrar.sendCommitment(approvedRequest);
   //Wait for 1st confirmation of commitment transaction

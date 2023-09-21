@@ -1,4 +1,4 @@
-import { SubdomainRegistrar } from '../../../src/registrars';
+import { registrars } from '@decentraweb/core';
 import { getProvider } from '../../lib/provider';
 import { expect } from 'chai';
 import { Chance } from 'chance';
@@ -8,9 +8,9 @@ const chance = new Chance();
 const { network, provider, signer } = getProvider('polygon');
 
 describe('Permanent subdomain registration', function () {
-  let registrar: SubdomainRegistrar;
+  let registrar: registrars.SubdomainRegistrar;
   beforeEach(() => {
-    registrar = new SubdomainRegistrar({
+    registrar = new registrars.SubdomainRegistrar({
       network: network,
       provider: provider,
       signer: signer

@@ -65,7 +65,7 @@
     async function registerDomain(event) {
       event.preventDefault();
       const form = event.target;
-      const {EthereumTLDRegistrar, DURATION} = Decentraweb.tld
+      const {EthereumTLDRegistrar, DURATION} = Decentraweb.registrars
       const registrar = new EthereumTLDRegistrar({network: network.name, provider: provider, signer: signer});
 
       const name = form.name.value;
@@ -78,7 +78,7 @@
         toggleProgress(true, '2/4 Committing request...');
         const commitedRequest = await registrar.sendCommitment(approvedRequest);
         toggleProgress(true, '2/4 Waiting for transaction confirmation...');
-        await commitedRequest.commitmentTx.wait(1);
+        await commitedRequest.tx.wait(1);
         toggleProgress(true, '3/4 Waiting 1 minute before registration...');
         await wait(60);
         toggleProgress(true, '4/4 Registering domain...');
