@@ -1,4 +1,4 @@
-import * as uts46 from 'idna-uts46-hx';
+import * as uts46 from 'idna-uts46-hx/dist/index.cjs';
 import { ethers } from 'ethers';
 
 export function hashName(inputName: string) {

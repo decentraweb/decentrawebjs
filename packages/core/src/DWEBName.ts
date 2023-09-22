@@ -3,10 +3,10 @@ import { formatsByName } from '@ensdomains/address-encoder';
 import { decode, encode } from './utils/content.js';
 import { dnsWireNameHash } from './utils/dns.js';
 import { Buffer } from 'buffer';
-import { getContract } from './contracts/index.js';
+import { getContract } from './contracts/index.cjs';
 
-import { Network } from './types/common.js';
-import { hashName } from './utils/name.js';
+import { Network } from './types/common.cjs';
+import { hashName } from './utils/name.cjs';
 
 const NO_DATA = '0x';
 

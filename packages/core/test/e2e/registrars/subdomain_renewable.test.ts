@@ -1,8 +1,8 @@
 import { registrars } from '@decentraweb/core';
-import { getProvider } from '../../lib/provider';
+import { getProvider } from '../../lib/provider.js';
 import { expect } from 'chai';
 import { Chance } from 'chance';
-import nameExists from '../../lib/assertions/nameExists';
+import nameExists from '../../lib/assertions/nameExists.js';
 const { DURATION, SubdomainRegistrar } = registrars;
 
 const chance = new Chance();

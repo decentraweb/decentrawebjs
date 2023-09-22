@@ -1,8 +1,8 @@
 import DwebContractWrapper from '../DwebContractWrapper.js';
 import { BigNumber, ethers, providers, Signer } from 'ethers';
-import { getContract, getWethContract } from '../contracts/index.js';
+import { getContract, getWethContract } from '../contracts/index.cjs';
 import DecentrawebAPI from '../api/index.js';
-import { DwebConfig, Network } from '../types/common.js';
+import { DwebConfig, Network } from '../types/common.cjs';
 import { NotStakedDomain, StakedDomain, StakingState } from './types/StakingState.js';
 
 /**

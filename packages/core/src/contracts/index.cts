@@ -1,25 +1,25 @@
 import { ContractInterface, ethers, providers } from 'ethers';
 //Ethereum ABI
-import DecentraWebToken from './abi/DecentraWebToken.json' assert { type: 'json' };
-import DWEBRegistry from './abi/ethereum/DWEBRegistry.json' assert { type: 'json' };
-import DefaultReverseResolver from './abi/ethereum/DefaultReverseResolver.json' assert { type: 'json' };
-import PublicResolver from './abi/ethereum/PublicResolver.json' assert { type: 'json' };
-import ReverseRegistrar from './abi/ethereum/ReverseRegistrar.json' assert { type: 'json' };
-import RootRegistrarController from './abi/ethereum/RootRegistrarController.json' assert { type: 'json' };
+import DecentraWebToken from './abi/DecentraWebToken.json';
+import DWEBRegistry from './abi/ethereum/DWEBRegistry.json';
+import DefaultReverseResolver from './abi/ethereum/DefaultReverseResolver.json';
+import PublicResolver from './abi/ethereum/PublicResolver.json';
+import ReverseRegistrar from './abi/ethereum/ReverseRegistrar.json';
+import RootRegistrarController from './abi/ethereum/RootRegistrarController.json';
 //Polygon ABI
-import WrappedEthToken from './abi/WrappedEthToken.json' assert { type: 'json' };
-import DWEBRegistryPolygon from './abi/polygon/DWEBRegistry.json' assert { type: 'json' };
-import DefaultReverseResolverPolygon from './abi/polygon/DefaultReverseResolver.json' assert { type: 'json' };
-import PublicResolverPolygon from './abi/polygon/PublicResolver.json' assert { type: 'json' };
-import ReverseRegistrarPolygon from './abi/polygon/ReverseRegistrar.json' assert { type: 'json' };
-import RootRegistrarControllerPolygon from './abi/polygon/RootRegistrarController.json' assert { type: 'json' };
+import WrappedEthToken from './abi/WrappedEthToken.json';
+import DWEBRegistryPolygon from './abi/polygon/DWEBRegistry.json';
+import DefaultReverseResolverPolygon from './abi/polygon/DefaultReverseResolver.json';
+import PublicResolverPolygon from './abi/polygon/PublicResolver.json';
+import ReverseRegistrarPolygon from './abi/polygon/ReverseRegistrar.json';
+import RootRegistrarControllerPolygon from './abi/polygon/RootRegistrarController.json';
 import {
   ContractConfig,
   ContractOptions,
   DwebContract,
   Network,
   PolygonNetwork
-} from '../types/common.js';
+} from '../types/common.cjs';
 
 /**
  * Contract addresses for different Ethereum/Polygon networks

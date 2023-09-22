@@ -1,6 +1,10 @@
 {
   "name": "@decentraweb/resolver",
   "version": "2.0.0-alpha.2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decentraweb/decentrawebjs.git"
+  },
   "engines": {
     "node": ">=16.0.0"
   },

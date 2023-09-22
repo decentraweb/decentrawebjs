@@ -1,3 +1,4 @@
+import { Network } from '@decentraweb/core';
 import { config } from 'dotenv';
 import { providers, Wallet } from 'ethers';
 

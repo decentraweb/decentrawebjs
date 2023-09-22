@@ -30,6 +30,7 @@ module.exports = {
     extensions: ['.ts', '.js', '.json'],
     extensionAlias: {
       '.js': ['.ts', '.js'],
+      '.cjs': ['.cts', '.cjs'],
       '.mjs': ['.mts', '.mjs'],
     },
     fallback: {
@@ -39,7 +40,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|ts)$/,
+        test: /\.(js|mjs|cjs|ts|mts|cts)$/,
         use: {
           loader: 'babel-loader',
           options: {

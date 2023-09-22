@@ -6,7 +6,7 @@ import { TLDBalanceVerificationResult, TLDEntry } from '../types/TLD.js';
 import { normalizeDomainEntries, normalizeDuration } from '../utils.js';
 import { APPROVAL_TTL, REGISTRATION_WAIT } from '../constants.js';
 import BaseRegistrar from '../BaseRegistrar.js';
-import { normalizeName } from '../../utils/name.js';
+import { normalizeName } from '../../utils/name.cjs';
 
 export type {
   ApprovedRegistration,

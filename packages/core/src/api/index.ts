@@ -20,10 +20,10 @@ import {
 } from './types.js';
 import { TypedData } from '../types/TypedData.js';
 import getRandomHex from '../utils/getRandomHex.js';
-import { getDwebAddress, getWethAddress } from '../contracts/index.js';
+import { getDwebAddress, getWethAddress } from '../contracts/index.cjs';
 import { SubdomainEntry as SubdomainEntry } from '../registrars/types/Subdomain.js';
 import { getChainId } from '../utils/ethereum.js';
-import { ChainId, Network } from '../types/common.js';
+import { ChainId, Network } from '../types/common.cjs';
 
 export * from './types.js';
 

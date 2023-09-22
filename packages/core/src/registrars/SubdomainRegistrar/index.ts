@@ -13,7 +13,7 @@ import { DURATION } from '../constants.js';
 import { normalizeDuration } from '../utils.js';
 import BaseRegistrar from '../BaseRegistrar.js';
 import { SubdomainApproval } from '../../api/index.js';
-import { hashName, normalizeName } from '../../utils/name.js';
+import { hashName, normalizeName } from '../../utils/name.cjs';
 
 /**
  * Class that handles subdomain registration.

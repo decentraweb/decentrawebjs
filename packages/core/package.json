@@ -2,21 +2,59 @@
   "name": "@decentraweb/core",
   "version": "2.0.0-alpha.2",
   "description": "Decentraweb javascript library",
-  "type": "module",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "build/esm/index.js",
+  "types": "build/esm/index.d.ts",
   "exports": {
-    ".": "./build/index.js",
-    "./api": "./build/api/index.js",
-    "./contracts": "./build/contracts/index.js",
-    "./registrars": "./build/registrars/index.js"
+    ".": {
+      "import": {
+        "types": "./build/esm/index.d.ts",
+        "default": "./build/esm/index.js"
+      },
+      "require": {
+        "types": "./build/cjs/index.d.ts",
+        "default": "./build/cjs/index.js"
+      }
+    },
+    "./api": {
+      "import": {
+        "types": "./build/esm/api/index.d.ts",
+        "default": "./build/esm/api/index.js"
+      },
+      "require": {
+        "types": "./build/cjs/api/index.d.ts",
+        "default": "./build/cjs/api/index.js"
+      }
+    },
+    "./contracts": {
+      "import": {
+        "types": "./build/esm/contracts/index.d.ts",
+        "default": "./build/esm/contracts/index.js"
+      },
+      "require": {
+        "types": "./build/cjs/contracts/index.d.ts",
+        "default": "./build/cjs/contracts/index.js"
+      }
+    },
+    "./registrars": {
+      "import": {
+        "types": "./build/esm/registrars/index.d.ts",
+        "default": "./build/esm/registrars/index.js"
+      },
+      "require": {
+        "types": "./build/cjs/registrars/index.d.ts",
+        "default": "./build/cjs/registrars/index.js"
+      }
+    }
   },
   "scripts": {
     "prepare": "npm run build",
-    "build": "tsc",
+    "build:esm": "tsc --project tsconfig.json",
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build": "npm run build:esm && npm run build:cjs",
     "build:browser": "webpack --progress --config webpack.config.cjs",
     "test:e2e": "mocha test/e2e/**/*.test.ts",
-    "watch": "tsc --watch",
+    "watch": "tsc --watch --project tsconfig.json",
+    "watch:cjs": "tsc --watch --project tsconfig.cjs.json",
     "watch:browser": "webpack --watch --progress --config webpack.config.cjs --mode development"
   },
   "author": "",

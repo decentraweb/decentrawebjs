@@ -7,9 +7,9 @@ import { CommittedRegistration } from './types.js';
 import { APPROVAL_TTL } from '../constants.js';
 import signTypedData from '../../utils/signTypedData.js';
 import BaseRegistrar, { RegistrarConfig } from '../BaseRegistrar.js';
-import { getWethContract } from '../../contracts/index.js';
-import { PolygonNetwork } from '../../types/common.js';
-import { normalizeName } from '../../utils/name.js';
+import { getWethContract } from '../../contracts/index.cjs';
+import { PolygonNetwork } from '../../types/common.cjs';
+import { normalizeName } from '../../utils/name.cjs';
 
 interface Config extends RegistrarConfig {
   network: PolygonNetwork;
