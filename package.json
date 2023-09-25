@@ -9,9 +9,6 @@
     "gateway": "npm run start --workspace=@decentraweb/http-gateway",
     "resolver": "npm run start --workspace=@decentraweb/resolver",
     "manage": "npm run start --workspace=@decentraweb/cli",
-    "wiki:init": "git remote add wiki git@github.com:decentraweb/decentrawebjs.wiki.git",
-    "wiki:pull": "git subtree pull --prefix docs wiki master --squash --message=\"Merge wiki updates into docs.\"",
-    "wiki:push": "git subtree push --prefix docs wiki master",
     "docs": "typedoc"
   },
   "workspaces": [
