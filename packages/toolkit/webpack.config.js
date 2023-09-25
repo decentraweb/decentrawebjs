@@ -18,13 +18,12 @@ module.exports = {
     })
   ],
   externals: {
-    ethers: 'ethers'
+    ethers: 'ethers',
+    crypto: 'crypto'
   },
   resolve: {
     alias: {
-      // To avoid blotting up the `bn.js` library all over the packages
-      // use single library instance.
-      'bn.js': path.resolve(__dirname, '../../node_modules/bn.js')
+      buffer: path.resolve(__dirname, '../../node_modules/buffer')
     },
     extensions: ['.ts', '.js', '.json'],
     fallback: {

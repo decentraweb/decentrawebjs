@@ -1,11 +1,11 @@
 import DWEBName from './DWEBName';
 import DWEBRegistry from './DWEBRegistry';
-import * as api from './api/index';
+import * as api from './api';
 import * as contracts from './contracts';
-import * as registrars from './registrars/index';
-import RecordSet from './RecordSet/index';
+import * as registrars from './registrars';
+import RecordSet from './RecordSet';
 import * as contentHash from './utils/content';
-import * as utils from './utils/index';
+import * as utils from './utils';
 
 export * from './types/common';
 export * from './types/TypedData';

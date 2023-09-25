@@ -1,7 +1,7 @@
 import { answer as answerCoder } from 'dns-packet';
-import * as recordType from './type.js';
+import * as recordType from './type';
 import { Buffer } from 'buffer';
-import { DNSRecord } from './DNSRecord.js';
+import { DNSRecord } from './DNSRecord';
 
 /**
  * Helper class for encoding and decoding DNS records. Record set is an array of DNS records.

@@ -1,2 +1,2 @@
-export { hashName, normalizeName } from './name.js';
-export { default as signTypedData } from './signTypedData.js';
+export { hashName, normalizeName } from './name';
+export { default as signTypedData } from './signTypedData';
