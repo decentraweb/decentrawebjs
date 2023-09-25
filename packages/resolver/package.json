@@ -1,6 +1,10 @@
 {
   "name": "@decentraweb/resolver",
   "version": "2.0.0-alpha.2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decentraweb/decentrawebjs.git"
+  },
   "engines": {
     "node": ">=16.0.0"
   },
@@ -8,8 +12,8 @@
   "main": "build/index.js",
   "types": "build/index.d.js",
   "scripts": {
-    "build": "tsc",
-    "prepare": "npm run build",
+    "build": "rimraf ./build && tsc",
+    "prepublish": "npm run build",
     "start": "node build/resolver.js",
     "watch:ts": "tsc --watch",
     "watch:js": "nodemon --watch build build/resolver.js",
@@ -31,6 +35,7 @@
     "@types/node": "^16.18.31",
     "@types/punycode": "^2.1.0",
     "nodemon": "^2.0.22",
+    "rimraf": "^5.0.1",
     "typescript": "^5.0.4"
   }
 }

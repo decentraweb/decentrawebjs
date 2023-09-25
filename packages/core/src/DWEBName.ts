@@ -1,11 +1,12 @@
 import { ethers, providers } from 'ethers';
-import { hash as namehash } from '@ensdomains/eth-ens-namehash';
 import { formatsByName } from '@ensdomains/address-encoder';
 import { decode, encode } from './utils/content';
 import { dnsWireNameHash } from './utils/dns';
 import { Buffer } from 'buffer';
 import { getContract } from './contracts';
-import { EthNetwork } from './contracts/interfaces';
+
+import { Network } from './types/common';
+import { hashName } from './utils';
 
 const NO_DATA = '0x';
 
@@ -13,7 +14,7 @@ type NameConfig = {
   name: string;
   provider: providers.BaseProvider;
   registry: ethers.Contract;
-  network: EthNetwork;
+  network: Network;
   signer?: ethers.Signer;
 };
 
@@ -22,17 +23,15 @@ export default class DWEBName {
   readonly namehash: string;
   private readonly provider: providers.BaseProvider;
   private readonly registryContract: ethers.Contract;
-  //private readonly ensWithSigner: ethers.Contract
-  private readonly network: EthNetwork;
+  private readonly network: Network;
   private readonly signer?: ethers.Signer;
   private resolverAddress?: string;
 
   constructor(options: NameConfig) {
     const { name, registry, provider, network, signer } = options;
     this.registryContract = registry;
-    //this.ensWithSigner = this.ens.connect(signer)
     this.name = name;
-    this.namehash = namehash(name);
+    this.namehash = hashName(name);
     this.provider = provider;
     this.network = network;
     this.signer = signer;
@@ -133,7 +132,7 @@ export default class DWEBName {
     let addressAsBytes;
     if (!address) {
       //Special handling for ETH
-      if(coinType === 60){
+      if (coinType === 60) {
         addressAsBytes = decoder('0x0000000000000000000000000000000000000000');
       } else {
         addressAsBytes = Buffer.alloc(0);

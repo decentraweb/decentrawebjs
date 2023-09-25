@@ -13,7 +13,16 @@
 <script>
   window.addEventListener('load', async () => {
     const {DwebToolkit} = Decentraweb;
-    const toolkit = new DwebToolkit({network: 'goerli', provider: ethers.getDefaultProvider('goerli')});
+    const toolkit = new DwebToolkit({
+      ethereum: {
+        network: 'goerli',
+        provider: ethers.getDefaultProvider('goerli')
+      },
+      polygon: {
+        network: 'maticmum',
+        provider: ethers.getDefaultProvider('maticmum')
+      }
+    });
     const domain = await toolkit.domain('serhii');
     if (domain) {
       const domainProvider = domain.provider;

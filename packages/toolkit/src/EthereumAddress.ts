@@ -1,7 +1,7 @@
-import { providers, utils } from 'ethers';
+import { utils } from 'ethers';
 import { getDomainProvider } from './lib/getDomainProvider';
 import { DomainProvider, ToolkitConfig } from './types';
-import { DWEBRegistry, EthNetwork } from '@decentraweb/core';
+import { DWEBRegistry } from '@decentraweb/core';
 
 interface ResolutionResult {
   provider: DomainProvider;
@@ -9,15 +9,16 @@ interface ResolutionResult {
 }
 
 export class EthereumAddress {
-  readonly network: EthNetwork;
-  readonly provider: providers.BaseProvider;
-  protected dweb: DWEBRegistry;
+  readonly ethereum: ToolkitConfig['ethereum'];
+  readonly polygon: ToolkitConfig['polygon'];
+  protected ethRegistry: DWEBRegistry;
+  protected polygonRegistry: DWEBRegistry;
 
   constructor(options: ToolkitConfig) {
-    const { network, provider } = options;
-    this.provider = provider;
-    this.network = network;
-    this.dweb = new DWEBRegistry(options);
+    this.ethereum = options.ethereum;
+    this.polygon = options.polygon;
+    this.ethRegistry = new DWEBRegistry(options.ethereum);
+    this.polygonRegistry = new DWEBRegistry(options.polygon);
   }
 
   /**
@@ -28,11 +29,12 @@ export class EthereumAddress {
     const domainProvider = await getDomainProvider(name);
     switch (domainProvider) {
       case 'dweb': {
-        const dwebName = this.dweb.name(name);
-        return dwebName.getAddress('ETH');
+        const isNameOnEthereum = await this.ethRegistry.nameExists(name);
+        const registry = isNameOnEthereum ? this.ethRegistry : this.polygonRegistry;
+        return registry.name(name).getAddress('ETH');
       }
       case 'ens':
-        return this.provider.resolveName(name);
+        return this.ethereum.provider.resolveName(name);
       default:
         return null;
     }
@@ -50,7 +52,10 @@ export class EthereumAddress {
     const checksumAddress = utils.getAddress(address);
     const result: ResolutionResult[] = [];
     if (!domainProvider || domainProvider === 'dweb') {
-      const name = await this.dweb.getReverseRecord(checksumAddress);
+      let name = await this.ethRegistry.getReverseRecord(checksumAddress);
+      if (!name) {
+        name = await this.polygonRegistry.getReverseRecord(checksumAddress);
+      }
       if (name) {
         result.push({
           provider: 'dweb',
@@ -59,7 +64,7 @@ export class EthereumAddress {
       }
     }
     if (!domainProvider || domainProvider === 'ens') {
-      const name = await this.provider.lookupAddress(checksumAddress);
+      const name = await this.ethereum.provider.lookupAddress(checksumAddress);
       if (name) {
         result.push({
           provider: 'ens',

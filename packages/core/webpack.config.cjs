@@ -1,40 +1,39 @@
 const path = require('path');
 const webpack = require('webpack');
 const {version} = require('./package.json');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 
 module.exports = {
   mode: 'production',
   devtool: 'source-map',
   entry: {
-    "decentraweb-core": './src/index.browser.ts'
+    'decentraweb-core': './src/index.ts'
   },
   plugins: [
     new CleanWebpackPlugin(),
-    new BundleAnalyzerPlugin(),
+    // new BundleAnalyzerPlugin(),
     new webpack.ProvidePlugin({
-      Buffer: ['buffer/', 'Buffer'],
-    }),
+      Buffer: ['buffer/', 'Buffer']
+    })
   ],
   externals: {
     ethers: 'ethers',
+    crypto: 'crypto'
   },
   resolve: {
     alias: {
-      // To avoid blotting up the `bn.js` library all over the packages
-      // use single library instance.
-      "bn.js": path.resolve(__dirname, '../../node_modules/bn.js')
+      'buffer': path.resolve(__dirname, '../../node_modules/buffer')
     },
     extensions: ['.ts', '.js', '.json'],
     fallback: {
-      buffer: require.resolve('buffer/'),
+      buffer: require.resolve('buffer/')
     }
   },
   module: {
     rules: [
       {
-        test: /\.(js|ts)$/,
+        test: /\.(js|mjs|cjs|ts|mts|cts)$/,
         use: {
           loader: 'babel-loader',
           options: {
@@ -49,7 +48,10 @@ module.exports = {
                 }
               ]
             ],
-            plugins: []
+            plugins: [
+              ['@babel/plugin-proposal-decorators', {version: 'legacy'}],
+              ['@babel/plugin-syntax-import-attributes',{ deprecatedAssertSyntax: true }],
+            ]
           }
         }
       }

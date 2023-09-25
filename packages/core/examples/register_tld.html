@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+      .progress-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(255, 255, 255, 0.75);
+      }
+  </style>
+</head>
+<body>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js" type="application/javascript"></script>
+<script src="../dist/decentraweb-core-2.0.0-alpha.2.min.js" type="application/javascript"></script>
+<script>
+  (function () {
+    let network;
+    let provider;
+    let signer;
+
+    function connectWallet() {
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      provider.send("eth_requestAccounts", []).then(async () => {
+        network = await provider.getNetwork();
+        // Check if the current chain is Goerli, and prompt the user to switch if not
+        if (network.chainId !== 5) {
+          try {
+            await provider.send('wallet_switchEthereumChain', [{chainId: '0x5'}])
+            connectWallet();
+          } catch (e) {
+            alert('Please switch to Goerli testnet')
+          }
+        }
+        signer = provider.getSigner();
+      });
+    }
+
+    function toggleProgress(visible, message = 'Loading...') {
+      const overlay = document.querySelector('.progress-overlay');
+      if(visible) {
+        overlay.classList.remove('d-none');
+      } else {
+        overlay.classList.add('d-none');
+      }
+      overlay.querySelector('h4').innerText = message;
+    }
+
+    async function wait(seconds) {
+      await new Promise(resolve => setTimeout(resolve, seconds * 1000));
+    }
+
+    async function registerDomain(event) {
+      event.preventDefault();
+      const form = event.target;
+      const {EthereumTLDRegistrar, DURATION} = Decentraweb.registrars
+      const registrar = new EthereumTLDRegistrar({network: network.name, provider: provider, signer: signer});
+
+      const name = form.name.value;
+      const payInDweb = form.payInDweb.checked;
+      try {
+        toggleProgress(true, '1/4 Requesting approval...');
+        const approvedRequest = await registrar.requestApproval([
+          {name: name, duration: DURATION.ONE_YEAR}
+        ]);
+        toggleProgress(true, '2/4 Committing request...');
+        const commitedRequest = await registrar.sendCommitment(approvedRequest);
+        toggleProgress(true, '2/4 Waiting for transaction confirmation...');
+        await commitedRequest.tx.wait(1);
+        toggleProgress(true, '3/4 Waiting 1 minute before registration...');
+        await wait(60);
+        toggleProgress(true, '4/4 Registering domain...');
+        const tx = await registrar.register(commitedRequest, payInDweb);
+        toggleProgress(true, '4/4 Waiting for transaction confirmation...');
+        await tx.wait(1);
+        alert(`Domain name ${name} registered successfully`);
+      } catch (e) {
+        alert(e.message);
+      }
+      toggleProgress(false);
+    }
+
+    window.addEventListener('load', () => {
+      if (window.ethereum) {
+        connectWallet();
+      } else {
+        alert('Please install MetaMask');
+      }
+      document.getElementById('tld-form').addEventListener('submit', registerDomain);
+    });
+
+  })();
+</script>
+<div class="container">
+  <form id="tld-form">
+    <h2>Register domain</h2>
+    <div class="mb-3">
+      <label for="tld-name" class="form-label">Domain Name:</label>
+      <input id="tld-name" class="form-control" type="text" name="name" placeholder="Domain name to register" required/>
+    </div>
+    <div class="form-check mb-3">
+      <input id="tld-pay-in-dweb" class="form-check-input" type="checkbox" value="1" name="payInDweb">
+      <label for="tld-pay-in-dweb" class="form-check-label">
+        Pay in DWEB tokens
+      </label>
+    </div>
+    <button class="btn btn-primary" type="submit">Register</button>
+  </form>
+</div>
+<div class="progress-overlay d-none d-flex flex-column justify-content-center align-items-center">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <h4>Loading...</h4>
+</div>
+</body>
+</html>

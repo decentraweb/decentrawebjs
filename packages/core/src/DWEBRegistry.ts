@@ -1,51 +1,15 @@
 import { ethers, providers } from 'ethers';
-import { hash as namehash } from '@ensdomains/eth-ens-namehash';
 import DWEBName from './DWEBName';
 import { DEFAULT_TTL } from './utils/contracts';
-import { getContractConfig, getContract } from './contracts';
-import { ContractConfig, EthNetwork } from './contracts/interfaces';
+import { getContract } from './contracts';
 import { isValidDomain } from './utils/dns';
+import { DwebConfig } from './types/common';
+import DwebContractWrapper, { requiresSigner } from './DwebContractWrapper';
+import { hashName } from './utils';
 
-export type RegistryConfig = {
-  network: EthNetwork;
-  provider: providers.BaseProvider;
-  signer?: ethers.Signer;
-  contracts?: ContractConfig;
-};
-
-export default class DWEBRegistry {
-  network: EthNetwork;
-  provider: providers.BaseProvider;
-  private readonly contract: ethers.Contract;
-  readonly contractConfig: ContractConfig;
-  signer?: ethers.Signer;
-
-  constructor(options: RegistryConfig) {
-    const { network, provider, signer } = options;
-    this.provider = provider;
-    this.signer = signer;
-    this.network = network;
-    this.contractConfig = options.contracts || getContractConfig(network);
-    this.contract = getContract({
-      address: this.contractConfig.DWEBRegistry,
-      name: 'DWEBRegistry',
-      provider: provider,
-      network: this.network
-    });
-  }
-
-  private getWritableContract() {
-    if (!this.signer) {
-      throw new Error(
-        'DWEBRegistry is initialized in read-only mode. Provide signer to write data.'
-      );
-    }
-    return getContract({
-      address: this.contractConfig.DWEBRegistry,
-      name: 'DWEBRegistry',
-      provider: this.signer,
-      network: this.network
-    });
+export default class DWEBRegistry extends DwebContractWrapper {
+  constructor(options: DwebConfig) {
+    super(options, 'DWEBRegistry');
   }
 
   /**
@@ -62,21 +26,56 @@ export default class DWEBRegistry {
     });
   }
 
+  /**
+   * Check if domain name exists. Note that name could be located on Ethereum or Polygon network.
+   * If name is currently on Polygon, it will not exist on Ethereum and vice versa.
+   * @param name
+   */
+  async nameExists(name: string): Promise<boolean> {
+    const hash = hashName(name);
+    try {
+      await this.contract.owner(hash);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /**
+   * Assign default resolver contract to domain name. This is usually done during the registration process, but may be
+   * required if domain has no resolver set or if it is no compatible with Decentraweb.
+   * @param name
+   */
+  @requiresSigner
   async assignDefaultResolver(name: string): Promise<providers.TransactionResponse> {
-    const contract = this.getWritableContract();
-    const hash = namehash(name);
-    return contract.setResolverAndTTL(hash, this.contractConfig.PublicResolver, DEFAULT_TTL);
+    const hash = hashName(name);
+    return this.contract.setResolverAndTTL(hash, this.contractConfig.PublicResolver, DEFAULT_TTL);
   }
 
+  /**
+   * Set resolver contract for domain name. May be used to assign domain custom resolver contract.
+   *
+   * Be careful as this may break domain functionality if resolver contract is not compatible with Decentraweb.
+   * @param name - domain name you would like to work assign resolver to
+   * @param address - address of resolver contract
+   */
+  @requiresSigner
   async setResolver(name: string, address: string): Promise<providers.TransactionResponse> {
-    const contract = this.getWritableContract();
-    const hash = namehash(name);
-    return contract.setResolver(hash, address);
+    const hash = hashName(name);
+    return this.contract.setResolver(hash, address);
   }
 
+  /**
+   * Get reverse record for address.
+   *
+   * Important: address owner can set any name for his address, even if he doesn't own it, or it is not registered.
+   * To check that name is valid, we check that it resolves to the same address.
+   * @param address
+   * @param skipForwardCheck -  by default we check that returned name resolves to the same address. Set this to true to skip this check.
+   */
   async getReverseRecord(address: string, skipForwardCheck = false): Promise<string | null> {
     const reverseName = `${address.slice(2)}.addr.reverse`;
-    const reverseHash = namehash(reverseName);
+    const reverseHash = hashName(reverseName);
     const resolverAddr = await this.contract.resolver(reverseHash);
     if (parseInt(resolverAddr, 16) === 0) {
       return null;
@@ -101,16 +100,17 @@ export default class DWEBRegistry {
     return domain;
   }
 
-  async setReverseRecord(name: string) {
-    if (!this.signer) {
-      throw new Error(
-        'DWEBRegistry is initialized in read-only mode. Provide signer to write data.'
-      );
-    }
+  /**
+   * Set reverse record for signer address. Don't forget to also assign this address to name.
+   * @param name
+   */
+  @requiresSigner
+  async setReverseRecord(name: string): Promise<providers.TransactionResponse> {
+    const signer = this.signer as ethers.Signer;
     const reverseRegistrar = getContract({
       address: this.contractConfig.ReverseRegistrar,
       name: 'ReverseRegistrar',
-      provider: this.signer,
+      provider: signer,
       network: this.network
     });
     return reverseRegistrar.setName(name);

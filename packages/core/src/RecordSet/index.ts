@@ -1,11 +1,18 @@
 import { answer as answerCoder } from 'dns-packet';
-import * as recordType from './type';
+import * as recordType from './type.js';
 import { Buffer } from 'buffer';
-import { DNSRecord, Record, RecordType, RecordClass } from './DNSRecord';
+import { DNSRecord } from './DNSRecord.js';
 
-export { DNSRecord, Record, RecordType, RecordClass };
-
+/**
+ * Helper class for encoding and decoding DNS records. Record set is an array of DNS records.
+ */
 export class RecordSet {
+  static recordType = recordType;
+
+  /**
+   * Decodes a buffer into an array of DNS records.
+   * @param buf - dns record in binary format
+   */
   static decode(buf: Buffer): DNSRecord[] {
     let offset = 0;
     const result = [];
@@ -16,6 +23,10 @@ export class RecordSet {
     return result;
   }
 
+  /**
+   * Encodes an array of DNS records into a binary format.
+   * @param records
+   */
   static encode(records: DNSRecord[]): Buffer {
     const buffers: Buffer[] = [];
     records.forEach((record) => {
@@ -23,8 +34,6 @@ export class RecordSet {
     });
     return Buffer.concat(buffers);
   }
-
-  static recordType = recordType;
 }
 
 export default RecordSet;

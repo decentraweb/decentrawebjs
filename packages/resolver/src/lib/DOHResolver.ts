@@ -1,11 +1,11 @@
 import Resolver, { ResolverConfig } from './Resolver';
 import http, { IncomingMessage, ServerResponse } from 'http';
 import { URL } from 'url';
-import ReadableStream = NodeJS.ReadableStream;
 import { Buffer } from 'buffer';
 import * as dnsPacket from 'dns-packet';
-import { RecordSet } from '@decentraweb/core';
 import { RecordType } from 'dns-packet';
+import { RecordSet } from '@decentraweb/core';
+import ReadableStream = NodeJS.ReadableStream;
 
 function decodeBase64URL(str: string): string | undefined {
   let queryData = str.replace(/-/g, '+').replace(/_/g, '/');
@@ -36,8 +36,8 @@ interface DOHConfig extends ResolverConfig {
 }
 
 class DOHResolver extends Resolver {
-  private server: http.Server;
   readonly cors: true | string | CorsHandler;
+  private server: http.Server;
 
   constructor(options: DOHConfig) {
     const { cors, ...resolverOptions } = options;

@@ -8,7 +8,8 @@
     "bootstrap": "lerna bootstrap",
     "gateway": "npm run start --workspace=@decentraweb/http-gateway",
     "resolver": "npm run start --workspace=@decentraweb/resolver",
-    "manage": "npm run start --workspace=@decentraweb/cli"
+    "manage": "npm run start --workspace=@decentraweb/cli",
+    "docs": "typedoc"
   },
   "workspaces": [
     "./packages/*"
@@ -20,6 +21,7 @@
     "@types/node": "^16.18.31",
     "lerna": "^6.6.2",
     "prettier": "^2.8.8",
+    "typedoc": "^0.25.1",
     "typescript": "^5.0.4"
   }
 }

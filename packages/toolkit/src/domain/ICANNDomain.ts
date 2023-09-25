@@ -1,7 +1,7 @@
 import * as dnsPacket from 'dns-packet';
+import { TxtAnswer } from 'dns-packet';
 import BaseDomain from './BaseDomain';
 import { RecordType } from '@decentraweb/core';
-import { TxtAnswer } from 'dns-packet';
 import fetchPonyfill from 'fetch-ponyfill';
 
 const { fetch } = fetchPonyfill();

@@ -1,4 +1,4 @@
-import { DNSRecord, Record, DWEBName, DWEBRegistry, RecordSet } from '@decentraweb/core';
+import { DNSRecord, DWEBName, DWEBRegistry, Record, RecordSet } from '@decentraweb/core';
 import prompts from 'prompts';
 import chalk from 'chalk';
 import { waitForTransaction } from '../utils/transaction';
@@ -28,6 +28,13 @@ const FORMATTERS = {
 class DNSRecords extends Command {
   private state: State;
 
+  constructor(registry: DWEBRegistry, name: DWEBName) {
+    super(registry, name);
+    this.state = {
+      records: []
+    };
+  }
+
   static recordToString(record: DNSRecord): string {
     switch (record.type) {
       case 'A':
@@ -53,13 +60,6 @@ class DNSRecords extends Command {
       records.push(...RecordSet.decode(data));
     }
     return records;
-  }
-
-  constructor(registry: DWEBRegistry, name: DWEBName) {
-    super(registry, name);
-    this.state = {
-      records: []
-    };
   }
 
   async start(): Promise<void> {

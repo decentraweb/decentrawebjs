@@ -8,7 +8,252 @@ This is a library for interacting with the Decentraweb smart contracts. It conta
 
 This library is using [ethers.js](https://docs.ethers.io/v5/) to interact with Ethereum blockchain. `ethers.js` is included as peer dependency, so don't forget to add it to your `package.json`
 
-## Usage
+## Registering domain name
+Domain name can be registered on Ethereum or Polygon networks. After registration, domain name will be available for
+resolution on network where it was registered. Later owner can move domain name between networks.
+
+### Registration fees
+Registration fee can be paid either in ETH or DWEB tokens. If you want to pay in DWEB tokens, you need to allow
+`RootRegistrarController` contract to spend tokens from your account. You can either approve amount enough to pay for
+specific registration or approve unlimited amount.
+#### Ethereum network
+```typescript
+import {ethers, providers, Wallet} from "ethers";
+import {registrars} from "@decentraweb/core";
+
+const ETH_NETWORK = 'mainnet';
+const JSONRPC_URL = 'https://mainnet.infura.io/v3/00000000000000000000000000000000';
+const PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000000';
+
+const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
+const signer = new Wallet(PRIVATE_KEY, provider);
+const registrar = new registrars.EthereumTLDRegistrar({network: ETH_NETWORK, provider, signer});
+
+//Approve usage of unlimited amount of DWEB tokens
+registrar.allowTokenUsage('DWEB').then((receipt) => {
+  // receipt is instance of ethers.js TransactionReceipt class
+  // https://docs.ethers.org/v5/api/providers/types/#providers-TransactionReceipt
+  console.log(receipt);
+});
+
+//Approve usage for up to 50 DWEB tokens
+registrar.setTokenAllowance('DWEB', ethers.utils.parseEther('50')).then((receipt) => {
+  // receipt is instance of ethers.js TransactionReceipt class
+  // https://docs.ethers.org/v5/api/providers/types/#providers-TransactionReceipt
+  console.log(receipt);
+});
+```
+#### Polygon network
+On Polygon network registration fees are paid either in DWEB or Wrapped Ether (WETH) tokens. Both tokens require approval
+to be used by `RootRegistrarController` contract.
+```typescript
+import {ethers, providers, Wallet} from "ethers";
+import {registrars} from "@decentraweb/core";
+
+const ETH_NETWORK = 'matic';
+const JSONRPC_URL = 'https://matic.infura.io/v3/00000000000000000000000000000000';
+const PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000000';
+
+const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
+const signer = new Wallet(PRIVATE_KEY, provider);
+const registrar = new registrars.PolygonTLDRegistrar({network: ETH_NETWORK, provider, signer});
+
+//Approve usage of unlimited amount of DWEB tokens
+registrar.allowTokenUsage('WETH').then((receipt) => {
+  // receipt is instance of ethers.js TransactionReceipt class
+  // https://docs.ethers.org/v5/api/providers/types/#providers-TransactionReceipt
+  console.log(receipt);
+});
+
+//Approve usage for up to 50 DWEB tokens
+registrar.setTokenAllowance('WETH', ethers.utils.parseEther('50')).then((receipt) => {
+  // receipt is instance of ethers.js TransactionReceipt class
+  // https://docs.ethers.org/v5/api/providers/types/#providers-TransactionReceipt
+  console.log(receipt);
+});
+```
+
+### Registering TLD on Ehthereum
+Registration of TLD on Ethereum consists of three steps:
+1. Getting approval from Decentraweb API
+2. Submitting commitment to register domain name
+3. Wait for 1 minute and submit registration transaction
+
+Since process includes multiple steps it is recommended to save result of each step, to be able to resume registration
+if it fails on some step (ie because of insufficient balance).
+```typescript
+import {ethers, providers, Wallet} from "ethers";
+import {registrars} from "@decentraweb/core";
+
+
+const ETH_NETWORK = 'mainnet';
+const JSONRPC_URL = 'https://mainnet.infura.io/v3/00000000000000000000000000000000';
+const PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000000';
+
+const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
+const signer = new Wallet(PRIVATE_KEY, provider);
+const registrar = new registrars.EthereumTLDRegistrar({network: ETH_NETWORK, provider, signer});
+
+async function wait(seconds: number) {
+  await new Promise(resolve => setTimeout(resolve, seconds * 1000));
+}
+
+async function registerDomains(){
+  const approvedRequest = await registrar.requestApproval([
+    {name: 'foo', duration: registrars.DURATION.ONE_YEAR},
+    {name: 'bar', duration: registrars.DURATION.ONE_YEAR},
+    {name: '🙂🙂🙂', duration: registrars.DURATION.ONE_YEAR}
+  ]);
+  const commitedRequest = await registrar.sendCommitment(approvedRequest);
+  //Wait for 1st confirmation of commitment transaction
+  await commitedRequest.tx.wait(1);
+  //Wait for 1 minute before registering domain name
+  await wait(60);
+  //If paying registration fee in ETH 
+  const tx = await registrar.register(commitedRequest);
+  // If paying registration fee in DWEB tokens
+  //const tx = await registrar.register(commitedRequest, true);
+  
+  //Wait for 1st confirmation
+  return tx.wait(1);  
+}
+
+registerDomains().then((receipt)=>{
+  // receipt is instance of ethers.js TransactionReceipt class
+  // https://docs.ethers.org/v5/api/providers/types/#providers-TransactionReceipt
+  console.log(receipt);
+});
+```
+### Registering TLD on Polygon
+Registration of TLD on Polygon consists of 2 steps:
+1. Sending commitment to register domain name
+2. Finishing registration
+
+Registration fee is paid either in DWEB or Wrapped Ether (WETH) tokens.
+```typescript
+import {ethers, providers, Wallet} from "ethers";
+import {registration} from "@decentraweb/core";
+
+
+const ETH_NETWORK = 'mainnet';
+const JSONRPC_URL = 'https://mainnet.infura.io/v3/00000000000000000000000000000000';
+const PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000000';
+
+const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
+const signer = new Wallet(PRIVATE_KEY, provider);
+const registrar = new registration.PolygonTLDRegistrar({network: ETH_NETWORK, provider, signer});
+
+async function wait(seconds: number) {
+  await new Promise(resolve => setTimeout(resolve, seconds * 1000));
+}
+
+async function registerDomains(){
+  const approvedRequest = await registrar.requestApproval([
+    {name: 'foo', duration: registration.DURATION.ONE_YEAR},
+    {name: 'bar', duration: registration.DURATION.ONE_YEAR},
+    {name: '🙂🙂🙂', duration: registration.DURATION.ONE_YEAR}
+  ]);
+  const commitedRequest = await registrar.sendCommitment(approvedRequest);
+  // If paying registration fee in DWEB tokens
+  // const commitedRequest = await registrar.sendCommitment(approvedRequest, true);
+  //Wait for 1 minute before registering domain name
+  await wait(60);
+  //If paying registration fee in ETH 
+  const tx = await registrar.register(commitedRequest);
+  //Wait for 1st confirmation
+  return tx.wait(1);  
+}
+
+registerDomains().then((receipt)=>{
+  // receipt is instance of ethers.js TransactionReceipt class
+  // https://docs.ethers.org/v5/api/providers/types/#providers-TransactionReceipt
+  console.log(receipt);
+});
+```
+
+### Registering subdomain
+Subdomain registration has no difference between Ethereum and Polygon networks.
+
+There are two type of subdomain registrations:
+1. Registering subdomain for domain name owned by you. We call it **self-registration**
+2. Registering subdomain for staked domain name that belong to other owner. We call it **on-demand registration**
+
+Decentraweb support 2 types of subdomains:
+1. **Permanent** - subdomain that has no expiration date.
+2. **Renewed** - subdomain that has expiration date and can be renewed.
+
+During **self-registration** domain owner can make subdomain permanent by specifying 0 as duration. If duration is not
+0 then subdomain owner will have to renew it before expiration date. Also, domain owner can set registration fee, that fee
+will be paid to domain owner when subdomain is renewed.
+
+During **on-demand registration** subdomain type (permanent or renewed) and renewal fee (if applicable), is defined by
+parameters that owner has set when staking domain name.
+
+#### Self-registration
+In case of self-registration, you have to pay service fee. As of now, service fee is $2 per subdomain and is paid in ETH.
+```typescript
+import {ethers, providers, Wallet} from "ethers";
+import {sld} from "@decentraweb/core";
+
+const ETH_NETWORK = 'mainnet';
+const JSONRPC_URL = 'https://mainnet.infura.io/v3/00000000000000000000000000000000';
+const PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000000';
+
+const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
+const signer = new Wallet(PRIVATE_KEY, provider);
+const registrar = new sld.EthereumSLDRegistrar({network: ETH_NETWORK, provider, signer});
+async function registerSuddomains() {
+  const approvedRegistration = await registrar.approveSelfRegistration([
+    {name: '🙂🙂🙂', label: 'public'},
+    {name: 'foobar', label: 'api'}
+  ]);
+  //It is recommended to cache approvedRegistration object, so you can resume registration if next step fails
+  const tx = await registrar.registerSubdomains(approvedRegistration);
+  const receipt = await tx.wait(1);
+  console.log('Registered, TX hash', receipt.transactionHash);
+}
+
+registerSuddomains().then(() => {
+  console.log('Done');
+}).catch(err => {
+  console.error(err);
+});
+
+```
+
+### On-demand registration
+Any user can set registration fee and stake their domain. This would allow other users to register subdomains for that 
+domain name. 
+```typescript
+import {ethers, providers, Wallet} from "ethers";
+import {sld} from "@decentraweb/core";
+
+const ETH_NETWORK = 'mainnet';
+const JSONRPC_URL = 'https://mainnet.infura.io/v3/00000000000000000000000000000000';
+const PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000000';
+
+const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
+const signer = new Wallet(PRIVATE_KEY, provider);
+const registrar = new sld.EthereumSLDRegistrar({network: ETH_NETWORK, provider, signer});
+async function registerSuddomains() {
+  const approvedRegistration = await registrar.approveOndemandRegistration([
+    {name: '🙂🙂🙂', label: 'public'},
+    {name: 'foobar', label: 'api'}
+  ]);
+  //It is recommended to cache approvedRegistration object, so you can resume registration if next step fails
+  const tx = await registrar.registerSubdomains(approvedRegistration);
+  const receipt = await tx.wait(1);
+  console.log('Registered, TX hash', receipt.transactionHash);
+}
+
+registerSuddomains().then(() => {
+  console.log('Done');
+}).catch(err => {
+  console.error(err);
+});
+``` 
+
+## Reading and writing domain records
 ### Initialization
 ```typescript
 import {providers, Wallet} from "ethers";

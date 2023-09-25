@@ -18,28 +18,58 @@ List of ICANN domains can be found [here](https://data.iana.org/TLD/tlds-alpha-b
 
 ## Initialization
 Toolkit uses [ethers.js](https://docs.ethers.io/v5/) to call Ethereum contracts. It is required as peer dependency.
-To initialize Toolkit instance just pass Ethereum network name (`mainnet` and `goerli` supported at the moment) and valid 
-`etherers.js` provider instance. 
+
+Decentraweb supports both Ethereum and Polygon networks. Toolkit will automatically detect which network to use based on
+where domain name is located currently. To initialize Toolkit instance you need to pass Ethereum and Polygon network 
+name (`mainnet` is used with 'matic' and `goerli` is used with 'maticmum') and ethers.js providers for each network. 
 ```typescript
 import {providers, Wallet} from "ethers";
 import DwebToolkit, {ToolkitConfig} from "@decentraweb/toolkit";
 
 const ETH_NETWORK = 'goerli';
-const JSONRPC_URL = 'https://goerli.infura.io/v3/00000000000000000000000000000000';
-const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
-const config: ToolkitConfig = {network: ETH_NETWORK, provider};
+const ETH_JSONRPC_URL = 'https://goerli.infura.io/v3/00000000000000000000000000000000';
+const POLYGON_NETWORK = 'maticmum';
+const POLYGON_JSONRPC_URL = 'https://polygon-mumbai.infura.io/v3/00000000000000000000000000000000';
+const config: ToolkitConfig = {
+  ethereum: {
+    network: ETH_NETWORK,
+    provider: new providers.JsonRpcProvider(ETH_JSONRPC_URL, ETH_NETWORK),
+  },
+  polygon: {
+    network: POLYGON_NETWORK,
+    provider: new providers.JsonRpcProvider(POLYGON_JSONRPC_URL, POLYGON_NETWORK)
+  }
+};
+const toolkit = new DwebToolkit(config);
+```
+Alternatively, if you use one of supported providers, you can initialize Toolkit in a simpler way:
+```typescript
+const config: ToolkitConfig = {
+  apiProvider: 'infura', //Supported providers: 'etherscan', 'infura', 'alchemy', 'cloudflare', 'pocket', 'ankr'
+  apiKey: '00000000000000000000000000000000', //
+  production: false //If true, then mainnet and matic networks will be used, otherwise goerli and maticmum
+};
 const toolkit = new DwebToolkit(config);
 ```
 ### Browser bundle
 In most cases importing library using `npm` is preferred way, but for fast prototyping you can load it from our CND:
 ```html
+
 <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js" type="application/javascript"></script>
 <script src="https://cdn.decentraweb.org/decentraweb-toolkit-1.2.2.min.js" type="application/javascript"></script>
 <script>
   window.addEventListener('load', async () => {
     const {DwebToolkit} = Decentraweb;
-    const toolkit = new DwebToolkit({network: 'goerli', provider: ethers.getDefaultProvider('goerli')});
-  })
+    const toolkit = new DwebToolkit({
+      ethereum: {
+        network: 'goerli',
+        provider: ethers.getDefaultProvider('goerli')
+      },
+      polygon: {
+        network: 'maticmum',
+        provider: ethers.getDefaultProvider('maticmum')
+      }
+    })
 </script>
 ```
 ## Resolve Ethereum address to name
