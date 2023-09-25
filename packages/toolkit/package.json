@@ -11,9 +11,9 @@
     "url": "git+https://github.com/decentraweb/decentrawebjs.git"
   },
   "scripts": {
-    "prepare": "npm run build",
-    "build": "tsc",
-    "build:browser": "webpack --progress --config webpack.config.js",
+    "prepublish": "npm run build",
+    "build": "rimraf ./build && tsc",
+    "build:browser": "rimraf ./dist && webpack --progress --config webpack.config.js",
     "watch": "tsc --watch",
     "update-tld-list": "node ./utils/update-tld-list.js"
   },
@@ -43,6 +43,7 @@
     "core-js": "^3.30.2",
     "ethers": "^5.7.0",
     "jest": "^29.5.0",
+    "rimraf": "^5.0.1",
     "typescript": "^5.0.4",
     "webpack": "^5.82.1",
     "webpack-bundle-analyzer": "^4.8.0",

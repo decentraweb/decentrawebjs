@@ -14,8 +14,8 @@
     "node": ">=16.0.0"
   },
   "scripts": {
-    "build": "tsc",
-    "prepare": "npm run build",
+    "build": "rimraf ./build && tsc",
+    "prepublish": "npm run build",
     "start": "node build/gateway.js",
     "watch:ts": "tsc --watch",
     "watch:js": "nodemon --watch build build/gateway.js"
@@ -35,6 +35,7 @@
     "@types/node": "^16.18.31",
     "ethers": "^5.7.2",
     "nodemon": "^2.0.22",
+    "rimraf": "^5.0.1",
     "typescript": "^5.0.4"
   },
   "peerDependencies": {
