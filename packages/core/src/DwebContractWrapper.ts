@@ -1,7 +1,7 @@
 import { ethers, providers } from 'ethers';
-import { ContractConfig, DwebConfig, DwebContract, Network } from './types/common.cjs';
-import { getContract, getContractConfig } from './contracts/index.cjs';
-import { getChainId } from './utils/ethereum.js';
+import { ContractConfig, DwebConfig, DwebContract, Network } from './types/common';
+import { getContract, getContractConfig } from './contracts';
+import { getChainId } from './utils/ethereum';
 
 export function requiresSigner(target: any, ctx: DecoratorContext): any {
   return function (this: DwebContractWrapper, ...args: any[]) {

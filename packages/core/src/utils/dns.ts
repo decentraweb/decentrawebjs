@@ -1,6 +1,6 @@
 import { name } from 'dns-packet';
 import { ethers } from 'ethers';
-import { hashName } from './name.cjs';
+import { hashName } from './name';
 
 export function dnsWireName(domain: string): Buffer {
   return name.encode(domain);

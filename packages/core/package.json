@@ -2,59 +2,15 @@
   "name": "@decentraweb/core",
   "version": "2.0.0-alpha.2",
   "description": "Decentraweb javascript library",
-  "main": "build/esm/index.js",
-  "types": "build/esm/index.d.ts",
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./build/esm/index.d.ts",
-        "default": "./build/esm/index.js"
-      },
-      "require": {
-        "types": "./build/cjs/index.d.ts",
-        "default": "./build/cjs/index.js"
-      }
-    },
-    "./api": {
-      "import": {
-        "types": "./build/esm/api/index.d.ts",
-        "default": "./build/esm/api/index.js"
-      },
-      "require": {
-        "types": "./build/cjs/api/index.d.ts",
-        "default": "./build/cjs/api/index.js"
-      }
-    },
-    "./contracts": {
-      "import": {
-        "types": "./build/esm/contracts/index.d.ts",
-        "default": "./build/esm/contracts/index.js"
-      },
-      "require": {
-        "types": "./build/cjs/contracts/index.d.ts",
-        "default": "./build/cjs/contracts/index.js"
-      }
-    },
-    "./registrars": {
-      "import": {
-        "types": "./build/esm/registrars/index.d.ts",
-        "default": "./build/esm/registrars/index.js"
-      },
-      "require": {
-        "types": "./build/cjs/registrars/index.d.ts",
-        "default": "./build/cjs/registrars/index.js"
-      }
-    }
-  },
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "scripts": {
-    "prepare": "npm run build",
-    "build:esm": "tsc --project tsconfig.json",
-    "build:cjs": "tsc --project tsconfig.cjs.json",
-    "build": "npm run build:esm && npm run build:cjs",
-    "build:browser": "webpack --progress --config webpack.config.cjs",
+    "prepublish": "npm run build",
+    "build:clean": "rimraf ./build",
+    "build": "rimraf ./build && tsc --project tsconfig.json",
+    "build:browser": "rimraf ./dist && webpack --progress --config webpack.config.cjs",
     "test:e2e": "mocha test/e2e/**/*.test.ts",
     "watch": "tsc --watch --project tsconfig.json",
-    "watch:cjs": "tsc --watch --project tsconfig.cjs.json",
     "watch:browser": "webpack --watch --progress --config webpack.config.cjs --mode development"
   },
   "author": "",
@@ -85,6 +41,7 @@
     "dotenv": "^16.3.1",
     "ethers": "^5.7.2",
     "mocha": "^10.2.0",
+    "rimraf": "^5.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2",
     "webpack": "^5.88.2",

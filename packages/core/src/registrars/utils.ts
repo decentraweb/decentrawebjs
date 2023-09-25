@@ -1,6 +1,6 @@
-import { TLDEntry } from './types/TLD.js';
-import { DURATION, MAX_NAMES_PER_TX } from './constants.js';
-import { normalizeName } from '../utils/name.cjs';
+import { TLDEntry } from './types/TLD';
+import { DURATION, MAX_NAMES_PER_TX } from './constants';
+import { normalizeName } from '../utils';
 
 /**
  * Validates and normalizes domain names and durations for registration.

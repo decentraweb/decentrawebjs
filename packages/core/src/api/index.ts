@@ -17,15 +17,15 @@ import {
   TLDApproval,
   TLDApprovalPayload,
   TLDApprovalRes
-} from './types.js';
-import { TypedData } from '../types/TypedData.js';
-import getRandomHex from '../utils/getRandomHex.js';
-import { getDwebAddress, getWethAddress } from '../contracts/index.cjs';
-import { SubdomainEntry as SubdomainEntry } from '../registrars/types/Subdomain.js';
-import { getChainId } from '../utils/ethereum.js';
-import { ChainId, Network } from '../types/common.cjs';
+} from './types';
+import { TypedData } from '../types/TypedData';
+import getRandomHex from '../utils/getRandomHex';
+import { getDwebAddress, getWethAddress } from '../contracts';
+import { SubdomainEntry as SubdomainEntry } from '../registrars/types/Subdomain';
+import { getChainId } from '../utils/ethereum';
+import { ChainId, Network } from '../types/common';
 
-export * from './types.js';
+export * from './types';
 
 /**
  * Decentraweb API wrapper. This API is used during registration process. Usually you don't need to use it directly.

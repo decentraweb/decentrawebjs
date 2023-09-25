@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { ChainId, EthChainId, PolygonChainId } from '../types/common.cjs';
+import { ChainId, EthChainId, PolygonChainId } from '../types/common';
 
 export interface TLDApprovalPayload {
   name: Array<string>;

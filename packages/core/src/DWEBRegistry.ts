@@ -1,11 +1,11 @@
 import { ethers, providers } from 'ethers';
-import DWEBName from './DWEBName.js';
-import { DEFAULT_TTL } from './utils/contracts.js';
-import { getContract } from './contracts/index.cjs';
-import { isValidDomain } from './utils/dns.js';
-import { DwebConfig } from './types/common.cjs';
-import DwebContractWrapper, { requiresSigner } from './DwebContractWrapper.js';
-import { hashName } from './utils/name.cjs';
+import DWEBName from './DWEBName';
+import { DEFAULT_TTL } from './utils/contracts';
+import { getContract } from './contracts';
+import { isValidDomain } from './utils/dns';
+import { DwebConfig } from './types/common';
+import DwebContractWrapper, { requiresSigner } from './DwebContractWrapper';
+import { hashName } from './utils';
 
 export default class DWEBRegistry extends DwebContractWrapper {
   constructor(options: DwebConfig) {

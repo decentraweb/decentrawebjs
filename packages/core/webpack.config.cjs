@@ -23,16 +23,9 @@ module.exports = {
   },
   resolve: {
     alias: {
-      // To avoid blotting up the `bn.js` library all over the packages
-      // use single library instance.
       'buffer': path.resolve(__dirname, '../../node_modules/buffer')
     },
     extensions: ['.ts', '.js', '.json'],
-    extensionAlias: {
-      '.js': ['.ts', '.js'],
-      '.cjs': ['.cts', '.cjs'],
-      '.mjs': ['.mts', '.mjs'],
-    },
     fallback: {
       buffer: require.resolve('buffer/')
     }

@@ -1,12 +1,12 @@
 import { BigNumber, ethers, providers } from 'ethers';
 
-import { increaseByPercent } from '../../utils/misc.js';
-import { ApprovedRegistration, CommittedRegistration, RegistrationContext } from './types.js';
-import { TLDBalanceVerificationResult, TLDEntry } from '../types/TLD.js';
-import { normalizeDomainEntries, normalizeDuration } from '../utils.js';
-import { APPROVAL_TTL, REGISTRATION_WAIT } from '../constants.js';
-import BaseRegistrar from '../BaseRegistrar.js';
-import { normalizeName } from '../../utils/name.cjs';
+import { increaseByPercent } from '../../utils/misc';
+import { ApprovedRegistration, CommittedRegistration, RegistrationContext } from './types';
+import { TLDBalanceVerificationResult, TLDEntry } from '../types/TLD';
+import { normalizeDomainEntries, normalizeDuration } from '../utils';
+import { APPROVAL_TTL, REGISTRATION_WAIT } from '../constants';
+import BaseRegistrar from '../BaseRegistrar';
+import { normalizeName } from '../../utils';
 
 export type {
   ApprovedRegistration,

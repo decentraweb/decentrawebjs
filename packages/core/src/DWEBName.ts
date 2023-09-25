@@ -1,12 +1,12 @@
 import { ethers, providers } from 'ethers';
 import { formatsByName } from '@ensdomains/address-encoder';
-import { decode, encode } from './utils/content.js';
-import { dnsWireNameHash } from './utils/dns.js';
+import { decode, encode } from './utils/content';
+import { dnsWireNameHash } from './utils/dns';
 import { Buffer } from 'buffer';
-import { getContract } from './contracts/index.cjs';
+import { getContract } from './contracts';
 
-import { Network } from './types/common.cjs';
-import { hashName } from './utils/name.cjs';
+import { Network } from './types/common';
+import { hashName } from './utils';
 
 const NO_DATA = '0x';
 

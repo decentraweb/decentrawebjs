@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
     "lib": ["es6", "dom"],
-    "module": "NodeNext",
-    "moduleResolution": "nodenext",
+    "module": "commonjs",
     "target": "es6",
     "rootDir": "./src",
-    "outDir": "./build/esm",
+    "outDir": "./build",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

@@ -1,5 +1,5 @@
-import { Price } from './common.js';
-import { SubdomainApproval } from '../../api/index.js';
+import { Price } from './common';
+import { SubdomainApproval } from '../../api';
 
 /**
  * Subdomain registration entry for registering subdomains for staked domains. Domain owned may specify if subdomains

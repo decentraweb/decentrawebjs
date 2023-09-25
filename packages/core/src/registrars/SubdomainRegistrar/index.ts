@@ -6,14 +6,14 @@ import {
   SubdomainBalanceVerificationResult,
   SubdomainEntry,
   SubdomainFees
-} from '../types/Subdomain.js';
-import signTypedData from '../../utils/signTypedData.js';
-import { increaseByPercent } from '../../utils/misc.js';
-import { DURATION } from '../constants.js';
-import { normalizeDuration } from '../utils.js';
-import BaseRegistrar from '../BaseRegistrar.js';
-import { SubdomainApproval } from '../../api/index.js';
-import { hashName, normalizeName } from '../../utils/name.cjs';
+} from '../types/Subdomain';
+import signTypedData from '../../utils/signTypedData';
+import { increaseByPercent } from '../../utils/misc';
+import { DURATION } from '../constants';
+import { normalizeDuration } from '../utils';
+import BaseRegistrar from '../BaseRegistrar';
+import { SubdomainApproval } from '../../api';
+import { hashName, normalizeName } from '../../utils';
 
 /**
  * Class that handles subdomain registration.

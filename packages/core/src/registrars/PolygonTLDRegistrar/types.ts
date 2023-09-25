@@ -1,4 +1,4 @@
-import { TLDEntry } from '../types/TLD.js';
+import { TLDEntry } from '../types/TLD';
 import { BigNumber } from 'ethers';
 
 /**

@@ -19,7 +19,7 @@ import {
   DwebContract,
   Network,
   PolygonNetwork
-} from '../types/common.cjs';
+} from '../types/common';
 
 /**
  * Contract addresses for different Ethereum/Polygon networks
