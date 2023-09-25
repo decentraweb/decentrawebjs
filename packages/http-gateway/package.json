@@ -1,6 +1,6 @@
 {
   "name": "@decentraweb/http-gateway",
-  "version": "2.0.0-alpha.3",
+  "version": "2.0.0-alpha.4",
   "description": "HTTP gateway service",
   "author": "Serhii Lytvynenko <lytvynenkosv@gmail.com>",
   "license": "ISC",
@@ -24,7 +24,7 @@
     "url": "https://github.com/decentraweb/decentrawebjs/issues"
   },
   "dependencies": {
-    "@decentraweb/core": "^2.0.0-alpha.3",
+    "@decentraweb/core": "^2.0.0-alpha.4",
     "@sentry/node": "^7.52.1",
     "@sentry/tracing": "^7.52.1",
     "acme-http-01-webroot": "^3.0.0",
