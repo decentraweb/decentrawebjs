@@ -11,7 +11,8 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "prepublish": "npm run build",
+    "build": "rimraf ./build && tsc",
     "watch": "tsc --watch",
     "start": "node build/index.js"
   },
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "@types/prompts": "^2.4.4",
+    "rimraf": "^5.0.1",
     "typescript": "^5.0.4"
   }
 }
