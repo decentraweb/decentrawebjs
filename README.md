@@ -13,7 +13,7 @@ This monorepo is home for [Decentraweb](https://www.decentraweb.org/) JS librari
 ## Setup
 ```shell
 npm install
-npx lerna bootstrap
+npm build
 ```
 ### Run resolver
 Create `.env` file in `packages/resolver` from `.env.example`.

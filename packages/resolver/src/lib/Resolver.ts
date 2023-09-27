@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer';
 import { DNSRecord } from '@decentraweb/core';
-import DwebToolkit, { ToolkitConfig } from '@decentraweb/toolkit';
+import DwebToolkit, { ApiProviderConfig, ToolkitConfig } from '@decentraweb/toolkit';
 import dgram from 'dgram';
 import * as dnsPacket from 'dns-packet';
 import * as punycode from 'punycode/';
@@ -43,7 +43,7 @@ function createLogger(): Logger {
 }
 
 export interface ResolverConfig {
-  blockchain: ToolkitConfig;
+  blockchain: ToolkitConfig | ApiProviderConfig;
   ipfsGateway: {
     A: string[];
     AAAA: string[];
@@ -114,12 +114,15 @@ class Resolver {
       }
     }
     const provider = await this.toolkit.getDomainProvider(domain);
+    console.log('resolve', domain, resourceType, 'provider', provider);
     switch (provider) {
       case 'ens':
       case 'dweb':
         return this.resolveBlockchain(domain, resourceType);
       case 'icann':
         return this.resolveICANN(domain, resourceType);
+      default:
+        throw new Error(`Unsupported domain provider: ${provider}`);
     }
   }
 
@@ -152,6 +155,7 @@ class Resolver {
       return [];
     }
     const name = await this.toolkit.domain(domain);
+    console.log('name', name);
     if (!name) {
       return [];
     }

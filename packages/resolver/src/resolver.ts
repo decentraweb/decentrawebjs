@@ -1,4 +1,3 @@
-import { providers } from 'ethers';
 import UDPResolver from './lib/UDPResolver';
 import TCPResolver from './lib/TCPResolver';
 import DOHResolver from './lib/DOHResolver';
@@ -7,14 +6,9 @@ import { ResolverConfig } from './lib/Resolver';
 
 const resolverConfig: ResolverConfig = {
   blockchain: {
-    ethereum: {
-      network: config.eth_network,
-      provider: new providers.JsonRpcProvider(config.eth_jsonrpc_url, config.eth_network)
-    },
-    polygon: {
-      network: config.polygon_network,
-      provider: new providers.JsonRpcProvider(config.polygon_jsonrpc_url, config.eth_network)
-    }
+    apiProvider: config.provider,
+    apiKey: config.apiKey,
+    production: config.production
   },
   ipfsGateway: config.ipfs_gateway
 };
