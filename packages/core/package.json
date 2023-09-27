@@ -6,7 +6,6 @@
   "types": "build/index.d.ts",
   "scripts": {
     "prepublish": "npm run build",
-    "build:clean": "rimraf ./build",
     "build": "rimraf ./build && tsc --project tsconfig.json",
     "build:browser": "rimraf ./dist && webpack --progress --config webpack.config.cjs",
     "test:e2e": "mocha test/e2e/**/*.test.ts",

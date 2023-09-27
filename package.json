@@ -19,7 +19,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^16.18.31",
-    "lerna": "^6.6.2",
+    "lerna": "^7.3.0",
     "prettier": "^2.8.8",
     "typedoc": "^0.25.1",
     "typescript": "^5.0.4"
