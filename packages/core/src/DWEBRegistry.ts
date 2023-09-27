@@ -34,7 +34,7 @@ export default class DWEBRegistry extends DwebContractWrapper {
   async nameExists(name: string): Promise<boolean> {
     const hash = hashName(name);
     try {
-      await this.contract.owner(hash);
+      await this.contract['owner(bytes32)'](hash);
       return true;
     } catch (e) {
       return false;
