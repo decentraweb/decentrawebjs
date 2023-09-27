@@ -11,29 +11,12 @@
     "build": {
       "dependsOn": [
         "^build"
-      ],
-      "outputs": [
-        "{projectRoot}/build"
       ]
     },
     "build:browser": {
       "dependsOn": [
-        "^build:browser"
-      ],
-      "outputs": [
-        "{projectRoot}/dist"
+        "^build"
       ]
     }
-  },
-  "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "namedInputs": {
-    "default": [
-      "{projectRoot}/**/*",
-      "sharedGlobals"
-    ],
-    "sharedGlobals": [],
-    "production": [
-      "default"
-    ]
   }
 }

@@ -5,14 +5,14 @@
   "description": "",
   "main": "packages/resolver/src/index.js",
   "scripts": {
-    "bootstrap": "lerna bootstrap",
     "gateway": "npm run start --workspace=@decentraweb/http-gateway",
     "resolver": "npm run start --workspace=@decentraweb/resolver",
     "manage": "npm run start --workspace=@decentraweb/cli",
+    "build": "lerna run build",
     "docs": "typedoc"
   },
   "workspaces": [
-    "./packages/*"
+    "packages/*"
   ],
   "keywords": [],
   "author": "",
