@@ -114,7 +114,6 @@ class Resolver {
       }
     }
     const provider = await this.toolkit.getDomainProvider(domain);
-    console.log('resolve', domain, resourceType, 'provider', provider);
     switch (provider) {
       case 'ens':
       case 'dweb':
@@ -155,7 +154,6 @@ class Resolver {
       return [];
     }
     const name = await this.toolkit.domain(domain);
-    console.log('name', name);
     if (!name) {
       return [];
     }
