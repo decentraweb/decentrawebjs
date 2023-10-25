@@ -15,12 +15,14 @@
 <li><a href="../index.html">Decentraweb Packages</a></li>
 <li><a href="_decentraweb_resolver.html">@decentraweb/resolver</a></li></ul>
 <h1>Module @decentraweb/resolver</h1></div>
-<section class="tsd-panel tsd-typography"><a id="md:decentraweb-node-dns-resolver-and-dns-management-library" class="tsd-anchor"></a><h1><a href="#md:decentraweb-node-dns-resolver-and-dns-management-library">Decentraweb node DNS resolver and DNS management library</a></h1><p>This package is DNS resolver. It support resolving DWEB, ENS and ICANN domain names.</p>
-<p>If domain ends with <code>.eth</code> then it is resolved through ENS. If domain has 
-one of the ICANN TLDs, then it is resolved through regular DNS. All other domains are resolved
-with DWEB contracts.</p>
-<p>List of ICANN domains can be found at <a href="https://data.iana.org/TLD/tlds-alpha-by-domain.txt">https://data.iana.org/TLD/tlds-alpha-by-domain.txt</a> and is 
-stored in <code>./icann_tlds.txt</code> file. It needs to be regulary updated.</p>
+<section class="tsd-panel tsd-typography"><a id="md:decentraweb-dns-resolver" class="tsd-anchor"></a><h1><a href="#md:decentraweb-dns-resolver">Decentraweb DNS Resolver</a></h1><p>This package is DNS resolver. It supports resolving DWEB, ENS and ICANN domain names.</p>
+<p><strong>Resolution logic:</strong></p>
+<ol>
+<li>If domain ends with <code>.eth</code> then it is resolved through ENS.</li>
+<li>If domain has one of the ICANN TLDs, then it is resolved through regular DNS. </li>
+<li>All other domains are resolved with DWEB contracts.</li>
+</ol>
+<p>List of ICANN domains can be found at <a href="https://data.iana.org/TLD/tlds-alpha-by-domain.txt">https://data.iana.org/TLD/tlds-alpha-by-domain.txt</a> </p>
 <a id="md:resolver-types" class="tsd-anchor"></a><h2><a href="#md:resolver-types">Resolver types</a></h2><p>This package include 3 resolver classes:</p>
 <ol>
 <li>TCPResolver</li>
@@ -34,10 +36,11 @@ stored in <code>./icann_tlds.txt</code> file. It needs to be regulary updated.</
 <li><code>https://{server_address}/dns-query</code> - standard <a href="https://datatracker.ietf.org/doc/html/rfc8484">RFC 8484</a> binary format</li>
 <li><code>https://{server_address}/resolve</code> - JSON API for app developers.</li>
 </ol>
+<p>If you are only interested in JSON API, then you can only instantiate <code>DOHResolver</code>.</p>
 <a id="md:binary-queries" class="tsd-anchor"></a><h3><a href="#md:binary-queries">Binary queries</a></h3><p>We use <a href="https://www.npmjs.com/package/dns-packet">dns-packet</a> package to encode/decode binary DNS packets. It has code
 samples for querying DNS over TCP, UPD and DoH <a href="https://github.com/mafintosh/dns-packet/tree/master/examples">https://github.com/mafintosh/dns-packet/tree/master/examples</a></p>
 <a id="md:json-api" class="tsd-anchor"></a><h3><a href="#md:json-api">JSON API</a></h3><p>For app developers it is also possible to use simple JSON API to resolve names.</p>
-<pre><code class="language-shell"><span class="hl-0">curl</span><span class="hl-1"> </span><span class="hl-3">--location</span><span class="hl-1"> </span><span class="hl-3">--request</span><span class="hl-1"> </span><span class="hl-2">GET</span><span class="hl-1"> </span><span class="hl-2">&#39;resolver.decentraweb.org/resolve?name=frontender.me&amp;type=A&#39;</span>
+<pre><code class="language-shell"><span class="hl-0">curl</span><span class="hl-1"> </span><span class="hl-3">--location</span><span class="hl-1"> </span><span class="hl-3">--request</span><span class="hl-1"> </span><span class="hl-2">GET</span><span class="hl-1"> </span><span class="hl-2">&#39;https://{server_address}/resolve?name=frontender.me&amp;type=A&#39;</span>
 </code><button>Copy</button></pre>
 <p>Parameters:</p>
 <ol>
@@ -45,15 +48,26 @@ samples for querying DNS over TCP, UPD and DoH <a href="https://github.com/mafin
 <li><code>type</code> - record type. Either id or string representation supported. List of types can be found <a href="https://en.wikipedia.org/wiki/List_of_DNS_record_types">here</a>.
 Defaults to <code>A</code> if not specified.</li>
 </ol>
-<a id="md:setup" class="tsd-anchor"></a><h2><a href="#md:setup">Setup</a></h2><pre><code class="language-shell"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">build</span>
+<a id="md:setup" class="tsd-anchor"></a><h2><a href="#md:setup">Setup</a></h2><p>We assume you have node.js v16+ and npm installed. If not please go to <a href="https://nodejs.org/">https://nodejs.org/</a> to get latest stable version.</p>
+<p>Preparation steps:</p>
+<ol>
+<li>Create directory to store resolver data. For example <code>mkdir ~/dweb-resolver</code></li>
+<li>Go to this directory (<code>cd ~/dweb-resolver</code>)</li>
+<li>Install resolver package <code>npm install @decentraweb/resolver</code></li>
+<li>With editor of your choice create <code>index.mjs</code> file with following content:</li>
+</ol>
+<pre><code class="language-javascript"><span class="hl-5">import</span><span class="hl-1"> { </span><span class="hl-6">UDPResolver</span><span class="hl-1">, </span><span class="hl-6">TCPResolver</span><span class="hl-1">, </span><span class="hl-6">DOHResolver</span><span class="hl-1"> } </span><span class="hl-5">from</span><span class="hl-1"> </span><span class="hl-2">&quot;@decentraweb/resolver&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-8">/**</span><br/><span class="hl-8"> * IP address to listen on. If you want to listen on all interfaces, then use &#39;0.0.0.0&#39;</span><br/><span class="hl-8"> */</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-7">addr</span><span class="hl-1"> = </span><span class="hl-2">&#39;127.0.0.1&#39;</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-7">resolverConfig</span><span class="hl-1"> = {</span><br/><span class="hl-1">  </span><span class="hl-6">blockchain:</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-6">apiProvider:</span><span class="hl-1"> </span><span class="hl-2">&#39;infura&#39;</span><span class="hl-1">, </span><span class="hl-8">//Supported providers: &#39;etherscan&#39;, &#39;infura&#39;, &#39;alchemy&#39;, &#39;cloudflare&#39;, &#39;pocket&#39;, &#39;ankr&#39;</span><br/><span class="hl-1">    </span><span class="hl-6">apiKey:</span><span class="hl-1"> </span><span class="hl-2">&#39;00000000000000000000000000000000&#39;</span><span class="hl-1">, </span><span class="hl-8">// Your api key</span><br/><span class="hl-1">    </span><span class="hl-6">production:</span><span class="hl-1"> </span><span class="hl-3">false</span><span class="hl-1">, </span><span class="hl-8">// If true, then mainnet and matic networks will be used, otherwise goerli and maticmum</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">  </span><span class="hl-6">ipfsGateway:</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-8">/**</span><br/><span class="hl-8">     * IPFS gateway address, domains that have contentHash records will be redirected to this address. Gateway must be </span><br/><span class="hl-8">     * configured to resolve names through this resolver.</span><br/><span class="hl-8">     */</span><br/><span class="hl-1">    </span><span class="hl-6">A:</span><span class="hl-1"> </span><span class="hl-2">&#39;18.177.155.53&#39;</span><br/><span class="hl-1">  }</span><br/><span class="hl-1">};</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-7">udpServer</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">UDPResolver</span><span class="hl-1">(</span><span class="hl-6">resolverConfig</span><span class="hl-1">);</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-7">tcpServer</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">TCPResolver</span><span class="hl-1">(</span><span class="hl-6">resolverConfig</span><span class="hl-1">);</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-7">dohServer</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">DOHResolver</span><span class="hl-1">({</span><br/><span class="hl-1">  ...</span><span class="hl-6">resolverConfig</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">cors:</span><span class="hl-1"> </span><span class="hl-3">true</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-6">udpServer</span><span class="hl-1">.</span><span class="hl-0">listen</span><span class="hl-1">(</span><span class="hl-4">53</span><span class="hl-1">, </span><span class="hl-6">addr</span><span class="hl-1">).</span><span class="hl-0">then</span><span class="hl-1">(() </span><span class="hl-3">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-6">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">`UDP resolver listening`</span><span class="hl-1">);</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-6">tcpServer</span><span class="hl-1">.</span><span class="hl-0">listen</span><span class="hl-1">(</span><span class="hl-4">53</span><span class="hl-1">, </span><span class="hl-6">addr</span><span class="hl-1">).</span><span class="hl-0">then</span><span class="hl-1">(() </span><span class="hl-3">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-6">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">`TCP resolver listening`</span><span class="hl-1">);</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-6">dohServer</span><span class="hl-1">.</span><span class="hl-0">listen</span><span class="hl-1">(</span><span class="hl-4">80</span><span class="hl-1">).</span><span class="hl-0">then</span><span class="hl-1">(() </span><span class="hl-3">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-6">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">`DOH resolver listening`</span><span class="hl-1">);</span><br/><span class="hl-1">});</span>
 </code><button>Copy</button></pre>
-<p>Create <code>.env</code> file. If you only want to read data, you can leave <code>WALLET</code> and <code>PKEY</code> empty.</p>
-<p>To start resolver run:</p>
-<pre><code class="language-shell"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">start:resolver</span><span class="hl-1"> </span>
+<p>If you would like to use different provider or even your own Ethereum nodes, then config would look like this:</p>
+<pre><code class="language-javascript"><span class="hl-5">import</span><span class="hl-1"> {</span><span class="hl-6">providers</span><span class="hl-1">} </span><span class="hl-5">from</span><span class="hl-1"> </span><span class="hl-2">&#39;ethers&#39;</span><span class="hl-1">;</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-7">resolverConfig</span><span class="hl-1"> = {</span><br/><span class="hl-1">  </span><span class="hl-6">blockchain:</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-6">ethereum:</span><span class="hl-1"> {</span><br/><span class="hl-1">      </span><span class="hl-6">network:</span><span class="hl-1"> </span><span class="hl-2">&#39;mainnet&#39;</span><span class="hl-1">, </span><span class="hl-8">// Or &#39;goerli&#39;</span><br/><span class="hl-1">      </span><span class="hl-6">provider:</span><span class="hl-1"> </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-6">providers</span><span class="hl-1">.</span><span class="hl-0">JsonRpcProvider</span><span class="hl-1">(</span><span class="hl-2">&#39;https://mainnet.infura.io/v3/00000000000000000000000000000000&#39;</span><span class="hl-1">)</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">    </span><span class="hl-6">polygon:</span><span class="hl-1"> {</span><br/><span class="hl-1">      </span><span class="hl-6">network:</span><span class="hl-1"> </span><span class="hl-2">&#39;matic&#39;</span><span class="hl-1">, </span><span class="hl-8">// or &#39;maticmum&#39; if goerli was used for Ethereum</span><br/><span class="hl-1">      </span><span class="hl-6">provider:</span><span class="hl-1">  </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-6">providers</span><span class="hl-1">.</span><span class="hl-0">JsonRpcProvider</span><span class="hl-1">(</span><span class="hl-2">&#39;https://matic.infura.io/v3/00000000000000000000000000000000&#39;</span><span class="hl-1">),</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">  </span><span class="hl-6">ipfsGateway:</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-6">A:</span><span class="hl-1"> </span><span class="hl-2">&#39;18.177.155.53&#39;</span><br/><span class="hl-1">  }</span><br/><span class="hl-1">};</span>
 </code><button>Copy</button></pre>
-<p>In shell console run:</p>
-<pre><code class="language-shell"><span class="hl-0">dig</span><span class="hl-1"> </span><span class="hl-2">@127.0.0.1</span><span class="hl-1"> </span><span class="hl-3">-p</span><span class="hl-1"> </span><span class="hl-4">5333</span><span class="hl-1"> </span><span class="hl-2">sergiy.eth</span><span class="hl-1"> </span><span class="hl-2">A</span>
+<a id="md:running" class="tsd-anchor"></a><h2><a href="#md:running">Running</a></h2><p>To run resolver execute <code>node index.mjs</code> in shell console. You should see following output:</p>
+<pre><code><span class="hl-7">UDP</span><span class="hl-1"> </span><span class="hl-6">resolver</span><span class="hl-1"> </span><span class="hl-6">listening</span><br/><span class="hl-7">DOH</span><span class="hl-1"> </span><span class="hl-6">resolver</span><span class="hl-1"> </span><span class="hl-6">listening</span><br/><span class="hl-7">TCP</span><span class="hl-1"> </span><span class="hl-6">resolver</span><span class="hl-1"> </span><span class="hl-6">listening</span>
 </code><button>Copy</button></pre>
+<p>In another console run:</p>
+<pre><code class="language-shell"><span class="hl-0">dig</span><span class="hl-1"> </span><span class="hl-2">@127.0.0.1</span><span class="hl-1"> </span><span class="hl-3">-p</span><span class="hl-1"> </span><span class="hl-4">53</span><span class="hl-1"> </span><span class="hl-2">sagan</span><span class="hl-1"> </span><span class="hl-2">A</span>
+</code><button>Copy</button></pre>
+<a id="md:running-as-a-service" class="tsd-anchor"></a><h3><a href="#md:running-as-a-service">Running as a service</a></h3><p>There are numerous ways to run Node.js process as a service. We recommend using <a href="https://pm2.keymetrics.io/">pm2</a>.</p>
 </section></div>
 <div class="col-sidebar">
 <div class="page-menu">
@@ -76,7 +90,7 @@ Defaults to <code>A</code> if not specified.</li>
 <ul>
 <li>
 <ul>
-<li><a href="#md:decentraweb-node-dns-resolver-and-dns-management-library"><span>Decentraweb node DNS resolver and DNS management library</span></a></li>
+<li><a href="#md:decentraweb-dns-resolver"><span>Decentraweb DNS <wbr/>Resolver</span></a></li>
 <li>
 <ul>
 <li><a href="#md:resolver-types"><span>Resolver types</span></a></li>
@@ -84,12 +98,16 @@ Defaults to <code>A</code> if not specified.</li>
 <ul>
 <li><a href="#md:binary-queries"><span>Binary queries</span></a></li>
 <li><a href="#md:json-api"><span>JSON API</span></a></li></ul></li>
-<li><a href="#md:setup"><span>Setup</span></a></li></ul></li></ul></li></ul></div></details></div>
+<li><a href="#md:setup"><span>Setup</span></a></li>
+<li><a href="#md:running"><span>Running</span></a></li>
+<li>
+<ul>
+<li><a href="#md:running-as-a-service"><span>Running as a service</span></a></li></ul></li></ul></li></ul></li></ul></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../index.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1"></use></svg><span>Decentraweb Packages - v1.0.0</span></a>
 <ul class="tsd-small-nested-navigation" id="tsd-nav-container" data-base="..">
 <li><a href="_decentraweb_cli.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2"></use></svg>@decentraweb/cli</a></li>
-<li><a href="_decentraweb_core.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2"></use></svg>@decentraweb/core - v2.0.0-alpha.4</a></li>
+<li><a href="_decentraweb_core.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2"></use></svg>@decentraweb/core - v2.0.0</a></li>
 <li><a href="_decentraweb_http_gateway.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2"></use></svg>@decentraweb/http-gateway</a></li>
 <li><a href="_decentraweb_resolver.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2"></use></svg>@decentraweb/resolver</a></li>
 <li><a href="_decentraweb_toolkit.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2"></use></svg>@decentraweb/toolkit</a></li></ul></nav></div></div></div>

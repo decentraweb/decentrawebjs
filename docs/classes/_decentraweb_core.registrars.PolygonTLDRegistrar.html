@@ -26,7 +26,7 @@ Registration is done in 2 steps:</p>
 </ol>
 </div>
 <div class="tsd-comment tsd-typography">
-<h4>Example</h4><pre><code class="language-ts"><span class="hl-5">import</span><span class="hl-1"> { </span><span class="hl-6">registration</span><span class="hl-1"> } </span><span class="hl-5">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@decentraweb/core&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-7">registrar</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-6">registration</span><span class="hl-1">.</span><span class="hl-0">PolygonTLDRegistrar</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-6">network:</span><span class="hl-1"> </span><span class="hl-6">network</span><span class="hl-1"> </span><span class="hl-5">as</span><span class="hl-1"> </span><span class="hl-9">any</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">provider:</span><span class="hl-1"> </span><span class="hl-6">provider</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">signer:</span><span class="hl-1"> </span><span class="hl-6">signer</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-7">registration</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-6">registrar</span><span class="hl-1">.</span><span class="hl-0">sendCommitment</span><span class="hl-1">({ </span><span class="hl-6">name:</span><span class="hl-1"> </span><span class="hl-2">&#39;wallet&#39;</span><span class="hl-1">, </span><span class="hl-6">duration:</span><span class="hl-1"> </span><span class="hl-6">registration</span><span class="hl-1">.</span><span class="hl-7">DURATION</span><span class="hl-1">.</span><span class="hl-7">ONE_YEAR</span><span class="hl-1"> });</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-7">tx</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-6">registrar</span><span class="hl-1">.</span><span class="hl-0">register</span><span class="hl-1">(</span><span class="hl-6">registration</span><span class="hl-1">);</span><br/><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-6">tx</span><span class="hl-1">.</span><span class="hl-0">wait</span><span class="hl-1">(</span><span class="hl-4">1</span><span class="hl-1">);</span>
+<h4>Example</h4><pre><code class="language-ts"><span class="hl-5">import</span><span class="hl-1"> { </span><span class="hl-6">registration</span><span class="hl-1"> } </span><span class="hl-5">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@decentraweb/core&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-7">registrar</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-6">registration</span><span class="hl-1">.</span><span class="hl-0">PolygonTLDRegistrar</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-6">network:</span><span class="hl-1"> </span><span class="hl-6">network</span><span class="hl-1"> </span><span class="hl-5">as</span><span class="hl-1"> </span><span class="hl-14">any</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">provider:</span><span class="hl-1"> </span><span class="hl-6">provider</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">signer:</span><span class="hl-1"> </span><span class="hl-6">signer</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-7">registration</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-6">registrar</span><span class="hl-1">.</span><span class="hl-0">sendCommitment</span><span class="hl-1">({ </span><span class="hl-6">name:</span><span class="hl-1"> </span><span class="hl-2">&#39;wallet&#39;</span><span class="hl-1">, </span><span class="hl-6">duration:</span><span class="hl-1"> </span><span class="hl-6">registration</span><span class="hl-1">.</span><span class="hl-7">DURATION</span><span class="hl-1">.</span><span class="hl-7">ONE_YEAR</span><span class="hl-1"> });</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-7">tx</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-6">registrar</span><span class="hl-1">.</span><span class="hl-0">register</span><span class="hl-1">(</span><span class="hl-6">registration</span><span class="hl-1">);</span><br/><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-6">tx</span><span class="hl-1">.</span><span class="hl-0">wait</span><span class="hl-1">(</span><span class="hl-4">1</span><span class="hl-1">);</span>
 </code><button>Copy</button></pre>
 </div></section>
 <section class="tsd-panel tsd-hierarchy">
@@ -36,7 +36,7 @@ Registration is done in 2 steps:</p>
 <ul class="tsd-hierarchy">
 <li><span class="target">PolygonTLDRegistrar</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L38">registrars/PolygonTLDRegistrar/index.ts:38</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L38">registrars/PolygonTLDRegistrar/index.ts:38</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -89,7 +89,7 @@ Registration is done in 2 steps:</p>
 <h4 class="tsd-returns-title">Returns <a href="_decentraweb_core.registrars.PolygonTLDRegistrar.html" class="tsd-signature-type tsd-kind-class">PolygonTLDRegistrar</a></h4><aside class="tsd-sources">
 <p>Overrides BaseRegistrar.constructor</p>
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L42">registrars/PolygonTLDRegistrar/index.ts:42</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L42">registrars/PolygonTLDRegistrar/index.ts:42</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="api" class="tsd-anchor"></a>
@@ -100,25 +100,25 @@ Registration is done in 2 steps:</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from BaseRegistrar.api</p>
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/registrars/BaseRegistrar.ts#L23">registrars/BaseRegistrar.ts:23</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/registrars/BaseRegistrar.ts#L23">registrars/BaseRegistrar.ts:23</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="chainId" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagReadonly">Readonly</code> <span>chain<wbr/>Id</span><a href="#chainId" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">chain<wbr/>Id</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div><aside class="tsd-sources">
 <p>Inherited from BaseRegistrar.chainId</p>
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/DwebContractWrapper.ts#L17">DwebContractWrapper.ts:17</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/DwebContractWrapper.ts#L18">DwebContractWrapper.ts:18</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-protected tsd-is-inherited"><a id="contract" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagProtected">Protected</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>contract</span><a href="#contract" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">contract</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">Contract</span></div><aside class="tsd-sources">
 <p>Inherited from BaseRegistrar.contract</p>
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/DwebContractWrapper.ts#L21">DwebContractWrapper.ts:21</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/DwebContractWrapper.ts#L22">DwebContractWrapper.ts:22</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="contractConfig" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagReadonly">Readonly</code> <span>contract<wbr/>Config</span><a href="#contractConfig" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">contract<wbr/>Config</span><span class="tsd-signature-symbol">:</span> <a href="../types/_decentraweb_core.ContractConfig.html" class="tsd-signature-type tsd-kind-type-alias">ContractConfig</a></div><aside class="tsd-sources">
 <p>Inherited from BaseRegistrar.contractConfig</p>
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/DwebContractWrapper.ts#L20">DwebContractWrapper.ts:20</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/DwebContractWrapper.ts#L21">DwebContractWrapper.ts:21</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="dwebToken" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagReadonly">Readonly</code> <span>dweb<wbr/>Token</span><a href="#dwebToken" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">dweb<wbr/>Token</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">Contract</span></div>
@@ -127,19 +127,19 @@ Registration is done in 2 steps:</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from BaseRegistrar.dwebToken</p>
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/registrars/BaseRegistrar.ts#L27">registrars/BaseRegistrar.ts:27</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/registrars/BaseRegistrar.ts#L27">registrars/BaseRegistrar.ts:27</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="network" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagReadonly">Readonly</code> <span>network</span><a href="#network" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">network</span><span class="tsd-signature-symbol">:</span> <a href="../types/_decentraweb_core.PolygonNetwork.html" class="tsd-signature-type tsd-kind-type-alias">PolygonNetwork</a></div><aside class="tsd-sources">
 <p>Overrides BaseRegistrar.network</p>
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L39">registrars/PolygonTLDRegistrar/index.ts:39</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L39">registrars/PolygonTLDRegistrar/index.ts:39</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="provider" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagReadonly">Readonly</code> <span>provider</span><a href="#provider" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">provider</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">BaseProvider</span></div><aside class="tsd-sources">
 <p>Inherited from BaseRegistrar.provider</p>
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/DwebContractWrapper.ts#L18">DwebContractWrapper.ts:18</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/DwebContractWrapper.ts#L19">DwebContractWrapper.ts:19</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="signer" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagReadonly">Readonly</code> <span>signer</span><a href="#signer" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">signer</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">Signer</span></div>
@@ -148,13 +148,13 @@ Registration is done in 2 steps:</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from BaseRegistrar.signer</p>
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/registrars/BaseRegistrar.ts#L25">registrars/BaseRegistrar.ts:25</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/registrars/BaseRegistrar.ts#L25">registrars/BaseRegistrar.ts:25</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="wethToken" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagReadonly">Readonly</code> <span>weth<wbr/>Token</span><a href="#wethToken" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">weth<wbr/>Token</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">Contract</span></div><aside class="tsd-sources">
 <p>Overrides BaseRegistrar.wethToken</p>
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L40">registrars/PolygonTLDRegistrar/index.ts:40</a></li></ul></aside></section></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L40">registrars/PolygonTLDRegistrar/index.ts:40</a></li></ul></aside></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Accessors</h2>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="isMatic" class="tsd-anchor"></a>
@@ -168,7 +168,7 @@ Registration is done in 2 steps:</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from BaseRegistrar.isMatic</p>
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/registrars/BaseRegistrar.ts#L52">registrars/BaseRegistrar.ts:52</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/registrars/BaseRegistrar.ts#L52">registrars/BaseRegistrar.ts:52</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="readonly" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>readonly</span><a href="#readonly" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -177,7 +177,7 @@ Registration is done in 2 steps:</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
 <p>Inherited from BaseRegistrar.readonly</p>
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/DwebContractWrapper.ts#L38">DwebContractWrapper.ts:38</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/DwebContractWrapper.ts#L39">DwebContractWrapper.ts:39</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="allowTokenUsage" class="tsd-anchor"></a>
@@ -199,7 +199,7 @@ Registration is done in 2 steps:</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from BaseRegistrar.allowTokenUsage</p>
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/registrars/BaseRegistrar.ts#L88">registrars/BaseRegistrar.ts:88</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/registrars/BaseRegistrar.ts#L88">registrars/BaseRegistrar.ts:88</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getRentPrice" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Rent<wbr/>Price</span><a href="#getRentPrice" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -226,7 +226,7 @@ Registration is done in 2 steps:</p>
 
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L156">registrars/PolygonTLDRegistrar/index.ts:156</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L156">registrars/PolygonTLDRegistrar/index.ts:156</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getRentPriceBatch" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Rent<wbr/>Price<wbr/>Batch</span><a href="#getRentPriceBatch" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -253,7 +253,7 @@ Registration is done in 2 steps:</p>
 
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L170">registrars/PolygonTLDRegistrar/index.ts:170</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L170">registrars/PolygonTLDRegistrar/index.ts:170</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="register" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>register</span><a href="#register" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -272,7 +272,7 @@ Registration is done in 2 steps:</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">TransactionResponse</span><span class="tsd-signature-symbol">&gt;</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L98">registrars/PolygonTLDRegistrar/index.ts:98</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L98">registrars/PolygonTLDRegistrar/index.ts:98</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="sendCommitment" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>send<wbr/>Commitment</span><a href="#sendCommitment" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -301,7 +301,7 @@ Registration is done in 2 steps:</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">CommittedRegistration</span><span class="tsd-signature-symbol">&gt;</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L54">registrars/PolygonTLDRegistrar/index.ts:54</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L54">registrars/PolygonTLDRegistrar/index.ts:54</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="setTokenAllowance" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Token<wbr/>Allowance</span><a href="#setTokenAllowance" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -326,7 +326,7 @@ Registration is done in 2 steps:</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from BaseRegistrar.setTokenAllowance</p>
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/registrars/BaseRegistrar.ts#L61">registrars/BaseRegistrar.ts:61</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/registrars/BaseRegistrar.ts#L61">registrars/BaseRegistrar.ts:61</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="stakingStatus" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>staking<wbr/>Status</span><a href="#stakingStatus" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -346,7 +346,7 @@ Registration is done in 2 steps:</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from BaseRegistrar.stakingStatus</p>
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/registrars/BaseRegistrar.ts#L99">registrars/BaseRegistrar.ts:99</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/registrars/BaseRegistrar.ts#L99">registrars/BaseRegistrar.ts:99</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="verifySignerBalance" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>verify<wbr/>Signer<wbr/>Balance</span><a href="#verifySignerBalance" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -364,7 +364,7 @@ Registration is done in 2 steps:</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_decentraweb_core.registrars.TLDBalanceVerificationResult.html" class="tsd-signature-type tsd-kind-interface">TLDBalanceVerificationResult</a><span class="tsd-signature-symbol">&gt;</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/7d4cd97/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L118">registrars/PolygonTLDRegistrar/index.ts:118</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/decentraweb/decentrawebjs/blob/41cd259/packages/core/src/registrars/PolygonTLDRegistrar/index.ts#L118">registrars/PolygonTLDRegistrar/index.ts:118</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -408,7 +408,7 @@ Registration is done in 2 steps:</p>
 <nav class="tsd-navigation"><a href="../index.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1"></use></svg><span>Decentraweb Packages - v1.0.0</span></a>
 <ul class="tsd-small-nested-navigation" id="tsd-nav-container" data-base="..">
 <li><a href="../modules/_decentraweb_cli.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2"></use></svg>@decentraweb/cli</a></li>
-<li><a href="../modules/_decentraweb_core.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2"></use></svg>@decentraweb/core - v2.0.0-alpha.4</a></li>
+<li><a href="../modules/_decentraweb_core.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2"></use></svg>@decentraweb/core - v2.0.0</a></li>
 <li><a href="../modules/_decentraweb_http_gateway.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2"></use></svg>@decentraweb/http-gateway</a></li>
 <li><a href="../modules/_decentraweb_resolver.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2"></use></svg>@decentraweb/resolver</a></li>
 <li><a href="../modules/_decentraweb_toolkit.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2"></use></svg>@decentraweb/toolkit</a></li></ul></nav></div></div></div>
