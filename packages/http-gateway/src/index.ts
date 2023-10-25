@@ -3,7 +3,7 @@ import { providers } from 'ethers';
 import Greenlock from 'greenlock';
 import path from 'path';
 import http, { IncomingMessage, RequestOptions, ServerResponse } from 'http';
-import { DWEBName, DWEBRegistry, Network } from '@decentraweb/core';
+import { DWEBName, DWEBRegistry, EthereumNetwork } from '@decentraweb/core';
 import * as https from 'https';
 import resolveDNS, { DNSResult } from './lib/resolveDNS';
 import { hasResolver } from './lib/hasResolver';
@@ -13,7 +13,7 @@ import { errorPage } from './lib/errorPage';
 export interface GatewayOptions {
   baseDomain: string;
   provider: providers.BaseProvider;
-  network: Network;
+  network: EthereumNetwork;
   ipfsGatewayIp: string;
   certs: {
     maintainerEmail: string;
