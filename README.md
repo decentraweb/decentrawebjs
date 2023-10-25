@@ -15,14 +15,3 @@ This monorepo is home for [Decentraweb](https://www.decentraweb.org/) JS librari
 npm install
 npm build
 ```
-### Run resolver
-Create `.env` file in `packages/resolver` from `.env.example`.
-
-To start resolver run:
-```shell
-npm run resolver 
-```
-To test resolver in shell console run:
-```shell
-dig @127.0.0.1 -p 5333 your_dweb_domain A
-```
