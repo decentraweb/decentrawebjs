@@ -16,7 +16,9 @@ List of ICANN domains can be found [here](https://data.iana.org/TLD/tlds-alpha-b
 
 **Important Note:** This logic may change in the future.
 
-## Initialization
+## Installation and initialization
+To install library run `npm install --save @decentraweb/toolkit ethers@5` in your project directory.
+
 Toolkit uses [ethers.js](https://docs.ethers.io/v5/) to call Ethereum contracts. It is required as peer dependency.
 
 Decentraweb supports both Ethereum and Polygon networks. Toolkit will automatically detect which network to use based on
@@ -56,7 +58,7 @@ In most cases importing library using `npm` is preferred way, but for fast proto
 ```html
 
 <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js" type="application/javascript"></script>
-<script src="https://cdn.decentraweb.org/decentraweb-toolkit-1.2.2.min.js" type="application/javascript"></script>
+<script src="https://cdn.decentraweb.org/decentraweb-toolkit-2.0.0.min.js" type="application/javascript"></script>
 <script>
   window.addEventListener('load', async () => {
     const {DwebToolkit} = Decentraweb;

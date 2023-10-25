@@ -4,6 +4,49 @@ This is a library for interacting with the Decentraweb smart contracts. It conta
 
 This library is using [ethers.js](https://docs.ethers.io/v5/) to interact with Ethereum blockchain. `ethers.js` is included as peer dependency, so don't forget to add it to your `package.json`
 
+## Installation and initialization
+To install library run `npm install --save @decentraweb/core ethers@5` in your project directory.
+
+Then you can initialize Decentraweb instance to read/write domain records:
+```typescript
+import {providers, Wallet} from "ethers";
+import {DWEBRegistry} from "@decentraweb/core";
+
+const ETH_NETWORK = 'goerli';
+const JSONRPC_URL = '';
+const PRIVATE_KEY = '';
+
+const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
+//Signer only required if you want to write data to blockchain
+const signer = new Wallet(PRIVATE_KEY, provider); 
+const contracts = {
+  "DWEBRegistry": "0x8eb93AB94A6Afa8d416aB1884Ebb5A3f00920a7A",
+  "DefaultReverseResolver": "0x7d770Cfe9608Ff3AA3F5A34bdCd27c3870a370Da",
+  "PublicResolver": "0xf157D3559DF1F8c69cb757A1A2cdF8736618E083",
+  "ReverseRegistrar": "0x3D8f878584199e47a2d40A1E269042E10aa50754"
+}
+const dweb = new DWEBRegistry({network: ETH_NETWORK, provider, signer, contracts});
+```
+Parameters:
+1. `network` (required) - Ethereum network name (`mainnet`, `goerli`, `matic`, `maticmum`)
+2. `provider` (required) - [ethers Provider](https://docs.ethers.io/v5/api/providers/provider/) instance to read blockchain data.
+3. `signer` (optional) - [ethers Signer](https://docs.ethers.io/v5/api/signer/) instance. Only required if you want to write data to blockchain.
+4. `contracts` (optional) - used to override default Decentraweb contract addresses. Only needs to be used for development purposes.
+
+### Browser bundle
+In most cases importing library using `npm` is preferred way, but for fast prototyping you can load it from our CND:
+```html
+<script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js" type="application/javascript"></script>
+<script src="https://cdn.decentraweb.org/decentraweb-core-2.0.0.min.js" type="application/javascript"></script>
+<script>
+  window.addEventListener('load', () => {
+    const {DWEBRegistry} = Decentraweb;
+    const dweb = new DWEBRegistry({network: 'goerli', provider: ethers.getDefaultProvider('goerli')});
+    const name = dweb.name('some_dweb_name');
+  })
+</script>
+```
+
 ## Registering domain name
 Domain name can be registered on Ethereum or Polygon networks. After registration, domain name will be available for
 resolution on network where it was registered. Later owner can move domain name between networks.
@@ -250,49 +293,16 @@ registerSuddomains().then(() => {
 ``` 
 
 ## Reading and writing domain records
-### Initialization
-```typescript
-import {providers, Wallet} from "ethers";
-import {DWEBRegistry} from "@decentraweb/core";
+Domain names support following types of records:
+1. Addresses
+2. Content hash
+3. Text records
+4. DNS records
 
-const ETH_NETWORK = 'goerli';
-const JSONRPC_URL = '';
-const PRIVATE_KEY = '';
-
-const provider = new providers.JsonRpcProvider(JSONRPC_URL, ETH_NETWORK);
-//Signer only required if you want to write data to blockchain
-const signer = new Wallet(PRIVATE_KEY, provider); 
-const contracts = {
-  "DWEBRegistry": "0x8eb93AB94A6Afa8d416aB1884Ebb5A3f00920a7A",
-  "DefaultReverseResolver": "0x7d770Cfe9608Ff3AA3F5A34bdCd27c3870a370Da",
-  "PublicResolver": "0xf157D3559DF1F8c69cb757A1A2cdF8736618E083",
-  "ReverseRegistrar": "0x3D8f878584199e47a2d40A1E269042E10aa50754"
-}
-const dweb = new DWEBRegistry({network: ETH_NETWORK, provider, signer, contracts});
-```
-Parameters:
-1. `network` (required) - Ethereum network name. Only `goerli` and `mainnet` supported currently.
-2. `provider` (required) - [ethers Provider](https://docs.ethers.io/v5/api/providers/provider/) instance to read blockchain data.
-3. `signer` (optional) - [ethers Signer](https://docs.ethers.io/v5/api/signer/) instance. Only required if you need to write data to blockchain.
-4. `contracts` (optional) - used to override default Decentraweb contract addresses. Only needs to be used for development purposes.
-
-#### Browser bundle
-In most cases importing library using `npm` is preferred way, but for fast prototyping you can load it from our CND:
-```html
-<script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js" type="application/javascript"></script>
-<script src="https://cdn.decentraweb.org/decentraweb-core-1.2.0.min.js" type="application/javascript"></script>
-<script>
-  window.addEventListener('load', () => {
-    const {DWEBRegistry} = Decentraweb;
-    const dweb = new DWEBRegistry({network: 'goerli', provider: ethers.getDefaultProvider('goerli')});
-    const name = dweb.name('some_dweb_name');
-  })
-</script>
-```
-
+Ethereum netwrok support all types of records, while Polygon network support only addresses at this moment.
 
 ### Writing data to blockchain
-As it was stated above, a valid signer instance must be provided to enable writing data to blockchain.
+As it was stated before, a valid signer instance must be provided to enable writing data to blockchain.
 
 All write operations return instance of ethers.js [TransactionResponse](https://docs.ethers.io/v5/api/providers/types/#providers-TransactionResponse) class.
 You can call `transaction.wait(n)` to wait until transaction get `n` confirmations.
@@ -405,8 +415,3 @@ const name = dweb.name('test');
 const data = await name.getDNS(RecordSet.recordType.toType('A'));
 const aRecords = RecordSet.decode(data);
 ```
-
-## Development
-After monorepo is bootstrapped this package should have all dependencies installed and you can run:
-- `npm run build` - to build production ready code
-- `npm run watch` - to start compilation in watch mode
