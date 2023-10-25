@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const {version} = require('./package.json');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
-const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
+// const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 
 module.exports = {
   mode: 'production',
@@ -50,7 +50,6 @@ module.exports = {
             ],
             plugins: [
               ['@babel/plugin-proposal-decorators', {version: 'legacy'}],
-              ['@babel/plugin-syntax-import-attributes',{ deprecatedAssertSyntax: true }],
             ]
           }
         }

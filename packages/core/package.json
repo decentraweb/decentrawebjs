@@ -23,11 +23,10 @@
     "idna-uts46-hx": "^5.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.19",
-    "@babel/plugin-proposal-decorators": "^7.22.15",
-    "@babel/plugin-syntax-import-attributes": "^7.22.5",
-    "@babel/preset-env": "^7.22.15",
-    "@babel/preset-typescript": "^7.22.15",
+    "@babel/core": "^7.23.2",
+    "@babel/plugin-proposal-decorators": "^7.23.2",
+    "@babel/preset-env": "^7.23.2",
+    "@babel/preset-typescript": "^7.23.2",
     "@types/chai": "^4.3.6",
     "@types/chance": "^1.1.4",
     "@types/mocha": "^10.0.1",

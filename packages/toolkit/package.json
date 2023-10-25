@@ -33,9 +33,9 @@
     "punycode": "^2.3.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.8",
-    "@babel/preset-env": "^7.21.5",
-    "@babel/preset-typescript": "^7.21.5",
+    "@babel/core": "^7.23.2",
+    "@babel/preset-env": "^7.23.2",
+    "@babel/preset-typescript": "^7.23.2",
     "@types/punycode": "^2.1.0",
     "babel-loader": "^9.1.2",
     "buffer": "^6.0.3",
