@@ -2,11 +2,12 @@ import { ethers, providers } from 'ethers';
 import { ContractConfig, DwebConfig, DwebContract, Network } from './types/common';
 import { getContract, getContractConfig } from './contracts';
 import { getChainId } from './utils/ethereum';
+import { SignerRequiredError } from './utils/errors';
 
 export function requiresSigner(target: any, ctx: DecoratorContext): any {
   return function (this: DwebContractWrapper, ...args: any[]) {
     if (!this.signer) {
-      throw new Error('Provide signer to call non-constant methods');
+      throw new SignerRequiredError();
     }
     return target.apply(this, args);
   };

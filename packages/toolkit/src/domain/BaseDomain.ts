@@ -2,7 +2,7 @@ import { RecordType } from '@decentraweb/core';
 import { DomainProvider } from '../types';
 import { Answer } from 'dns-packet';
 
-type DomainFeature = 'address' | 'contentHash' | 'dns' | 'txt';
+export type DomainFeature = 'address' | 'contentHash' | 'dns' | 'txt';
 
 export abstract class BaseDomain {
   readonly name: string;
