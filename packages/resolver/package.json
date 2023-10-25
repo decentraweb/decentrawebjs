@@ -11,6 +11,10 @@
   "description": "DNS resolver for Decentraweb",
   "main": "build/index.js",
   "types": "build/index.d.js",
+  "files": [
+    "README.md",
+    "build/"
+  ],
   "scripts": {
     "build": "rimraf ./build && tsc",
     "prepublish": "npm run build",

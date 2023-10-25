@@ -6,6 +6,10 @@
   "license": "ISC",
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "files": [
+    "README.md",
+    "build/"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/decentraweb/decentrawebjs.git"
