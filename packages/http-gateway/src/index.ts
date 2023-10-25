@@ -3,7 +3,7 @@ import { providers } from 'ethers';
 import Greenlock from 'greenlock';
 import path from 'path';
 import http, { IncomingMessage, RequestOptions, ServerResponse } from 'http';
-import { DWEBName, DWEBRegistry, EthereumNetwork, PolygonNetwork } from '@decentraweb/core';
+import { DWEBName, DWEBRegistry, Network } from '@decentraweb/core';
 import * as https from 'https';
 import resolveDNS, { DNSResult } from './lib/resolveDNS';
 import { hasResolver } from './lib/hasResolver';
@@ -12,14 +12,8 @@ import { errorPage } from './lib/errorPage';
 
 export interface GatewayOptions {
   baseDomain: string;
-  ethereum: {
-    network: EthereumNetwork;
-    provider: providers.BaseProvider;
-  };
-  polygon: {
-    network: PolygonNetwork;
-    provider: providers.BaseProvider;
-  };
+  provider: providers.BaseProvider;
+  network: Network;
   ipfsGatewayIp: string;
   certs: {
     maintainerEmail: string;
@@ -44,8 +38,7 @@ export class HTTPGateway {
   readonly ipfsGatewayIp: string;
   private httpServer: http.Server;
   private httpsServer: https.Server;
-  private ethRegistry: DWEBRegistry;
-  private polyRegistry: DWEBRegistry;
+  private dweb: DWEBRegistry;
   private greenlock: Greenlock.Greenlock;
 
   constructor(options: GatewayOptions) {
@@ -73,8 +66,7 @@ export class HTTPGateway {
     });
     this.httpServer.on('request', this.handleRequest);
     this.httpsServer.on('request', this.handleRequest);
-    this.ethRegistry = new DWEBRegistry(options.ethereum);
-    this.polyRegistry = new DWEBRegistry(options.polygon);
+    this.dweb = new DWEBRegistry({ network: options.network, provider: options.provider });
     this.greenlock = Greenlock.create({
       packageRoot: process.cwd(),
       configDir: options.certs.storageDir,
@@ -194,12 +186,7 @@ export class HTTPGateway {
       return null;
     }
     const dwebName = domain.slice(0, -1 - this.baseDomain.length);
-    let name;
-    if (await this.ethRegistry.nameExists(dwebName)) {
-      name = this.ethRegistry.name(dwebName);
-    } else {
-      name = this.polyRegistry.name(dwebName);
-    }
+    const name = this.dweb.name(dwebName);
     return (await hasResolver(name)) ? name : null;
   }
 

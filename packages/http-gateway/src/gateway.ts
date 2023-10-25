@@ -24,26 +24,13 @@ if (config.sentry_dsn) {
   addExtensionMethods();
 }
 
-const ethProvider = new providers.WebSocketProvider(config.eth_websocket_url, config.eth_network);
-const polyProvider = new providers.WebSocketProvider(
-  config.poly_websocket_url,
-  config.poly_network
-);
+const provider = new providers.WebSocketProvider(config.websocket_url, config.eth_network);
 
 setInterval(() => {
   const responseTimeout = setTimeout(() => {
     throw new Error('Ethereum provider timed out');
   }, PROVIDER_TIMEOUT);
-  ethProvider.getBlockNumber().then(() => {
-    clearTimeout(responseTimeout);
-  });
-}, KEEPALIVE_INTERVAL);
-
-setInterval(() => {
-  const responseTimeout = setTimeout(() => {
-    throw new Error('Polygon provider timed out');
-  }, PROVIDER_TIMEOUT);
-  polyProvider.getBlockNumber().then(() => {
+  provider.getBlockNumber().then(() => {
     clearTimeout(responseTimeout);
   });
 }, KEEPALIVE_INTERVAL);
@@ -51,14 +38,8 @@ setInterval(() => {
 const gateway = new HTTPGateway({
   baseDomain: config.gateway_domain,
   ipfsGatewayIp: config.ipfs_gateway,
-  ethereum: {
-    network: config.eth_network,
-    provider: ethProvider
-  },
-  polygon: {
-    network: config.poly_network,
-    provider: polyProvider
-  },
+  network: config.eth_network,
+  provider,
   certs: {
     maintainerEmail: config.cert_maintainer_email,
     storageDir: config.cert_storage_dir
