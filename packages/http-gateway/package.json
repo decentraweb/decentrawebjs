@@ -29,20 +29,17 @@
   },
   "dependencies": {
     "@decentraweb/core": "^2.0.0-alpha.4",
-    "@sentry/node": "^7.52.1",
-    "@sentry/tracing": "^7.52.1",
+    "@sentry/node": "^7.75.1",
+    "@sentry/tracing": "^7.75.1",
     "acme-http-01-webroot": "^3.0.0",
     "dotenv": "^16.0.3",
+    "ethers": "^5.7.0",
     "greenlock": "^4.0.4"
   },
   "devDependencies": {
     "@types/node": "^16.18.31",
-    "ethers": "^5.7.2",
     "nodemon": "^2.0.22",
     "rimraf": "^5.0.1",
     "typescript": "^5.0.4"
-  },
-  "peerDependencies": {
-    "ethers": "^5.7.0"
   }
 }

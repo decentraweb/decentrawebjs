@@ -54,14 +54,14 @@ export class HTTPGateway {
         this.handleSNI(name)
           .then((ctx) => {
             cb(null, ctx);
-            transaction.setStatus('ok');
+            transaction?.setStatus('ok');
           })
           .catch((e) => {
             Sentry.captureException(e);
             cb(null);
-            transaction.setStatus('unknown_error');
+            transaction?.setStatus('unknown_error');
           })
-          .then(() => transaction.finish());
+          .then(() => transaction?.finish());
       }
     });
     this.httpServer.on('request', this.handleRequest);
@@ -98,6 +98,10 @@ export class HTTPGateway {
 
   handleSNI = async (name: string): Promise<SecureContext | undefined> => {
     let site = await this.greenlock.get({ servername: name });
+    if (!name.toLowerCase().endsWith(this.baseDomain)) {
+      return undefined;
+    }
+
     if (!site) {
       const transaction = Sentry.getCurrentHub().getScope()?.getTransaction();
       const span = transaction?.startChild({ op: 'Issue certificate' });
@@ -144,12 +148,12 @@ export class HTTPGateway {
     });
     Sentry.getCurrentHub().configureScope((scope) => scope.setSpan(transaction));
     res.on('close', () => {
-      transaction.finish();
+      transaction?.finish();
     });
     const ctx = new Context(req, res);
     this._handleRequest(ctx)
       .then(() => {
-        transaction.setStatus('ok');
+        transaction?.setStatus('ok');
       })
       .catch((e) => {
         console.error(e);

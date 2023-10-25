@@ -1,4 +1,4 @@
-# Decentraweb node DNS resolver and DNS management library
+# Decentraweb DNS Resolver
 This package is DNS resolver. It supports resolving DWEB, ENS and ICANN domain names.
 
 **Resolution logic:**
