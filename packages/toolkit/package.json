@@ -31,10 +31,9 @@
     "@decentraweb/core": "^2.0.0",
     "@ensdomains/address-encoder": "^0.2.21",
     "@ensdomains/ens-contracts": "^0.0.20",
-    "@ensdomains/eth-ens-namehash": "^2.0.15",
     "dns-packet": "^5.6.0",
     "fetch-ponyfill": "^7.1.0",
-    "punycode": "^2.3.0"
+    "tr46": "^4.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.23.2",

@@ -13,7 +13,7 @@
     "build": "rimraf ./build && tsc --project tsconfig.json",
     "build:browser": "rimraf ./dist && webpack --progress --config webpack.config.cjs",
     "test:e2e": "mocha test/e2e/**/*.test.ts",
-    "watch": "tsc --watch --project tsconfig.json",
+    "watch": "rimraf ./build && tsc --watch --project tsconfig.json",
     "watch:browser": "webpack --watch --progress --config webpack.config.cjs --mode development"
   },
   "author": "",
@@ -24,7 +24,7 @@
     "bs58": "^5.0.0",
     "dns-packet": "^5.6.1",
     "fetch-ponyfill": "^7.1.0",
-    "idna-uts46-hx": "^5.1.0"
+    "tr46": "^4.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.23.2",

@@ -1,9 +1,8 @@
 import { ethers, providers } from 'ethers';
 import { formatsByName } from '@ensdomains/address-encoder';
 import { PublicResolver as publicResolverContract } from '@ensdomains/ens-contracts';
-import { hash as namehash } from '@ensdomains/eth-ens-namehash';
 import BaseDomain from '../BaseDomain';
-import { RecordSet, RecordType } from '@decentraweb/core';
+import { RecordSet, RecordType, utils } from '@decentraweb/core';
 import { dnsWireNameHash } from './utils';
 import { ENSConfig } from '../../types';
 
@@ -52,7 +51,7 @@ export class ENSDomain extends BaseDomain {
     const resolver = await this.getResolver();
     const contract = getResolverContract(resolver.address, this.config.provider);
     const data = await contract.dnsRecord(
-      namehash(this.name),
+      utils.hashName(this.name),
       dnsWireNameHash(this.name),
       RecordSet.recordType.toType(recordType)
     );

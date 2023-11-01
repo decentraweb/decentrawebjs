@@ -1,4 +1,4 @@
-import * as uts46 from 'idna-uts46-hx/dist/index.cjs';
+import { toUnicode } from 'tr46';
 import { ethers } from 'ethers';
 
 export function hashName(inputName: string) {
@@ -23,5 +23,12 @@ export function hashName(inputName: string) {
 }
 
 export function normalizeName(name: string) {
-  return name ? uts46.toUnicode(name, { useStd3ASCII: true }) : name;
+  if (!name) {
+    throw new Error(`Invalid name: ${name}`);
+  }
+  const result = toUnicode(name, { useSTD3ASCIIRules: true });
+  if (result.error) {
+    throw new Error(`Invalid name: ${name}`);
+  }
+  return result.domain;
 }
