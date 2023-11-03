@@ -1,6 +1,6 @@
-# Decentraweb node DNS resolver and DNS management library
+# Decentraweb DNS resolver service & DNS management libraries
 
-This (Lerna)[https://lerna.js.org/] (monorepo)[https://monorepo.tools/#what-is-a-monorepo] is home to [Decentraweb](https://www.decentraweb.org/) JS libraries. It contains:
+This [Lerna](https://lerna.js.org/) [monorepo](https://monorepo.tools/#what-is-a-monorepo) is home to [Decentraweb](https://www.decentraweb.org/) JS libraries. It contains:
 
 - `@decentraweb/core` - core library to interact with Decentraweb smart contracts
 - `@decentraweb/namekit` - library to read data for DWEB, ENS and classic domains
