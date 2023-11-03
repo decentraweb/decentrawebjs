@@ -9,11 +9,11 @@
 </head>
 <body>
 <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js" type="application/javascript"></script>
-<script src="https://cdn.decentraweb.org/decentraweb-toolkit-1.0.1.min.js" type="application/javascript"></script>
+<script src="https://cdn.decentraweb.org/decentraweb-namekit-2.2.0.min.js" type="application/javascript"></script>
 <script>
   window.addEventListener('load', async () => {
-    const {DwebToolkit} = Decentraweb;
-    const toolkit = new DwebToolkit({
+    const {DwebNamekit} = Decentraweb;
+    const namekit = new DwebNamekit({
       ethereum: {
         network: 'goerli',
         provider: ethers.getDefaultProvider('goerli')
@@ -23,7 +23,7 @@
         provider: ethers.getDefaultProvider('maticmum')
       }
     });
-    const domain = await toolkit.domain('serhii');
+    const domain = await namekit.domain('serhii');
     if (domain) {
       const domainProvider = domain.provider;
       console.log('domainProvider', domainProvider);

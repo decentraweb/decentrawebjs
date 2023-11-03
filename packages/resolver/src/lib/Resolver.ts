@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer';
 import { DNSRecord } from '@decentraweb/core';
-import DwebToolkit, { ApiProviderConfig, ToolkitConfig } from '@decentraweb/toolkit';
+import DwebNamekit, { ApiProviderConfig, NamekitConfig } from '@decentraweb/namekit';
 import dgram from 'dgram';
 import * as dnsPacket from 'dns-packet';
 import * as punycode from 'punycode/';
@@ -43,7 +43,7 @@ function createLogger(): Logger {
 }
 
 export interface ResolverConfig {
-  blockchain: ToolkitConfig | ApiProviderConfig;
+  blockchain: NamekitConfig | ApiProviderConfig;
   ipfsGateway: {
     A: string[];
     AAAA: string[];
@@ -54,11 +54,11 @@ export type DomainProvider = 'dweb' | 'ens' | 'icann';
 
 class Resolver {
   protected options: ResolverConfig;
-  protected toolkit: DwebToolkit;
+  protected namekit: DwebNamekit;
 
   constructor(options: ResolverConfig) {
     this.options = options;
-    this.toolkit = new DwebToolkit(this.options.blockchain);
+    this.namekit = new DwebNamekit(this.options.blockchain);
   }
 
   async processRequest(data: Buffer): Promise<Buffer | null> {
@@ -113,7 +113,7 @@ class Resolver {
         ];
       }
     }
-    const provider = await this.toolkit.getDomainProvider(domain);
+    const provider = await this.namekit.getDomainProvider(domain);
     switch (provider) {
       case 'ens':
       case 'dweb':
@@ -153,7 +153,7 @@ class Resolver {
     if (domain.includes('_')) {
       return [];
     }
-    const name = await this.toolkit.domain(domain);
+    const name = await this.namekit.domain(domain);
     if (!name) {
       return [];
     }
@@ -177,7 +177,7 @@ class Resolver {
   }
 
   async emulateDNSLink(domain: string): Promise<DNSRecord[]> {
-    const name = await this.toolkit.domain(domain.replace(/^_dnslink./i, ''));
+    const name = await this.namekit.domain(domain.replace(/^_dnslink./i, ''));
     if (!name) {
       return [];
     }

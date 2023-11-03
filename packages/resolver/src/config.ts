@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { ApiProvider } from '@decentraweb/toolkit';
+import { ApiProvider } from '@decentraweb/namekit';
 
 dotenv.config();
 

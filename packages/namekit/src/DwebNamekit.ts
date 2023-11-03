@@ -1,5 +1,5 @@
 import { EthereumAddress } from './EthereumAddress';
-import { ApiProviderConfig, isApiProviderConfig, ToolkitConfig } from './types';
+import { ApiProviderConfig, isApiProviderConfig, NamekitConfig } from './types';
 import ICANNDomain from './domain/ICANNDomain';
 import ENSDomain from './domain/ENSDomain';
 import DWEBDomain from './domain/DWEBDomain';
@@ -11,13 +11,13 @@ import { DWEBRegistry } from '@decentraweb/core';
  * Helper class to resolve data for Decentraweb, ENS and classic domains.
  *
  */
-export class DwebToolkit {
+export class DwebNamekit {
   readonly address: EthereumAddress;
-  readonly config: ToolkitConfig;
+  readonly config: NamekitConfig;
   readonly ethRegistry: DWEBRegistry;
   readonly polygonRegistry: DWEBRegistry;
 
-  constructor(config: ToolkitConfig | ApiProviderConfig) {
+  constructor(config: NamekitConfig | ApiProviderConfig) {
     if (isApiProviderConfig(config)) {
       this.config = {
         ...getProviders(config),
@@ -63,4 +63,4 @@ export class DwebToolkit {
   }
 }
 
-export default DwebToolkit;
+export default DwebNamekit;
