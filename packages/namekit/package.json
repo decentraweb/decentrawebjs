@@ -6,6 +6,9 @@
   "license": "ISC",
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "config": {
+    "access": "public"
+  },
   "files": [
     "README.md",
     "build/"
