@@ -6,7 +6,7 @@
   "license": "ISC",
   "main": "build/index.js",
   "types": "build/index.d.ts",
-  "config": {
+  "publishConfig": {
     "access": "public"
   },
   "files": [
