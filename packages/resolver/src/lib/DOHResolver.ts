@@ -195,7 +195,7 @@ class DOHResolver extends Resolver {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(
       JSON.stringify({
-        provider: await this.toolkit.getDomainProvider(name),
+        provider: await this.namekit.getDomainProvider(name),
         result: data
       })
     );

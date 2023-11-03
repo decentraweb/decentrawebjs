@@ -27,7 +27,7 @@
   "license": "ISC",
   "dependencies": {
     "@decentraweb/core": "^2.1.0",
-    "@decentraweb/toolkit": "^2.1.0",
+    "@decentraweb/namekit": "^2.1.0",
     "bs58": "^5.0.0",
     "dns-packet": "^5.6.0",
     "dotenv": "^16.0.3",
