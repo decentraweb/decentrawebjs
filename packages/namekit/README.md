@@ -58,7 +58,7 @@ In most cases importing library using `npm` is preferred way, but for fast proto
 ```html
 
 <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js" type="application/javascript"></script>
-<script src="https://cdn.decentraweb.org/decentraweb-namekit-2.2.0.min.js" type="application/javascript"></script>
+<script src="https://cdn.decentraweb.org/decentraweb-namekit-2.2.1.min.js" type="application/javascript"></script>
 <script>
   window.addEventListener('load', async () => {
     const {DwebNamekit} = Decentraweb;
