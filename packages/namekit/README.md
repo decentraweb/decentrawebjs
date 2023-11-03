@@ -1,9 +1,9 @@
-# Decentraweb Toolkit
-Toolkit package intended to allow app developers to seamlessly integrate decentralized name systems into their apps.
+# Decentraweb Namekit
+Namekit package intended to allow app developers to seamlessly integrate decentralized name systems into their apps.
 Right now it has support for [ENS](https://ens.domains/), [Decentraweb](https://www.decentraweb.org/) and limited support
 of classic DNS system.
 
-For now Toolkit only support reading data. If you need to manage domain data, please check 
+For now Namekit only support reading data. If you need to manage domain data, please check 
 [@decentraweb/core](https://www.npmjs.com/package/@decentraweb/core) or one of [ENS libraries](https://docs.ens.domains/dapp-developer-guide/ens-libraries). 
 
 ## Domain resolution logic
@@ -17,22 +17,22 @@ List of ICANN domains can be found [here](https://data.iana.org/TLD/tlds-alpha-b
 **Important Note:** This logic may change in the future.
 
 ## Installation and initialization
-To install library run `npm install --save @decentraweb/toolkit ethers@5` in your project directory.
+To install library run `npm install --save @decentraweb/namekit ethers@5` in your project directory.
 
-Toolkit uses [ethers.js](https://docs.ethers.io/v5/) to call Ethereum contracts. It is required as peer dependency.
+Namekit uses [ethers.js](https://docs.ethers.io/v5/) to call Ethereum contracts. It is required as peer dependency.
 
-Decentraweb supports both Ethereum and Polygon networks. Toolkit will automatically detect which network to use based on
-where domain name is located currently. To initialize Toolkit instance you need to pass Ethereum and Polygon network 
+Decentraweb supports both Ethereum and Polygon networks. Namekit will automatically detect which network to use based on
+where domain name is located currently. To initialize Namekit instance you need to pass Ethereum and Polygon network 
 name (`mainnet` is used with 'matic' and `goerli` is used with 'maticmum') and ethers.js providers for each network. 
 ```typescript
 import {providers, Wallet} from "ethers";
-import DwebToolkit, {ToolkitConfig} from "@decentraweb/toolkit";
+import DwebNamekit, {NamekitConfig} from "@decentraweb/namekit";
 
 const ETH_NETWORK = 'goerli';
 const ETH_JSONRPC_URL = 'https://goerli.infura.io/v3/00000000000000000000000000000000';
 const POLYGON_NETWORK = 'maticmum';
 const POLYGON_JSONRPC_URL = 'https://polygon-mumbai.infura.io/v3/00000000000000000000000000000000';
-const config: ToolkitConfig = {
+const config: NamekitConfig = {
   ethereum: {
     network: ETH_NETWORK,
     provider: new providers.JsonRpcProvider(ETH_JSONRPC_URL, ETH_NETWORK),
@@ -42,34 +42,34 @@ const config: ToolkitConfig = {
     provider: new providers.JsonRpcProvider(POLYGON_JSONRPC_URL, POLYGON_NETWORK)
   }
 };
-const toolkit = new DwebToolkit(config);
+const namekit = new DwebNamekit(config);
 ```
-Alternatively, if you use one of supported providers, you can initialize Toolkit in a simpler way:
+Alternatively, if you use one of supported providers, you can initialize Namekit in a simpler way:
 ```typescript
-const config: ToolkitConfig = {
+const config: NamekitConfig = {
   apiProvider: 'infura', //Supported providers: 'etherscan', 'infura', 'alchemy', 'cloudflare', 'pocket', 'ankr'
   apiKey: '00000000000000000000000000000000', //
   production: false //If true, then mainnet and matic networks will be used, otherwise goerli and maticmum
 };
-const toolkit = new DwebToolkit(config);
+const namekit = new DwebNamekit(config);
 ```
 ### Browser bundle
 In most cases importing library using `npm` is preferred way, but for fast prototyping you can load it from our CND:
 ```html
 
 <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js" type="application/javascript"></script>
-<script src="https://cdn.decentraweb.org/decentraweb-toolkit-2.0.0.min.js" type="application/javascript"></script>
+<script src="https://cdn.decentraweb.org/decentraweb-namekit-2.2.0.min.js" type="application/javascript"></script>
 <script>
   window.addEventListener('load', async () => {
-    const {DwebToolkit} = Decentraweb;
-    const toolkit = new DwebToolkit({
+    const {DwebNamekit} = Decentraweb;
+    const namekit = new DwebNamekit({
       ethereum: {
-        network: 'goerli',
-        provider: ethers.getDefaultProvider('goerli')
+        network: 'mainnet',
+        provider: ethers.getDefaultProvider('mainnet')
       },
       polygon: {
-        network: 'maticmum',
-        provider: ethers.getDefaultProvider('maticmum')
+        network: 'matic',
+        provider: ethers.getDefaultProvider('matic')
       }
     })
 </script>
@@ -77,7 +77,7 @@ In most cases importing library using `npm` is preferred way, but for fast proto
 ## Resolve Ethereum address to name
 Ethereum address can be resolved through both Decentraweb and ENS contracts or through one specified system.
 ```typescript
-const names = await toolkit.address.resolve('0x4323E6b155BCf0b25f8c4C0B37dA808e3550b521');
+const names = await namekit.address.resolve('0x4323E6b155BCf0b25f8c4C0B37dA808e3550b521');
 /*
 Returns:
 [
@@ -86,28 +86,28 @@ Returns:
 ]
 */
 //To query Decentraweb only
-const dwebName = await toolkit.address.resolve('0x4323E6b155BCf0b25f8c4C0B37dA808e3550b521', 'dweb');
+const dwebName = await namekit.address.resolve('0x4323E6b155BCf0b25f8c4C0B37dA808e3550b521', 'dweb');
 /*
 Returns: 'vitalik'
 */
 // Alternatively to query ENS
-const ensName = await toolkit.address.resolve('0x4323E6b155BCf0b25f8c4C0B37dA808e3550b521', 'ens');
+const ensName = await namekit.address.resolve('0x4323E6b155BCf0b25f8c4C0B37dA808e3550b521', 'ens');
 /*
 Returns: 'vitalik.eth'
 */
 
 ```
 ## Resolve name to Ethereum address
-In this case Toolkit will detect which domain name system name belongs to and will look for Ethereum address associated 
+In this case Namekit will detect which domain name system name belongs to and will look for Ethereum address associated 
 with given name. Note that classic domains will always return `null`.
 ```typescript
-const address = await toolkit.address.lookup('vitalik');
+const address = await namekit.address.lookup('vitalik');
 /*
 Returns: '0x4323E6b155BCf0b25f8c4C0B37dA808e3550b521'
 */
 ```
 ## Reading extended domain data
-By calling `toolkit.domain(domainName)` you can get instance of class that will allow to read extended data associated
+By calling `namekit.domain(domainName)` you can get instance of class that will allow to read extended data associated
 with domain name. Depending on domain name provider you will get either `DWEBDomain`, `ENSDomain` or `ICANNDomain` instance.
 Below you can see feature support table for different domain name systems.
 
@@ -121,7 +121,7 @@ Below you can see feature support table for different domain name systems.
 1. supported through [DNSLink](https://dnslink.dev/)
 
 ```typescript
-const domain = await toolkit.domain('vitalik');
+const domain = await namekit.domain('vitalik');
 if (domain) {
   const domainProvider = domain.provider; // 'ens'
   const ethAddress = await domain.address('ETH'); // '0x4323E6b155BCf0b25f8c4C0B37dA808e3550b521'

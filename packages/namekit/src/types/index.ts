@@ -33,7 +33,7 @@ export interface ProviderSet {
   };
 }
 
-export interface ToolkitConfig extends ProviderSet {
+export interface NamekitConfig extends ProviderSet {
   dnsServer?: string;
 }
 

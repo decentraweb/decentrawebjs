@@ -1,6 +1,6 @@
 import { utils } from 'ethers';
 import { getDomainProvider } from './lib/getDomainProvider';
-import { DomainProvider, ToolkitConfig } from './types';
+import { DomainProvider, NamekitConfig } from './types';
 import { DWEBRegistry } from '@decentraweb/core';
 
 interface ResolutionResult {
@@ -9,12 +9,12 @@ interface ResolutionResult {
 }
 
 export class EthereumAddress {
-  readonly ethereum: ToolkitConfig['ethereum'];
-  readonly polygon: ToolkitConfig['polygon'];
+  readonly ethereum: NamekitConfig['ethereum'];
+  readonly polygon: NamekitConfig['polygon'];
   protected ethRegistry: DWEBRegistry;
   protected polygonRegistry: DWEBRegistry;
 
-  constructor(options: ToolkitConfig) {
+  constructor(options: NamekitConfig) {
     this.ethereum = options.ethereum;
     this.polygon = options.polygon;
     this.ethRegistry = new DWEBRegistry(options.ethereum);
