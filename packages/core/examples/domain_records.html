@@ -49,7 +49,7 @@
     }
 
     function renderRow(label, value) {
-      return `<tr><th scope="row">${label}</th><td>${value}</td></tr>`;
+      return `<tr><th scope="row">${label}</th><td>${value || '<em>not set</em>'}</td></tr>`;
     }
 
     async function readDomainRecords(event) {
@@ -94,14 +94,25 @@
       overlay.querySelector('h4').innerText = message;
     }
 
+    function readHashtag(){
+      const hashtag = window.location.hash || '#';
+      const domain = hashtag.substring(1);
+      if(domain){
+        document.getElementById('resolution-name').value = domain;
+        document.getElementById('submit-trigger').click();
+      }
+    }
+
 
     window.addEventListener('load', () => {
+      window.addEventListener('hashchange', readHashtag);
+      document.getElementById('resolution-form').addEventListener('submit', readDomainRecords);
       if (window.ethereum) {
         connectWallet();
       } else {
         alert('Please install MetaMask');
       }
-      document.getElementById('resolution-form').addEventListener('submit', readDomainRecords);
+      setTimeout(readHashtag, 100);
     });
 
   })();
@@ -113,7 +124,7 @@
       <label for="resolution-name" class="form-label">Domain Name:</label>
       <input id="resolution-name" class="form-control" type="text" name="name" placeholder="Name" required/>
     </div>
-    <button class="btn btn-primary" type="submit">Read records</button>
+    <button id="submit-trigger" class="btn btn-primary" type="submit">Read records</button>
   </form>
   <table id="domain-records" class="table">
     <tbody>

@@ -83,7 +83,9 @@
         const tx = await registrar.finishRegistration(approvedRegistration);
         toggleProgress(true, '2/2 Awaiting transaction confirmation...');
         await tx.wait(1);
-        alert(`Domain name ${subdomain}.${name} registered successfully`);
+        const domain = `${subdomain}.${name}`;
+        alert(`Domain name ${domain} registered successfully`);
+        window.location.href = './domain_records.html#' + domain;
       } catch (e) {
         alert(e.message);
       }
