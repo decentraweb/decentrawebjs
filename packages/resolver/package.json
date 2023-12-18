@@ -9,7 +9,7 @@
   "types": "build/index.d.js",
   "scripts": {
     "build": "tsc",
-    "prepare": "npm run build",
+    "prepublish": "npm run build",
     "start": "node build/resolver.js",
     "watch:ts": "tsc --watch",
     "watch:js": "nodemon --watch build build/resolver.js",

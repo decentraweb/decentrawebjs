@@ -11,7 +11,7 @@
     "url": "git+https://github.com/decentraweb/decentrawebjs.git"
   },
   "scripts": {
-    "prepare": "npm run build",
+    "prepublish": "npm run build",
     "build": "tsc",
     "build:browser": "webpack --progress --config webpack.config.js",
     "watch": "tsc --watch",

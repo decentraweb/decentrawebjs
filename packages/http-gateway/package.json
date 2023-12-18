@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "prepare": "npm run build",
+    "prepublish": "npm run build",
     "start": "node build/gateway.js",
     "watch:ts": "tsc --watch",
     "watch:js": "nodemon --watch build build/gateway.js"
