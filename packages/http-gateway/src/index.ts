@@ -8,7 +8,7 @@ import * as https from 'https';
 import resolveDNS, { DNSResult } from './lib/resolveDNS';
 import { hasResolver } from './lib/hasResolver';
 import { createSecureContext, SecureContext } from 'tls';
-import {errorPage} from "./lib/errorPage";
+import { errorPage } from './lib/errorPage';
 
 export interface GatewayOptions {
   baseDomain: string;
@@ -100,6 +100,10 @@ export class HTTPGateway {
     let site = await this.greenlock.get({ servername: name });
     if (!site) {
       const transaction = Sentry.getCurrentHub().getScope()?.getTransaction();
+      const dwebName = await this.getDwebName(name);
+      if (!dwebName) {
+        return;
+      }
       const span = transaction?.startChild({ op: 'Issue certificate' });
       try {
         await this.greenlock.add({
@@ -167,7 +171,7 @@ export class HTTPGateway {
       transaction?.setData('domain', ctx.hostname);
       return this.handleAcmeChallenge(ctx);
     }
-    if(ctx.hostname === this.baseDomain) {
+    if (ctx.hostname === this.baseDomain) {
       return this.homePage(ctx);
     }
     const name = await this.getDwebName(ctx.hostname);
@@ -192,50 +196,58 @@ export class HTTPGateway {
 
   homePage(ctx: Context) {
     ctx.res.statusCode = 200;
-    ctx.res.write(errorPage(
-      'Web2 Bridge',
-      `
+    ctx.res.write(
+      errorPage(
+        'Web2 Bridge',
+        `
         <p>This service allow you to access Decentraweb domains with regular browser.
          More details <a href="https://docs.decentraweb.org/welcome/publishing/using-the-dwebs.to-web2-bridge">here</a>.</p>
       `
-    ));
+      )
+    );
     ctx.res.end();
   }
 
   domainNotFound(ctx: Context) {
     const dwebName = ctx.hostname.slice(0, -1 - this.baseDomain.length);
     ctx.res.statusCode = 404;
-    ctx.res.write(errorPage(
-      'Name not registered',
-      `
+    ctx.res.write(
+      errorPage(
+        'Name not registered',
+        `
         <p>The domain name "${dwebName}" is not registered in Decentraweb system.</p>
         <p>You can check and register it <a href="https://dns.decentraweb.org/search/${dwebName}">here</a>.</p>
       `
-    ));
+      )
+    );
     ctx.res.end();
   }
 
   noContent(ctx: Context) {
     const dwebName = ctx.hostname.slice(0, -1 - this.baseDomain.length);
     ctx.res.statusCode = 404;
-    ctx.res.write(errorPage(
-      'No content',
-      `
+    ctx.res.write(
+      errorPage(
+        'No content',
+        `
         <p>The domain name "${dwebName}" has no IPFS or DNS records set.</p>
         <p>If you are the owner, you can set IPFS hash or DNS records <a href="https://dns.decentraweb.org/name/${dwebName}">here</a>.</p>
       `
-    ));
+      )
+    );
     ctx.res.end();
   }
 
   showError(ctx: Context) {
     ctx.res.statusCode = 500;
-    ctx.res.write(errorPage(
-      'Unexpected error',
-      `
+    ctx.res.write(
+      errorPage(
+        'Unexpected error',
+        `
         <p>Something went wrong. Please try again later</p>
       `
-    ));
+      )
+    );
     ctx.res.end();
   }
 
