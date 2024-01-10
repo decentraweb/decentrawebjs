@@ -54,7 +54,7 @@ abstract class BaseRegistrar extends DwebContractWrapper {
   }
 
   /**
-   * Approve the DWEB token amount that can be used by the registrar contract
+   * Approve the DWEB/WETH token amount that can be used by the registrar contract
    * @param token - token name. WETH is only supported on the Polygon network
    * @param amount - amount in wei
    */
@@ -77,6 +77,44 @@ abstract class BaseRegistrar extends DwebContractWrapper {
           value: '0x00'
         });
         return tx.wait(1);
+      }
+    }
+  }
+
+  /**
+   * Get DWEB/WETH token amount that can be used by the registrar contract
+   * @param token - token name. WETH is only supported on the Polygon network
+   */
+  async getTokenAllowance(token: 'WETH' | 'DWEB'): Promise<BigNumber> {
+    const signerAddress = await this.signer.getAddress();
+    switch (token) {
+      case 'DWEB': {
+        return this.dwebToken.allowance(signerAddress, this.contract.address);
+      }
+      case 'WETH': {
+        if (!this.isMatic) {
+          throw new Error('WETH is only supported on the Polygon network');
+        }
+        return this.wethToken?.allowance(signerAddress, this.contract.address);
+      }
+    }
+  }
+
+  /**
+   * Get DWEB/WETH token balance of the signer
+   * @param token - token name. WETH is only supported on the Polygon network
+   */
+  async getTokenBalance(token: 'DWEB' | 'WETH'): Promise<BigNumber> {
+    const signerAddress = await this.signer.getAddress();
+    switch (token) {
+      case 'DWEB': {
+        return this.dwebToken.balanceOf(signerAddress, this.contract.address);
+      }
+      case 'WETH': {
+        if (!this.isMatic) {
+          throw new Error('WETH is only supported on the Polygon network');
+        }
+        return this.wethToken?.balanceOf(signerAddress, this.contract.address);
       }
     }
   }
