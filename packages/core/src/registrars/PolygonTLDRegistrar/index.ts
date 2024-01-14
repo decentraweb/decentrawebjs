@@ -10,6 +10,7 @@ import BaseRegistrar, { RegistrarConfig } from '../BaseRegistrar';
 import { getWethContract } from '../../contracts';
 import { PolygonNetwork } from '../../types/common';
 import { normalizeName } from '../../utils';
+import { InsufficientAllowanceError, InsufficientBalanceError } from '../../errors';
 
 interface Config extends RegistrarConfig {
   network: PolygonNetwork;
@@ -59,7 +60,7 @@ class PolygonTLDRegistrar extends BaseRegistrar {
     const entries = normalizeDomainEntries(request);
     const { error, safePrice } = await this.verifySignerBalance(entries, isFeesInDweb);
     if (error) {
-      throw new Error(error);
+      throw error;
     }
     const nameOwner = owner ? ethers.utils.getAddress(owner) : await this.signer.getAddress();
     const names = entries.map((e) => e.name);
@@ -138,11 +139,11 @@ class PolygonTLDRegistrar extends BaseRegistrar {
 
     if (balance.lt(safePrice)) {
       result.success = false;
-      result.error = `Insufficient ${result.currency} balance. ${safePrice} wei needed, ${balance} wei found.`;
+      result.error = new InsufficientBalanceError(balance, safePrice, result.currency);
     }
     if (allowance.lt(safePrice)) {
       result.success = false;
-      result.error = `Insufficient ${result.currency} allowance. ${safePrice} wei needed, ${allowance} wei approved.`;
+      result.error = new InsufficientAllowanceError(allowance, safePrice, result.currency);
     }
     return result;
   }

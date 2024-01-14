@@ -1,5 +1,6 @@
 import { Price } from './common';
 import { SubdomainApproval } from '../../api';
+import { DwebError } from '../../errors';
 
 /**
  * Subdomain registration entry for registering subdomains for staked domains. Domain owned may specify if subdomains
@@ -59,5 +60,5 @@ export interface SubdomainBalanceVerificationResult extends SubdomainFees {
   /** If true, signer balance is enough to pay for registration */
   success: boolean;
   /** If success is false, error message will be set */
-  error: string | null;
+  error: DwebError | null;
 }

@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers';
+import { DwebError } from '../../errors';
 
 /**
  * Top level domain registration entry
@@ -15,7 +16,7 @@ export interface TLDEntry {
  */
 export interface TLDBalanceVerificationResult {
   success: boolean;
-  error: string | null;
+  error: DwebError | null;
   /** Registration fee in wei. */
   price: BigNumber;
   /** Registration fee in wei + 10%. Used to prevent failed transactions due to price fluctuations. */

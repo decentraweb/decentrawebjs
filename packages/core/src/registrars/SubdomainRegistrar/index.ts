@@ -14,6 +14,7 @@ import { normalizeDuration } from '../utils';
 import BaseRegistrar from '../BaseRegistrar';
 import { SubdomainApproval } from '../../api';
 import { hashName, normalizeName } from '../../utils';
+import { InsufficientAllowanceError, InsufficientBalanceError } from '../../errors';
 
 /**
  * Class that handles subdomain registration.
@@ -103,7 +104,7 @@ class SubdomainRegistrar extends BaseRegistrar {
       serviceFee
     } = await this.verifySignerBalance(approval, isFeeInDWEB);
     if (priceError) {
-      throw new Error(priceError);
+      throw priceError;
     }
 
     let baseCurrencyAmount = serviceFee.amount;
@@ -170,7 +171,11 @@ class SubdomainRegistrar extends BaseRegistrar {
 
     if (baseBalance.lt(safeBaseBalance)) {
       result.success = false;
-      result.error = `Insufficient ${serviceFee.currency} balance. ${safeBaseBalance} wei needed, ${baseBalance} wei found.`;
+      result.error = new InsufficientBalanceError(
+        baseBalance,
+        safeBaseBalance,
+        serviceFee.currency
+      );
       return result;
     }
 
@@ -181,12 +186,20 @@ class SubdomainRegistrar extends BaseRegistrar {
       ]);
       if (feeTokenBalance.lt(ownerFee.amount)) {
         result.success = false;
-        result.error = `Insufficient ${ownerFee.currency} balance. ${ownerFee.amount} wei needed, ${feeTokenBalance} wei found.`;
+        result.error = new InsufficientBalanceError(
+          feeTokenBalance,
+          ownerFee.amount,
+          ownerFee.currency
+        );
         return result;
       }
       if (feeTokenAllowance.lt(ownerFee.amount)) {
         result.success = false;
-        result.error = `Insufficient ${ownerFee.currency} allowance. ${ownerFee.amount} wei needed, ${feeTokenAllowance} wei approved.`;
+        result.error = new InsufficientAllowanceError(
+          feeTokenAllowance,
+          ownerFee.amount,
+          ownerFee.currency
+        );
         return result;
       }
     }

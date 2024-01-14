@@ -7,6 +7,7 @@ import { normalizeDomainEntries, normalizeDuration } from '../utils';
 import { APPROVAL_TTL, REGISTRATION_WAIT } from '../constants';
 import BaseRegistrar from '../BaseRegistrar';
 import { normalizeName } from '../../utils';
+import { InsufficientAllowanceError, InsufficientBalanceError } from '../../errors';
 
 export type {
   ApprovedRegistration,
@@ -117,7 +118,7 @@ export class EthereumTLDRegistrar extends BaseRegistrar {
     const { error: priceError, safePrice } = await this.verifySignerBalance(request, isFeesInDweb);
 
     if (priceError) {
-      throw new Error(priceError);
+      throw priceError;
     }
 
     return this.contract.registerWithConfigBatch(
@@ -161,15 +162,15 @@ export class EthereumTLDRegistrar extends BaseRegistrar {
     if (isFeesInDweb) {
       if (dwebBalance.lt(safePrice)) {
         result.success = false;
-        result.error = `Insufficient DWEB balance. ${safePrice} wei needed, ${dwebBalance} wei found.`;
+        result.error = new InsufficientBalanceError(dwebBalance, safePrice, 'DWEB');
       }
       if (dwebAllowance.lt(safePrice)) {
         result.success = false;
-        result.error = `Insufficient DWEB allowance. ${safePrice} wei needed, ${dwebAllowance} wei approved.`;
+        result.error = new InsufficientAllowanceError(dwebAllowance, safePrice, 'DWEB');
       }
     } else if (ethBalance.lt(safePrice)) {
       result.success = false;
-      result.error = `Insufficient Ethereum funds. ${safePrice.toString()} wei needed, ${ethBalance.toString()} wei found.`;
+      result.error = new InsufficientBalanceError(ethBalance, safePrice, 'ETH');
     }
 
     return result;
