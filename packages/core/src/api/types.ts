@@ -139,3 +139,8 @@ export interface PriceConversionResult {
   dweb: BigNumber;
   matic?: BigNumber;
 }
+
+export interface DomainFromHashRes {
+  name: string;
+  success: boolean;
+}

@@ -1,5 +1,6 @@
 import { BigNumber, ethers } from 'ethers';
 import {
+  DomainFromHashRes,
   EthSubdomainApprovalPayload,
   PolySubdomainApprovalPayload,
   PolyTLDCommitmentPayload,
@@ -191,6 +192,11 @@ export class DecentrawebAPI {
         chainid: this.chainId
       }
     );
+  }
+
+  async domainFromHash(hash: string): Promise<string | null> {
+    const data = await this.get<DomainFromHashRes>(`/api/v1/domain-from-hash/${hash}`, {});
+    return data.success ? data.name : null;
   }
 
   private async get<R>(path: string, query: Record<string, string>): Promise<R> {
