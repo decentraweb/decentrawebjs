@@ -6,6 +6,7 @@ import { isValidDomain } from './utils/dns';
 import { DwebConfig } from './types/common';
 import DwebContractWrapper, { requiresSigner } from './DwebContractWrapper';
 import { hashName } from './utils';
+import DecentrawebGraph from './graph';
 
 export default class DWEBRegistry extends DwebContractWrapper {
   constructor(options: DwebConfig) {
@@ -114,5 +115,16 @@ export default class DWEBRegistry extends DwebContractWrapper {
       network: this.network
     });
     return reverseRegistrar.setName(name);
+  }
+
+  /**
+   * Get all domains owned by address on current network
+   * @param address - Ethereum address
+   * @param skip
+   * @param limit
+   */
+  getOwnedDomains(address: string, skip: number, limit: number) {
+    const graph = new DecentrawebGraph(this.network);
+    return graph.getOwnedDomains(address, skip, limit);
   }
 }
