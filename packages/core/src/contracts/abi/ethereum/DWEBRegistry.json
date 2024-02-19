@@ -152,6 +152,19 @@
   },
   {
     "inputs": [],
+    "name": "GRACE_PERIOD",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "approverAddress",
     "outputs": [
       {
@@ -185,44 +198,76 @@
   {
     "inputs": [
       {
-        "internalType": "bytes32[]",
-        "name": "node",
-        "type": "bytes32[]"
-      },
-      {
-        "internalType": "bytes32[]",
-        "name": "label",
-        "type": "bytes32[]"
-      },
-      {
-        "internalType": "address[]",
-        "name": "owner",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256",
-        "name": "chainId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "expiry",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint8",
-        "name": "v",
-        "type": "uint8"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "r",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "s",
-        "type": "bytes32"
+        "components": [
+          {
+            "internalType": "bytes32[]",
+            "name": "node",
+            "type": "bytes32[]"
+          },
+          {
+            "internalType": "bytes32[]",
+            "name": "label",
+            "type": "bytes32[]"
+          },
+          {
+            "internalType": "address[]",
+            "name": "parentOwner",
+            "type": "address[]"
+          },
+          {
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "chainId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "expiry",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "durations",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "bool",
+            "name": "isFeeInDWEBToken",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "fee",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "renewalFee",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint8",
+            "name": "v",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "r",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "s",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct Common.CreateSubnodeParam",
+        "name": "createSubnodeParam",
+        "type": "tuple"
       }
     ],
     "name": "createSubnodeBatch",
@@ -270,12 +315,12 @@
         "type": "bytes32[]"
       }
     ],
-    "name": "domainExpiredBatch",
+    "name": "domainExpiryBatch",
     "outputs": [
       {
-        "internalType": "bool[]",
+        "internalType": "uint256[]",
         "name": "",
-        "type": "bool[]"
+        "type": "uint256[]"
       }
     ],
     "stateMutability": "view",
@@ -305,7 +350,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "owner",
+        "name": "domainOwner",
         "type": "address"
       },
       {
@@ -328,29 +373,76 @@
   {
     "inputs": [
       {
-        "internalType": "bytes32[]",
-        "name": "node",
-        "type": "bytes32[]"
-      },
-      {
-        "internalType": "bytes32[]",
-        "name": "label",
-        "type": "bytes32[]"
-      },
-      {
-        "internalType": "address[]",
-        "name": "owner",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256",
-        "name": "chainId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "expiry",
-        "type": "uint256"
+        "components": [
+          {
+            "internalType": "bytes32[]",
+            "name": "node",
+            "type": "bytes32[]"
+          },
+          {
+            "internalType": "bytes32[]",
+            "name": "label",
+            "type": "bytes32[]"
+          },
+          {
+            "internalType": "address[]",
+            "name": "parentOwner",
+            "type": "address[]"
+          },
+          {
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "chainId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "expiry",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "durations",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "bool",
+            "name": "isFeeInDWEBToken",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "fee",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "renewalFee",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint8",
+            "name": "v",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "r",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "s",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct Common.CreateSubnodeParam",
+        "name": "createSubnodeParam",
+        "type": "tuple"
       }
     ],
     "name": "makeSubdomainCommitmentBatch",
@@ -380,6 +472,44 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "tldTokenId",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "tldExpiries",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "parent",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "label",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "sldExpiries",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "mintFromBridge",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes32",
         "name": "node",
         "type": "bytes32"
@@ -407,53 +537,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32[]",
-        "name": "nodes",
-        "type": "bytes32[]"
-      }
-    ],
-    "name": "ownerBatch",
-    "outputs": [
-      {
-        "internalType": "address[]",
-        "name": "",
-        "type": "address[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_reverseRegistrar",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_defaultReverseResolver",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_defaultResolver",
-        "type": "address"
-      },
-      {
-        "internalType": "uint32",
-        "name": "_defaultTTL",
-        "type": "uint32"
-      }
-    ],
-    "name": "postUpgradeInit",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -598,9 +681,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint32",
+        "internalType": "uint64",
         "name": "_defaultTTL",
-        "type": "uint32"
+        "type": "uint64"
       }
     ],
     "name": "setDefaultTTL",
@@ -630,7 +713,7 @@
       },
       {
         "internalType": "address",
-        "name": "owner",
+        "name": "domainOwner",
         "type": "address"
       },
       {
@@ -663,17 +746,17 @@
       },
       {
         "internalType": "address",
-        "name": "owner",
+        "name": "domainOwner",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "resolver",
+        "name": "domainResolver",
         "type": "address"
       },
       {
         "internalType": "uint64",
-        "name": "ttl",
+        "name": "domainTTL",
         "type": "uint64"
       },
       {
@@ -706,7 +789,7 @@
       },
       {
         "internalType": "address",
-        "name": "resolver",
+        "name": "domainResolver",
         "type": "address"
       }
     ],
@@ -724,12 +807,12 @@
       },
       {
         "internalType": "address",
-        "name": "resolver",
+        "name": "domainResolver",
         "type": "address"
       },
       {
         "internalType": "uint64",
-        "name": "ttl",
+        "name": "domainTTL",
         "type": "uint64"
       }
     ],
@@ -747,7 +830,7 @@
       },
       {
         "internalType": "address",
-        "name": "owner",
+        "name": "domainOwner",
         "type": "address"
       }
     ],
@@ -771,17 +854,17 @@
       },
       {
         "internalType": "address",
-        "name": "owner",
+        "name": "domainOwner",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "resolver",
+        "name": "domainResolver",
         "type": "address"
       },
       {
         "internalType": "uint64",
-        "name": "ttl",
+        "name": "domainTTL",
         "type": "uint64"
       }
     ],
@@ -799,7 +882,7 @@
       },
       {
         "internalType": "uint64",
-        "name": "ttl",
+        "name": "domainTTL",
         "type": "uint64"
       }
     ],

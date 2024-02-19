@@ -1,4 +1,4 @@
-import { ethers, providers } from 'ethers';
+import { BigNumber, ethers, providers } from 'ethers';
 import { formatsByName } from '@ensdomains/address-encoder';
 import { decode, encode } from './utils/content';
 import { dnsWireNameHash } from './utils/dns';
@@ -69,8 +69,13 @@ export default class DWEBName {
     return !!resolverArrd;
   }
 
-  async getTTL() {
-    return this.registryContract.ttl(this.namehash);
+  /**
+   * Get time to live for the records in seconds.
+   * Note that DNS records have TTL specified in the records themselves.
+   */
+  async getTTL(): Promise<number> {
+    const ttl = (await this.registryContract.ttl(this.namehash)) as BigNumber;
+    return ttl.toNumber();
   }
 
   /**
@@ -164,6 +169,72 @@ export default class DWEBName {
       addressAsBytes = decoder(address);
     }
     return Resolver['setAddr(bytes32,uint256,bytes)'](this.namehash, coinType, addressAsBytes);
+  }
+
+  /**
+   * Get multiple coin addresses associated with name
+   * @param coinIds - array of coinIds `['ETH', 'BTC']`
+   */
+  async getAddressBatch(
+    coinIds: string[]
+  ): Promise<{ id: string; type: number; success: boolean; address: string }[]> {
+    const Resolver = await this.getResolver();
+    if (!Resolver) {
+      throw new Error(`No resolver found for name ${this.name}`);
+    }
+    const ids = coinIds.map((id) => formatsByName[id.toUpperCase()].coinType);
+    const [records] = await Resolver.getAllRecords([this.namehash], [ids]);
+    return records.map((addr: string, i: number) => {
+      const coinId = coinIds[i].toUpperCase();
+      const { coinType, encoder } = formatsByName[coinId];
+      try {
+        return {
+          id: coinId,
+          success: true,
+          type: coinType,
+          address: addr === '0x' ? null : encoder(Buffer.from(addr.slice(2), 'hex'))
+        };
+      } catch (e) {
+        console.log(e);
+        console.warn('Error reading wallet address from the resolver contract.');
+        return {
+          id: coinId,
+          success: false,
+          type: null,
+          address: null
+        };
+      }
+    });
+  }
+
+  /**
+   * Set multiple coin addresses associated with name in a single transaction.
+   * @param data - map of coinId to address `{'ETH': '0x1234', 'BTC': 'bc1q...'}`
+   */
+  async setAddressBatch(data: Record<string, string>): Promise<providers.TransactionResponse> {
+    const Resolver = await this.getResolver(true);
+    if (!Resolver) {
+      throw new Error(`No resolver found for name ${this.name}`);
+    }
+    const coinTypes: number[] = [];
+    const addresses: Buffer[] = [];
+    for (const [coinId, address] of Object.entries(data)) {
+      const { decoder, coinType } = formatsByName[coinId.toUpperCase()];
+      let addressAsBytes;
+      if (!address) {
+        //Special handling for ETH
+        if (coinType === 60) {
+          addressAsBytes = decoder('0x0000000000000000000000000000000000000000');
+        } else {
+          addressAsBytes = Buffer.alloc(0);
+        }
+      } else {
+        addressAsBytes = decoder(address);
+      }
+      coinTypes.push(coinType);
+      addresses.push(addressAsBytes);
+    }
+    return Resolver.setAllRecords([this.namehash], [coinTypes], [addresses]);
   }
 
   @ethereumOnly

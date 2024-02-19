@@ -369,6 +369,24 @@
   {
     "inputs": [
       {
+        "internalType": "bytes32[]",
+        "name": "node",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "uint256[][]",
+        "name": "coinType",
+        "type": "uint256[][]"
+      }
+    ],
+    "name": "clearAllRecords",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes32",
         "name": "node",
         "type": "bytes32"
@@ -422,6 +440,30 @@
         "internalType": "bytes",
         "name": "",
         "type": "bytes"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "node",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "uint256[][]",
+        "name": "coinType",
+        "type": "uint256[][]"
+      }
+    ],
+    "name": "getAllRecords",
+    "outputs": [
+      {
+        "internalType": "bytes[][]",
+        "name": "",
+        "type": "bytes[][]"
       }
     ],
     "stateMutability": "view",
@@ -615,6 +657,29 @@
       }
     ],
     "name": "setAddr",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "node",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "uint256[][]",
+        "name": "coinType",
+        "type": "uint256[][]"
+      },
+      {
+        "internalType": "bytes[][]",
+        "name": "recordAddress",
+        "type": "bytes[][]"
+      }
+    ],
+    "name": "setAllRecords",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
