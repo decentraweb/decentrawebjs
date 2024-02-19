@@ -70,6 +70,15 @@ export default class DWEBName {
   }
 
   /**
+   * Get expiration date of the domain. Returns null if the domain has no expiration date.
+   */
+  async getExpirationDate(): Promise<Date | null> {
+    const [result] = await this.registryContract['domainExpiryBatch(bytes32[])']([this.namehash]);
+    const timestamp: number = result.toNumber();
+    return timestamp ? new Date(timestamp * 1000) : null;
+  }
+
+  /**
    * Get time to live for the records in seconds.
    * Note that DNS records have TTL specified in the records themselves.
    */
