@@ -1,6 +1,6 @@
 {
   "name": "@decentraweb/namekit",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "Toolkit to work with Decentraweb and ENS names",
   "author": "",
   "license": "ISC",
@@ -31,7 +31,7 @@
     "ethers": "^5.7.0"
   },
   "dependencies": {
-    "@decentraweb/core": "^2.4.0",
+    "@decentraweb/core": "^2.4.1",
     "@ensdomains/address-encoder": "^0.2.21",
     "@ensdomains/ens-contracts": "^0.0.20",
     "dns-packet": "^5.6.0",
