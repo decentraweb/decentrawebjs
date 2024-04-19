@@ -12,7 +12,7 @@ Then you can initialize Decentraweb instance to read/write domain records:
 import {providers, Wallet} from "ethers";
 import {DWEBRegistry} from "@decentraweb/core";
 
-const ETH_NETWORK = 'goerli';
+const ETH_NETWORK = 'sepolia';
 const JSONRPC_URL = '';
 const PRIVATE_KEY = '';
 
@@ -28,7 +28,7 @@ const contracts = {
 const dweb = new DWEBRegistry({network: ETH_NETWORK, provider, signer, contracts});
 ```
 Parameters:
-1. `network` (required) - Ethereum network name (`mainnet`, `goerli`, `matic`, `maticmum`)
+1. `network` (required) - Ethereum network name (`mainnet`, `sepolia`, `matic`, `maticmum`)
 2. `provider` (required) - [ethers Provider](https://docs.ethers.io/v5/api/providers/provider/) instance to read blockchain data.
 3. `signer` (optional) - [ethers Signer](https://docs.ethers.io/v5/api/signer/) instance. Only required if you want to write data to blockchain.
 4. `contracts` (optional) - used to override default Decentraweb contract addresses. Only needs to be used for development purposes.
@@ -41,7 +41,7 @@ In most cases importing library using `npm` is preferred way, but for fast proto
 <script>
   window.addEventListener('load', () => {
     const {DWEBRegistry} = Decentraweb;
-    const dweb = new DWEBRegistry({network: 'goerli', provider: ethers.getDefaultProvider('goerli')});
+    const dweb = new DWEBRegistry({network: 'sepolia', provider: ethers.getDefaultProvider('sepolia')});
     const name = dweb.name('some_dweb_name');
   })
 </script>

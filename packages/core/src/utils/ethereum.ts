@@ -4,8 +4,8 @@ export function getChainId(network: Network): ChainId {
   switch (network) {
     case 'mainnet':
       return 1;
-    case 'goerli':
-      return 5;
+    case 'sepolia':
+      return 11155111;
     case 'matic':
       return 137;
     case 'maticmum':

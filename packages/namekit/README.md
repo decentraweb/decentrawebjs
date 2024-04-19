@@ -23,13 +23,13 @@ Namekit uses [ethers.js](https://docs.ethers.io/v5/) to call Ethereum contracts.
 
 Decentraweb supports both Ethereum and Polygon networks. Namekit will automatically detect which network to use based on
 where domain name is located currently. To initialize Namekit instance you need to pass Ethereum and Polygon network 
-name (`mainnet` is used with 'matic' and `goerli` is used with 'maticmum') and ethers.js providers for each network. 
+name (`mainnet` is used with 'matic' and `sepolia` is used with 'maticmum') and ethers.js providers for each network. 
 ```typescript
 import {providers, Wallet} from "ethers";
 import DwebNamekit, {NamekitConfig} from "@decentraweb/namekit";
 
-const ETH_NETWORK = 'goerli';
-const ETH_JSONRPC_URL = 'https://goerli.infura.io/v3/00000000000000000000000000000000';
+const ETH_NETWORK = 'sepolia';
+const ETH_JSONRPC_URL = 'https://sepolia.infura.io/v3/00000000000000000000000000000000';
 const POLYGON_NETWORK = 'maticmum';
 const POLYGON_JSONRPC_URL = 'https://polygon-mumbai.infura.io/v3/00000000000000000000000000000000';
 const config: NamekitConfig = {
@@ -49,7 +49,7 @@ Alternatively, if you use one of supported providers, you can initialize Namekit
 const config: NamekitConfig = {
   apiProvider: 'infura', //Supported providers: 'etherscan', 'infura', 'alchemy', 'cloudflare', 'pocket', 'ankr'
   apiKey: '00000000000000000000000000000000', //
-  production: false //If true, then mainnet and matic networks will be used, otherwise goerli and maticmum
+  production: false //If true, then mainnet and matic networks will be used, otherwise sepolia and maticmum
 };
 const namekit = new DwebNamekit(config);
 ```

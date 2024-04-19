@@ -1,12 +1,12 @@
 import { ethers, providers } from 'ethers';
 
-export type EthereumNetwork = 'mainnet' | 'goerli';
+export type EthereumNetwork = 'mainnet' | 'sepolia';
 
 export type PolygonNetwork = 'matic' | 'maticmum';
 
 export type Network = EthereumNetwork | PolygonNetwork;
 
-export type EthChainId = 1 | 5;
+export type EthChainId = 1 | 11155111;
 
 export type PolygonChainId = 137 | 80001;
 

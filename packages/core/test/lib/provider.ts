@@ -11,8 +11,8 @@ export function getProvider(chain: 'ethereum' | 'polygon') {
   let network: Network;
   let provider: providers.BaseProvider;
   if (chain === 'ethereum') {
-    network = 'goerli';
-    provider = new providers.JsonRpcProvider(`https://goerli.infura.io/v3/${API_KEY}`, 'goerli');
+    network = 'sepolia';
+    provider = new providers.JsonRpcProvider(`https://sepolia.infura.io/v3/${API_KEY}`, 'sepolia');
   } else {
     network = 'maticmum';
     provider = new providers.JsonRpcProvider(

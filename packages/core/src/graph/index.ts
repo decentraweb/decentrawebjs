@@ -31,7 +31,8 @@ export class DecentrawebGraph {
         this.baseUrl = 'https://api.thegraph.com/subgraphs/name/decentra-web/decentrawebpolygon';
         this.grapnNetwork = 'matic';
         break;
-      case 'goerli':
+      case 'sepolia':
+        //TODO: Update this to the correct subgraph
         this.baseUrl = 'https://api.thegraph.com/subgraphs/name/ic999/dwebsubgraphrinkeby1';
         this.grapnNetwork = 'eth';
         break;

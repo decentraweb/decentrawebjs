@@ -7,8 +7,8 @@ export async function detectEthNetwork(provider: providers.BaseProvider): Promis
   switch (network.chainId) {
     case 1:
       return 'mainnet';
-    case 5:
-      return 'goerli';
+    case 11155111:
+      return 'sepolia';
     default:
       throw new Error(`Unsupported network: ${network.name}`);
   }
@@ -29,8 +29,8 @@ export async function detectMaticNetwork(
 }
 
 export function getProviders(config: ApiProviderConfig): ProviderSet {
-  const ethereumNetwork = config.production ? 'mainnet' : 'goerli';
-  const polygonNetwork = config.production ? 'matic' : 'maticmum';
+  const ethereumNetwork: EthereumNetwork = config.production ? 'mainnet' : 'sepolia';
+  const polygonNetwork: PolygonNetwork = config.production ? 'matic' : 'maticmum';
   let ProviderClass;
   switch (config.apiProvider) {
     case 'etherscan':

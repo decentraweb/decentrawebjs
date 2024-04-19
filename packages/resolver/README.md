@@ -59,7 +59,7 @@ const resolverConfig = {
   blockchain: {
     apiProvider: 'infura', //Supported providers: 'etherscan', 'infura', 'alchemy', 'cloudflare', 'pocket', 'ankr'
     apiKey: '00000000000000000000000000000000', // Your api key
-    production: false, // If true, then mainnet and matic networks will be used, otherwise goerli and maticmum
+    production: false, // If true, then mainnet and matic networks will be used, otherwise sepolia and maticmum
   },
   ipfsGateway: {
     /**
@@ -97,11 +97,11 @@ import {providers} from 'ethers';
 const resolverConfig = {
   blockchain: {
     ethereum: {
-      network: 'mainnet', // Or 'goerli'
+      network: 'mainnet', // Or 'sepolia'
       provider: new providers.JsonRpcProvider('https://mainnet.infura.io/v3/00000000000000000000000000000000')
     },
     polygon: {
-      network: 'matic', // or 'maticmum' if goerli was used for Ethereum
+      network: 'matic', // or 'maticmum' if sepolia was used for Ethereum
       provider:  new providers.JsonRpcProvider('https://matic.infura.io/v3/00000000000000000000000000000000'),
     },
   },

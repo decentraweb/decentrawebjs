@@ -8,7 +8,7 @@ export interface ApiProviderConfig {
   apiProvider: ApiProvider;
   /** API key for provider */
   apiKey: string;
-  /** Use production network (mainnet and matic) or testnet (goerli and maticmum) */
+  /** Use production network (mainnet and matic) or testnet (sepolia and maticmum) */
   production: boolean;
   /** DNS server to use for ICANN domains */
   dnsServer?: string;

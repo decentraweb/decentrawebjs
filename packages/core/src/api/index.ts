@@ -44,9 +44,9 @@ export class DecentrawebAPI {
       case 'matic':
         this.baseUrl = 'https://api.decentraweb.org';
         break;
-      case 'goerli':
+      case 'sepolia':
       case 'maticmum':
-        this.baseUrl = 'https://dns-api-goerli.decentraweb.org';
+        this.baseUrl = 'https://dns-api-demo.decentraweb.org';
         break;
       default:
         throw new Error(`Unsupported network: ${network}`);

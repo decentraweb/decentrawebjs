@@ -35,13 +35,13 @@
       provider = new ethers.providers.Web3Provider(window.ethereum);
       provider.send("eth_requestAccounts", []).then(async () => {
         network = await provider.getNetwork();
-        // Check if the current chain is Goerli, and prompt the user to switch if not
+        // Check if the current chain is Sepolia, and prompt the user to switch if not
         if (network.chainId !== 5) {
           try {
             await provider.send('wallet_switchEthereumChain', [{chainId: '0x5'}])
             connectWallet();
           } catch (e) {
-            alert('Please switch to Goerli testnet')
+            alert('Please switch to Sepolia testnet')
           }
         }
         signer = provider.getSigner();
@@ -56,7 +56,7 @@
       event.preventDefault();
       const tableBody = document.querySelector('#domain-records tbody');
       const {DWEBRegistry, RecordSet} = Decentraweb;
-      const dweb = new DWEBRegistry({network: 'goerli', provider: provider});
+      const dweb = new DWEBRegistry({network: 'sepolia', provider: provider});
       const domain = event.target.name.value;
       const name = dweb.name(domain);
       tableBody.innerHTML = '';

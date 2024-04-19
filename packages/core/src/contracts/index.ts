@@ -34,13 +34,13 @@ import {
  *     ReverseRegistrar: '0x3D8f878584199e47a2d40A1E269042E10aa50754',
  *     RootRegistrarController: '0xcCbCa4F9651Ef122D58d7EC5acCa27D806840209'
  *   },
- *   goerli: {
+ *   sepolia: {
  *     DecentraWebToken: '0x174db1922A6De366E253084ce7912463E57C11ae',
- *     DWEBRegistry: '0x33564B7b69E385615Db1e26A0fF917F3B2992c87',
- *     DefaultReverseResolver: '0xfF2e022F4D45ef8D4c7eA73f4dE2D63C8d437F2e',
- *     PublicResolver: '0xfE3146317183cBdebDeE12c3584141Fb15a80668',
- *     ReverseRegistrar: '0xA6E4607755F1cbF45E6f9e0840d3Be3075F3d729',
- *     RootRegistrarController: '0x94281bc70d6D62cc1DEb81A44b62cc7Fa22B10be'
+ *     DWEBRegistry: '0x0259C43D1fc8Ab933694C90FdD77E6B5e791572d',
+ *     DefaultReverseResolver: '0x74CAdF5F63612F0ad6F073f1932B7195c4867E9E',
+ *     PublicResolver: '0xD2A255f518C3E902EB17CcadE1947063e9C4CCe4',
+ *     ReverseRegistrar: '0xDCbE5a11588D7CcB9d6Ac4aC295FD30fe77c2ad6',
+ *     RootRegistrarController: '0xFDc967a956c865d4B248612FB06D9128283e9B99'
  *   },
  *   matic: {
  *     DecentraWebToken: '0x8839e639F210B80ffea73AedF51baed8DAc04499',
@@ -70,13 +70,13 @@ export const CONTRACT_ADDRESSES: Record<Network, ContractConfig> = {
     ReverseRegistrar: '0x3D8f878584199e47a2d40A1E269042E10aa50754',
     RootRegistrarController: '0xcCbCa4F9651Ef122D58d7EC5acCa27D806840209'
   },
-  goerli: {
+  sepolia: {
     DecentraWebToken: '0x174db1922A6De366E253084ce7912463E57C11ae',
-    DWEBRegistry: '0x33564B7b69E385615Db1e26A0fF917F3B2992c87',
-    DefaultReverseResolver: '0xfF2e022F4D45ef8D4c7eA73f4dE2D63C8d437F2e',
-    PublicResolver: '0xfE3146317183cBdebDeE12c3584141Fb15a80668',
-    ReverseRegistrar: '0xA6E4607755F1cbF45E6f9e0840d3Be3075F3d729',
-    RootRegistrarController: '0x94281bc70d6D62cc1DEb81A44b62cc7Fa22B10be'
+    DWEBRegistry: '0x0259C43D1fc8Ab933694C90FdD77E6B5e791572d',
+    DefaultReverseResolver: '0x74CAdF5F63612F0ad6F073f1932B7195c4867E9E',
+    PublicResolver: '0xD2A255f518C3E902EB17CcadE1947063e9C4CCe4',
+    ReverseRegistrar: '0xDCbE5a11588D7CcB9d6Ac4aC295FD30fe77c2ad6',
+    RootRegistrarController: '0xFDc967a956c865d4B248612FB06D9128283e9B99'
   },
   matic: {
     DecentraWebToken: '0x8839e639F210B80ffea73AedF51baed8DAc04499',
