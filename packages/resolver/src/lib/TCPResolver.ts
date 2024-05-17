@@ -18,6 +18,12 @@ class TCPResolver extends Resolver {
     });
   }
 
+  close(): Promise<void> {
+    return new Promise((resolve) => {
+      this.server.close(() => resolve());
+    });
+  }
+
   async handle(client: net.Socket) {
     const data = await this.readRequestStream(client);
     if (!data.length) {

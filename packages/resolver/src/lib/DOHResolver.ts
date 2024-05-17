@@ -206,6 +206,12 @@ class DOHResolver extends Resolver {
       this.server.listen(port, () => resolve());
     });
   }
+
+  close(): Promise<void> {
+    return new Promise((resolve) => {
+      this.server.close(() => resolve());
+    });
+  }
 }
 
 export default DOHResolver;

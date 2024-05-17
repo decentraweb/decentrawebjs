@@ -37,6 +37,12 @@ class UDPServer extends Resolver {
       this.socket.bind(port, address, () => resolve());
     });
   }
+
+  close(): Promise<void> {
+    return new Promise((resolve) => {
+      this.socket.close(() => resolve());
+    });
+  }
 }
 
 export default UDPServer;
