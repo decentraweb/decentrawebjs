@@ -22,7 +22,7 @@ export async function detectMaticNetwork(
     case 137:
       return 'matic';
     case 80001:
-      return 'maticmum';
+      return 'matic-amoy';
     default:
       throw new Error(`Unsupported network: ${network.name}`);
   }
@@ -30,7 +30,7 @@ export async function detectMaticNetwork(
 
 export function getProviders(config: ApiProviderConfig): ProviderSet {
   const ethereumNetwork: EthereumNetwork = config.production ? 'mainnet' : 'sepolia';
-  const polygonNetwork: PolygonNetwork = config.production ? 'matic' : 'maticmum';
+  const polygonNetwork: PolygonNetwork = config.production ? 'matic' : 'matic-amoy';
   let ProviderClass;
   switch (config.apiProvider) {
     case 'etherscan':

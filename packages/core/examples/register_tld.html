@@ -36,9 +36,9 @@
       provider.send("eth_requestAccounts", []).then(async () => {
         network = await provider.getNetwork();
         // Check if the current chain is Sepolia, and prompt the user to switch if not
-        if (network.chainId !== 5) {
+        if (network.chainId !== 11155111) {
           try {
-            await provider.send('wallet_switchEthereumChain', [{chainId: '0x5'}])
+            await provider.send('wallet_switchEthereumChain', [{chainId: '0xaa36a7'}])
             connectWallet();
           } catch (e) {
             alert('Please switch to Sepolia testnet')

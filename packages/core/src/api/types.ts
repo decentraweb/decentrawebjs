@@ -1,17 +1,19 @@
 import { BigNumber } from 'ethers';
-import { ChainId, EthChainId, PolygonChainId } from '../types/common';
+import { ChainId, EthChainId, PolygonChainId, Token } from '../types/common';
 
 export interface TLDApprovalPayload {
   name: Array<string>;
   owner: string;
   secret: string;
   chainid: ChainId;
+  feeTokenAddress: string;
 }
 
 export interface TLDApprovalSuccess {
   commitment: string;
   signature: string;
   timestamp: number;
+  feeTokenAddress: string | null;
 }
 
 export interface TLDApprovalError {
@@ -26,6 +28,8 @@ export interface TLDApproval {
   secret: string;
   signature: string;
   timestamp: number;
+  feeToken: Token;
+  feeTokenAddress: string;
 }
 
 export interface PolyTLDCommitmentPayload {
@@ -33,6 +37,7 @@ export interface PolyTLDCommitmentPayload {
   secret: string;
   signature: string;
   owner: string;
+  feeTokenAddress: string;
 }
 
 export interface PolyTLDCommitmentRes {
@@ -40,6 +45,7 @@ export interface PolyTLDCommitmentRes {
   commitment: string;
   chainId: PolygonChainId;
   timestamp: number;
+  feeTokenAddress: string;
 }
 
 export interface RequestPolyTLDRegistrationPayload {
@@ -60,7 +66,7 @@ export interface PolyTLDRegistrationRes {
   txid: string;
 }
 
-export interface SubdomainApprovalPayloadBase {
+export interface SubdomainApprovalPayload {
   name: string[];
   label: string[];
   owner: string;
@@ -69,19 +75,8 @@ export interface SubdomainApprovalPayloadBase {
   signature?: string; //Signature is required for self registration. Empty string for on-demand registration
   duration: number[];
   renewalFee?: string[];
-}
-
-export interface EthSubdomainApprovalPayload extends SubdomainApprovalPayloadBase {
-  chainid: EthChainId;
-  isFeeInDWEBToken: Boolean;
-}
-
-export interface PolySubdomainApprovalPayload extends SubdomainApprovalPayloadBase {
-  chainid: PolygonChainId;
   feeTokenAddress: string;
 }
-
-export type SubdomainApprovalPayload = EthSubdomainApprovalPayload | PolySubdomainApprovalPayload;
 
 export interface SubdomainApproval {
   commitment: string; //Commitment value.
@@ -130,6 +125,8 @@ export type StakedDomain =
 export interface PriceConversionRes {
   eth: string[];
   dweb: string[];
+  usdt: string[];
+  usdc: string[];
   matic?: string[];
 }
 
@@ -137,6 +134,8 @@ export interface PriceConversionResult {
   usd: number;
   eth: BigNumber;
   dweb: BigNumber;
+  usdt: BigNumber;
+  usdc: BigNumber;
   matic?: BigNumber;
 }
 

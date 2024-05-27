@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers';
 import { DwebError } from '../../errors';
+import { Token } from '../../types/common';
 
 /**
  * Top level domain registration entry
@@ -21,6 +22,6 @@ export interface TLDBalanceVerificationResult {
   price: BigNumber;
   /** Registration fee in wei + 10%. Used to prevent failed transactions due to price fluctuations. */
   safePrice: BigNumber;
-  /** Currency used to pay for registration. ETH or DWEB on Ethereum, WETH or DWEB on Polygon. */
-  currency: 'ETH' | 'DWEB' | 'WETH';
+  /** Currency used to pay for registration. */
+  currency: Token;
 }

@@ -1,18 +1,21 @@
 import { TLDEntry } from '../types/TLD';
 import { BigNumber } from 'ethers';
+import { Token } from '../../types/common';
 
 /**
  * @property domains - array of name and duration pairs
  * @property owner - domain owner address
  * @property expiresAt - date when the approval expires
- * @property isFeesInDweb - true if fees are paid in DWEB, false if fees are paid in ETH
+ * @property feeToken - token used for registration fee. Default is MATIC
+ * @property feeTokenAddress - address of the fee token. ERC20 address or zeroes for MATIC
  * @property fee - total fee in wei
  */
 export interface BaseRegistrationContext {
   domains: TLDEntry[];
   owner: string;
   expiresAt: Date;
-  isFeesInDweb: boolean;
+  feeToken: Token;
+  feeTokenAddress: string;
   fee: BigNumber;
 }
 

@@ -1,11 +1,10 @@
 import { BigNumber } from 'ethers';
-
-export type Currency = 'ETH' | 'DWEB' | 'WETH' | 'MATIC';
+import { Token } from '../../types/common';
 
 /**
  * Price object
  */
-export interface Price<C = Currency> {
+export interface Price<C = Token> {
   /** price amount in wei */
   amount: BigNumber;
   /** price currency */

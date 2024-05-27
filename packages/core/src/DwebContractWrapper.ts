@@ -1,7 +1,7 @@
 import { ethers, providers } from 'ethers';
 import { ContractConfig, DwebConfig, DwebContract, Network } from './types/common';
 import { getContract, getContractConfig } from './contracts';
-import { getChainId } from './utils/ethereum';
+import { getChainId } from './utils/chains';
 import { SignerRequiredError } from './utils/errors';
 
 export function requiresSigner(target: any, ctx: DecoratorContext): any {

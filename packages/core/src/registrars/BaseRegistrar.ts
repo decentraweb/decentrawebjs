@@ -1,9 +1,10 @@
 import DwebContractWrapper from '../DwebContractWrapper';
 import { BigNumber, ethers, providers, Signer } from 'ethers';
-import { getContract, getWethContract } from '../contracts';
 import DecentrawebAPI from '../api';
-import { DwebConfig, Network } from '../types/common';
+import { AltToken, DwebConfig, DwebContract, Network, Token } from '../types/common';
 import { NotStakedDomain, StakedDomain, StakingState } from './types/StakingState';
+import { isMaticChain } from '../utils/chains';
+import { getTokenAddress, getTokenContract, ZERO_ADDRESS } from '../tokens';
 
 /**
  * Configuration for the registrar
@@ -23,107 +24,86 @@ abstract class BaseRegistrar extends DwebContractWrapper {
   readonly api: DecentrawebAPI;
   /** Ethers.js Ethereum signer for writing data to the blockchain */
   readonly signer: Signer;
-  /** DWEB token contract */
-  readonly dwebToken: ethers.Contract;
-  /** WETH token contract, only available on the Polygon network */
-  readonly wethToken?: ethers.Contract;
 
-  constructor(options: RegistrarConfig) {
-    super(options, 'RootRegistrarController');
+  constructor(options: RegistrarConfig, contractName: DwebContract) {
+    super(options, contractName);
     this.network = options.network;
     this.api = new DecentrawebAPI(this.network);
     this.signer = options.signer;
-    this.dwebToken = getContract({
-      address: this.contractConfig.DecentraWebToken,
-      name: 'DecentraWebToken',
-      provider: this.signer,
-      network: this.network
-    });
-    switch (this.network) {
-      case 'matic':
-      case 'maticmum':
-        this.wethToken = getWethContract(this.network, this.signer);
-    }
   }
 
   /**
    * Is the registrar on the Polygon network
    */
   get isMatic() {
-    return this.network === 'matic' || this.network === 'maticmum';
+    return isMaticChain(this.network);
+  }
+
+  feeTokenAddress(token?: Token): string {
+    if (!token) {
+      return ZERO_ADDRESS;
+    }
+    token = token.toUpperCase() as Token;
+    if (token === 'ETH') {
+      if (!this.isMatic) {
+        return ZERO_ADDRESS;
+      }
+      throw new Error('ETH is not supported on the Polygon network, you can use WETH instead');
+    }
+    if (token === 'MATIC') {
+      if (this.isMatic) {
+        return ZERO_ADDRESS;
+      }
+      throw new Error('MATIC is not supported on the Ethereum network');
+    }
+    const address = getTokenAddress(this.network, token);
+    if (!address) {
+      throw new Error(`Token "${token}" is not supported on "${this.network}" network.`);
+    }
+    return address;
   }
 
   /**
-   * Approve the DWEB/WETH token amount that can be used by the registrar contract
+   * Approve the DWEB/WETH/USDT/USDC token amount that can be used by the registrar contract
    * @param token - token name. WETH is only supported on the Polygon network
    * @param amount - amount in wei
    */
   async setTokenAllowance(
-    token: 'WETH' | 'DWEB',
+    token: AltToken,
     amount: BigNumber
   ): Promise<providers.TransactionReceipt> {
-    switch (token) {
-      case 'DWEB': {
-        const tx = await this.dwebToken.approve(this.contract.address, amount, {
-          value: '0x00'
-        });
-        return tx.wait(1);
-      }
-      case 'WETH': {
-        if (!this.isMatic) {
-          throw new Error('WETH is only supported on the Polygon network');
-        }
-        const tx = await this.wethToken?.approve(this.contract.address, amount, {
-          value: '0x00'
-        });
-        return tx.wait(1);
-      }
-    }
+    const contract = getTokenContract(this.network, token, this.signer);
+    const tx = await contract.approve(this.contract.address, amount, {
+      value: '0x00'
+    });
+    return tx.wait(1);
   }
 
   /**
-   * Get DWEB/WETH token amount that can be used by the registrar contract
+   * Get DWEB/WETH/USDT/USDC token amount that can be used by the registrar contract
    * @param token - token name. WETH is only supported on the Polygon network
    */
-  async getTokenAllowance(token: 'WETH' | 'DWEB'): Promise<BigNumber> {
+  async getTokenAllowance(token: AltToken): Promise<BigNumber> {
     const signerAddress = await this.signer.getAddress();
-    switch (token) {
-      case 'DWEB': {
-        return this.dwebToken.allowance(signerAddress, this.contract.address);
-      }
-      case 'WETH': {
-        if (!this.isMatic) {
-          throw new Error('WETH is only supported on the Polygon network');
-        }
-        return this.wethToken?.allowance(signerAddress, this.contract.address);
-      }
-    }
+    const contract = getTokenContract(this.network, token, this.provider);
+    return contract.allowance(signerAddress, this.contract.address);
   }
 
   /**
-   * Get DWEB/WETH token balance of the signer
+   * Get DWEB/WETH/USDT/USDC token balance of the signer
    * @param token - token name. WETH is only supported on the Polygon network
    */
-  async getTokenBalance(token: 'DWEB' | 'WETH'): Promise<BigNumber> {
+  async getTokenBalance(token: AltToken): Promise<BigNumber> {
     const signerAddress = await this.signer.getAddress();
-    switch (token) {
-      case 'DWEB': {
-        return this.dwebToken.balanceOf(signerAddress, this.contract.address);
-      }
-      case 'WETH': {
-        if (!this.isMatic) {
-          throw new Error('WETH is only supported on the Polygon network');
-        }
-        return this.wethToken?.balanceOf(signerAddress, this.contract.address);
-      }
-    }
+    const contract = getTokenContract(this.network, token, this.provider);
+    return contract.balanceOf(signerAddress);
   }
 
   /**
    * Approve unlimited token usage by the registrar contract, so no further approvals are needed
    * @param token - token name. WETH is only supported on the Polygon network
    */
-  async allowTokenUsage(token: 'WETH' | 'DWEB') {
+  async allowTokenUsage(token: AltToken) {
     return this.setTokenAllowance(
       token,
       ethers.utils.parseUnits(Number.MAX_SAFE_INTEGER.toString(), 'ether')

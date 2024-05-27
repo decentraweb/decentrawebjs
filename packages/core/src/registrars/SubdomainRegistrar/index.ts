@@ -11,10 +11,17 @@ import signTypedData from '../../utils/signTypedData';
 import { increaseByPercent } from '../../utils/misc';
 import { DURATION } from '../constants';
 import { normalizeDuration } from '../utils';
-import BaseRegistrar from '../BaseRegistrar';
+import BaseRegistrar, { RegistrarConfig } from '../BaseRegistrar';
 import { SubdomainApproval } from '../../api';
 import { hashName, normalizeName } from '../../utils';
 import { InsufficientAllowanceError, InsufficientBalanceError } from '../../errors';
+import { Token } from '../../types/common';
+import {
+  getFeeTokenAddress,
+  getTokenContract,
+  isValidNativeToken,
+  validateFeeToken
+} from '../../tokens';
 
 /**
  * Class that handles subdomain registration.
@@ -35,17 +42,21 @@ import { InsufficientAllowanceError, InsufficientBalanceError } from '../../erro
  *  ```
  */
 class SubdomainRegistrar extends BaseRegistrar {
+  constructor(config: RegistrarConfig) {
+    super(config, 'RootRegistrarControllerSld');
+  }
   /**
    * Get subdomain registration approval for domain names owned by signer
    * @param {SelfRegEntry | Array<SelfRegEntry>} entry - list of domains and subdomains to register
+   * @param {Token} feeToken - token to pay for registration, defaults to ETH/MATIC depending on network
    * @param {string} owner - ETH address of the owner of created subdomains, defaults to signer address
-   * @param {boolean} isFeeInDWEB - if true, registration fee will be paid in DWEB tokens, otherwise in ETH
    */
   async approveSelfRegistration(
     entry: SelfRegEntry | Array<SelfRegEntry>,
-    isFeeInDWEB: boolean = false,
-    owner: string | null = null
+    feeToken?: Token,
+    owner?: string
   ): Promise<ApprovedRegistration> {
+    feeToken = validateFeeToken(this.network, feeToken);
     const signerAddress = await this.signer.getAddress();
     const ownerAddress = owner ? ethers.utils.getAddress(owner) : signerAddress;
     const normalizedEntries = await this.normalizeEntries(entry);
@@ -53,7 +64,7 @@ class SubdomainRegistrar extends BaseRegistrar {
       signerAddress,
       ownerAddress,
       normalizedEntries,
-      isFeeInDWEB
+      feeToken
     );
     const signature = await signTypedData(this.signer, typedData);
     const approval = await this.api.approveSelfSLDRegistration({
@@ -63,46 +74,50 @@ class SubdomainRegistrar extends BaseRegistrar {
     return {
       approval,
       owner: ownerAddress,
-      isFeeInDWEB: isFeeInDWEB
+      feeToken
     };
   }
 
   /**
    * Get subdomain registration approval for staked domain names
    * @param entry
+   * @param feeToken - token to pay for registration, defaults to ETH/MATIC depending on network
    * @param owner
-   * @param isFeeInDWEB - if true, registration fee will be paid in DWEB tokens, otherwise in ETH
    */
   async approveOndemandRegistration(
     entry: OnDemandEntry | Array<OnDemandEntry>,
-    isFeeInDWEB: boolean = false,
+    feeToken?: Token,
     owner: string | null = null
   ): Promise<ApprovedRegistration> {
+    feeToken = validateFeeToken(this.network, feeToken);
     const signerAddress = await this.signer.getAddress();
     const ownerAddress = owner ? ethers.utils.getAddress(owner) : signerAddress;
     const normalizedEntries = await this.normalizeEntries(entry);
     const approval = await this.api.approveSLDRegistration(
       ownerAddress,
       normalizedEntries,
-      isFeeInDWEB
+      feeToken
     );
     return {
       approval,
       owner: ownerAddress,
-      isFeeInDWEB: isFeeInDWEB
+      feeToken
     };
   }
 
-  async finishRegistration({
-    approval,
-    owner,
-    isFeeInDWEB
-  }: ApprovedRegistration): Promise<providers.TransactionResponse> {
+  /**
+   * Finish subdomain registration
+   * @param approval - approval object received from `approveSelfRegistration` or `approveOndemandRegistration`
+   */
+  async finishRegistration(
+    registration: ApprovedRegistration
+  ): Promise<providers.TransactionResponse> {
+    const { approval, owner, feeToken } = registration;
     const {
       error: priceError,
       ownerFee,
       serviceFee
-    } = await this.verifySignerBalance(approval, isFeeInDWEB);
+    } = await this.verifySignerBalance(registration);
     if (priceError) {
       throw priceError;
     }
@@ -123,7 +138,7 @@ class SubdomainRegistrar extends BaseRegistrar {
       this.chainId,
       approval.expiry,
       approval.durations,
-      this.isMatic ? (isFeeInDWEB ? this.dwebToken.address : this.wethToken?.address) : isFeeInDWEB,
+      getFeeTokenAddress(this.network, feeToken),
       approval.fee.map((i) => ethers.BigNumber.from(i)),
       approval.renewalFee.map((i) => ethers.BigNumber.from(i)),
       v,
@@ -136,24 +151,17 @@ class SubdomainRegistrar extends BaseRegistrar {
 
   /**
    * Verify that signer has enough balance to pay for registration
-   * @param approval
-   * @param isFeeInDWEB
+   * @param approval - approval object received from `approveSelfRegistration` or `approveOndemandRegistration`
+   * @param feeToken - token to pay for registration, defaults to ETH/MATIC depending on network
    */
-  async verifySignerBalance(approval: SubdomainApproval, isFeeInDWEB?: boolean) {
-    const { serviceFee, ownerFee } = await this.calculateTotalFee(approval, isFeeInDWEB);
+  async verifySignerBalance(
+    registration: ApprovedRegistration
+  ): Promise<SubdomainBalanceVerificationResult> {
+    const { feeToken } = registration;
+    const { serviceFee, ownerFee } = await this.calculateTotalFee(registration);
     const signerAddress = await this.signer.getAddress();
-    const baseBalance = await this.provider.getBalance(signerAddress);
-    let feeToken;
-    switch (ownerFee.currency) {
-      case 'DWEB':
-        feeToken = this.dwebToken;
-        break;
-      case 'WETH':
-        feeToken = this.wethToken;
-        break;
-      default:
-        feeToken = null;
-    }
+    const nativeBalance = await this.provider.getBalance(signerAddress);
+    const isPaidWithNative = !feeToken || isValidNativeToken(this.network, feeToken);
 
     const result: SubdomainBalanceVerificationResult = {
       success: true,
@@ -162,27 +170,28 @@ class SubdomainRegistrar extends BaseRegistrar {
       ownerFee
     };
 
-    let safeBaseBalance;
-    if (serviceFee.currency === ownerFee.currency) {
-      safeBaseBalance = increaseByPercent(serviceFee.amount.add(ownerFee.amount), 10);
+    let safeNativeBalance;
+    if (isPaidWithNative) {
+      safeNativeBalance = increaseByPercent(serviceFee.amount.add(ownerFee.amount), 10);
     } else {
-      safeBaseBalance = increaseByPercent(serviceFee.amount, 10);
+      safeNativeBalance = increaseByPercent(serviceFee.amount, 10);
     }
 
-    if (baseBalance.lt(safeBaseBalance)) {
+    if (nativeBalance.lt(safeNativeBalance)) {
       result.success = false;
       result.error = new InsufficientBalanceError(
-        baseBalance,
-        safeBaseBalance,
+        nativeBalance,
+        safeNativeBalance,
         serviceFee.currency
       );
       return result;
     }
 
-    if (feeToken) {
+    if (!isPaidWithNative) {
+      const tokenContract = getTokenContract(this.network, feeToken, this.signer);
       const [feeTokenBalance, feeTokenAllowance] = await Promise.all([
-        feeToken.balanceOf(signerAddress),
-        feeToken.allowance(signerAddress, this.contract.address)
+        tokenContract.balanceOf(signerAddress),
+        tokenContract.allowance(signerAddress, this.contract.address)
       ]);
       if (feeTokenBalance.lt(ownerFee.amount)) {
         result.success = false;
@@ -209,13 +218,10 @@ class SubdomainRegistrar extends BaseRegistrar {
 
   /**
    * Calculate total owner and service fee for approved subdomain registration
-   * @param approval
-   * @param isFeeInDWEB
+   * @param registration - approved registration object received from `approveSelfRegistration` or `approveOndemandRegistration`
    */
-  async calculateTotalFee(
-    approval: SubdomainApproval,
-    isFeeInDWEB: boolean = false
-  ): Promise<SubdomainFees> {
+  async calculateTotalFee(registration: ApprovedRegistration): Promise<SubdomainFees> {
+    const { approval, feeToken } = registration;
     const serviceFeeUSD = await this.getServiceFee();
     const serviceFee = await this.api.convertPrice(serviceFeeUSD);
     const renewalServiceFeeUSD = await this.getRenewalServiceFee();
@@ -224,8 +230,6 @@ class SubdomainRegistrar extends BaseRegistrar {
     const totalOwnerFee = approval.fee.reduce((a, b) => a.add(b), BigNumber.from(0));
     const totalOwnerRenewalFee = approval.renewalFee.reduce((a, b) => a.add(b), BigNumber.from(0));
 
-    const serviceFeeCurrency = this.isMatic ? 'MATIC' : 'ETH';
-    const ownerFeeCurrency = isFeeInDWEB ? 'DWEB' : this.isMatic ? 'WETH' : 'ETH';
     const serviceFeeAmount = BigNumber.from(this.isMatic ? serviceFee.matic : serviceFee.eth);
     const renewalServiceFeeAmount = BigNumber.from(
       this.isMatic ? renewalServiceFee.matic : renewalServiceFee.eth
@@ -239,11 +243,11 @@ class SubdomainRegistrar extends BaseRegistrar {
 
     return {
       serviceFee: {
-        currency: serviceFeeCurrency,
+        currency: this.isMatic ? 'MATIC' : 'ETH',
         amount: totalServiceFee.add(totalRenewalServiceFee)
       },
       ownerFee: {
-        currency: ownerFeeCurrency,
+        currency: feeToken,
         amount: totalOwnerFee.add(totalOwnerRenewalFee)
       }
     };

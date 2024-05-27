@@ -16,12 +16,12 @@
   },
   {
     "inputs": [],
-    "name": "EmptyArray",
+    "name": "EnoughFeeNotSent",
     "type": "error"
   },
   {
     "inputs": [],
-    "name": "EnoughFeeNotSent",
+    "name": "FeeTransferFailed",
     "type": "error"
   },
   {
@@ -42,11 +42,6 @@
   {
     "inputs": [],
     "name": "InvalidCommitmentAge",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "InvalidDuration",
     "type": "error"
   },
   {
@@ -103,6 +98,19 @@
       }
     ],
     "name": "DecentraWebDistributorChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
     "type": "event"
   },
   {
@@ -171,6 +179,12 @@
       },
       {
         "indexed": false,
+        "internalType": "bool",
+        "name": "isFeeInERC20Token",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
         "internalType": "address",
         "name": "feeTokenAddress",
         "type": "address"
@@ -208,6 +222,12 @@
       },
       {
         "indexed": false,
+        "internalType": "bool",
+        "name": "isFeeInERC20Token",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
         "internalType": "address",
         "name": "feeTokenAddress",
         "type": "address"
@@ -227,105 +247,6 @@
       }
     ],
     "name": "NewPriceOracle",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "bytes32[]",
-        "name": "node",
-        "type": "bytes32[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes32[]",
-        "name": "label",
-        "type": "bytes32[]"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "newOwner",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address[]",
-        "name": "owner",
-        "type": "address[]"
-      }
-    ],
-    "name": "OnDemandSubdomain",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "bytes32[]",
-        "name": "node",
-        "type": "bytes32[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes32[]",
-        "name": "label",
-        "type": "bytes32[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "feeTokenAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256[]",
-        "name": "fee",
-        "type": "uint256[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "totalSubDomainServiceFeeInMATIC",
-        "type": "uint256"
-      }
-    ],
-    "name": "OnDemandSubdomainFee",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "bytes32[]",
-        "name": "node",
-        "type": "bytes32[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes32[]",
-        "name": "label",
-        "type": "bytes32[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256[]",
-        "name": "renewalFee",
-        "type": "uint256[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256[]",
-        "name": "durations",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "OnDemandSubdomainRenewalFee",
     "type": "event"
   },
   {
@@ -352,36 +273,12 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "address[]",
-        "name": "parentOwner",
-        "type": "address[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes32[]",
-        "name": "subnode",
-        "type": "bytes32[]"
-      },
-      {
-        "indexed": false,
         "internalType": "address",
-        "name": "feeTokenAddress",
+        "name": "wethToken",
         "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256[]",
-        "name": "expiry",
-        "type": "uint256[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256[]",
-        "name": "renewalFee",
-        "type": "uint256[]"
       }
     ],
-    "name": "SldNameRenewed",
+    "name": "WETHTokenChanged",
     "type": "event"
   },
   {
@@ -421,6 +318,32 @@
     ],
     "name": "WhitelistDomainForSLDFee",
     "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_REGISTRATION_DURATION",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MIN_REGISTRATION_DURATION",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [
@@ -590,83 +513,16 @@
     "type": "function"
   },
   {
-    "inputs": [
+    "inputs": [],
+    "name": "dWebToken",
+    "outputs": [
       {
-        "components": [
-          {
-            "internalType": "bytes32[]",
-            "name": "node",
-            "type": "bytes32[]"
-          },
-          {
-            "internalType": "bytes32[]",
-            "name": "label",
-            "type": "bytes32[]"
-          },
-          {
-            "internalType": "address[]",
-            "name": "parentOwner",
-            "type": "address[]"
-          },
-          {
-            "internalType": "address",
-            "name": "newOwner",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "chainId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "expiry",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256[]",
-            "name": "durations",
-            "type": "uint256[]"
-          },
-          {
-            "internalType": "address",
-            "name": "feeTokenAddress",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256[]",
-            "name": "fee",
-            "type": "uint256[]"
-          },
-          {
-            "internalType": "uint256[]",
-            "name": "renewalFee",
-            "type": "uint256[]"
-          },
-          {
-            "internalType": "uint8",
-            "name": "v",
-            "type": "uint8"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "r",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "s",
-            "type": "bytes32"
-          }
-        ],
-        "internalType": "struct Common.CreateSubnodeParam",
-        "name": "createSubnodeParam",
-        "type": "tuple"
+        "internalType": "contract IERC20",
+        "name": "",
+        "type": "address"
       }
     ],
-    "name": "createSubnodeBatch",
-    "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -894,70 +750,14 @@
         "internalType": "uint256",
         "name": "timestamp",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "feeTokenAddress",
+        "type": "address"
       }
     ],
     "name": "makeCommitmentWithConfigBatch",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "components": [
-          {
-            "internalType": "address[]",
-            "name": "parentOwner",
-            "type": "address[]"
-          },
-          {
-            "internalType": "bytes32[]",
-            "name": "subnode",
-            "type": "bytes32[]"
-          },
-          {
-            "internalType": "uint256[]",
-            "name": "duration",
-            "type": "uint256[]"
-          },
-          {
-            "internalType": "address",
-            "name": "feeTokenAddress",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256[]",
-            "name": "renewalFee",
-            "type": "uint256[]"
-          },
-          {
-            "internalType": "uint8",
-            "name": "v",
-            "type": "uint8"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "r",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "s",
-            "type": "bytes32"
-          }
-        ],
-        "internalType": "struct Common.RenewSubnodeParam",
-        "name": "renewSubnodeParam",
-        "type": "tuple"
-      }
-    ],
-    "name": "makeCommitmentWithRenewSubnode",
     "outputs": [
       {
         "internalType": "bytes32",
@@ -1060,6 +860,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "prices",
+    "outputs": [
+      {
+        "internalType": "contract PriceOracle",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "string[]",
@@ -1104,7 +917,7 @@
     ],
     "name": "registerWithConfigBatch",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -1131,61 +944,6 @@
       }
     ],
     "name": "renew",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "components": [
-          {
-            "internalType": "address[]",
-            "name": "parentOwner",
-            "type": "address[]"
-          },
-          {
-            "internalType": "bytes32[]",
-            "name": "subnode",
-            "type": "bytes32[]"
-          },
-          {
-            "internalType": "uint256[]",
-            "name": "duration",
-            "type": "uint256[]"
-          },
-          {
-            "internalType": "address",
-            "name": "feeTokenAddress",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256[]",
-            "name": "renewalFee",
-            "type": "uint256[]"
-          },
-          {
-            "internalType": "uint8",
-            "name": "v",
-            "type": "uint8"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "r",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "s",
-            "type": "bytes32"
-          }
-        ],
-        "internalType": "struct Common.RenewSubnodeParam",
-        "name": "renewSubnodeParam",
-        "type": "tuple"
-      }
-    ],
-    "name": "renewSubnodeBatch",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
@@ -1221,6 +979,19 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "root",
+    "outputs": [
+      {
+        "internalType": "contract Root",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -1395,6 +1166,19 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_wethToken",
+        "type": "address"
+      }
+    ],
+    "name": "setWethTokenAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address[]",
         "name": "userAddresss",
         "type": "address[]"
@@ -1494,6 +1278,19 @@
         "internalType": "bool",
         "name": "",
         "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "wethToken",
+    "outputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",

@@ -1,5 +1,5 @@
 import { ChainId, Network } from '../types/common';
-import { getChainId } from '../utils/ethereum';
+import { getChainId } from '../utils/chains';
 import { accountDomainsPayload, AccountDomainsResponse } from './accountDomains';
 import DecentrawebAPI from '../api';
 import { AccountDomain } from './types';
@@ -32,12 +32,13 @@ export class DecentrawebGraph {
         this.grapnNetwork = 'matic';
         break;
       case 'sepolia':
-        //TODO: Update this to the correct subgraph
-        this.baseUrl = 'https://api.thegraph.com/subgraphs/name/ic999/dwebsubgraphrinkeby1';
+        this.baseUrl =
+          'https://api.studio.thegraph.com/query/9651/dwebsubgraphsepolia1/version/latest';
         this.grapnNetwork = 'eth';
         break;
-      case 'maticmum':
-        this.baseUrl = 'https://api.thegraph.com/subgraphs/name/ic999/dwebsubgraphmumbai1';
+      case 'matic-amoy':
+        this.baseUrl =
+          'https://api.studio.thegraph.com/query/9651/dwebsubgraphamoy1/version/latest';
         this.grapnNetwork = 'matic';
         break;
       default:

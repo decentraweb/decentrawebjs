@@ -2,23 +2,23 @@ import { ethers, providers } from 'ethers';
 
 export type EthereumNetwork = 'mainnet' | 'sepolia';
 
-export type PolygonNetwork = 'matic' | 'maticmum';
+export type PolygonNetwork = 'matic' | 'matic-amoy';
 
 export type Network = EthereumNetwork | PolygonNetwork;
 
 export type EthChainId = 1 | 11155111;
 
-export type PolygonChainId = 137 | 80001;
+export type PolygonChainId = 137 | 80002;
 
 export type ChainId = EthChainId | PolygonChainId;
 
 export type DwebContract =
-  | 'DecentraWebToken'
-  | 'DWEBRegistry'
+  | 'DWEBRegistryV2'
   | 'DefaultReverseResolver'
   | 'PublicResolver'
   | 'ReverseRegistrar'
-  | 'RootRegistrarController';
+  | 'RootRegistrarController'
+  | 'RootRegistrarControllerSld';
 
 export type ContractConfig = Record<DwebContract, string>;
 
@@ -46,3 +46,11 @@ export type DwebConfig = {
   signer?: ethers.Signer;
   contracts?: ContractConfig;
 };
+
+export type NativeToken = 'ETH' | 'MATIC';
+
+export type AltToken = 'DWEB' | 'WETH' | 'USDC' | 'USDT';
+
+export type Token = NativeToken | AltToken;
+
+export type AltTokenConfig = Record<AltToken, string | null>;

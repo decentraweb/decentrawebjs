@@ -1,8 +1,6 @@
 import { BigNumber, ethers } from 'ethers';
 import {
   DomainFromHashRes,
-  EthSubdomainApprovalPayload,
-  PolySubdomainApprovalPayload,
   PolyTLDCommitmentPayload,
   PolyTLDCommitmentRes,
   PolyTLDRegistrationRes,
@@ -12,7 +10,6 @@ import {
   StakedDomain,
   SubdomainApproval,
   SubdomainApprovalPayload,
-  SubdomainApprovalPayloadBase,
   SubdomainApprovalRes,
   SubmitPolyTLDRegistrationPayload,
   TLDApproval,
@@ -21,10 +18,10 @@ import {
 } from './types';
 import { TypedData } from '../types/TypedData';
 import getRandomHex from '../utils/getRandomHex';
-import { getDwebAddress, getWethAddress } from '../contracts';
 import { SubdomainEntry as SubdomainEntry } from '../registrars/types/Subdomain';
-import { getChainId } from '../utils/ethereum';
-import { ChainId, Network } from '../types/common';
+import { getChainId } from '../utils/chains';
+import { ChainId, Network, Token } from '../types/common';
+import { getFeeTokenAddress, validateFeeToken, ZERO_ADDRESS } from '../tokens';
 
 export * from './types';
 
@@ -45,7 +42,7 @@ export class DecentrawebAPI {
         this.baseUrl = 'https://api.decentraweb.org';
         break;
       case 'sepolia':
-      case 'maticmum':
+      case 'matic-amoy':
         this.baseUrl = 'https://dns-api-demo.decentraweb.org';
         break;
       default:
@@ -53,13 +50,20 @@ export class DecentrawebAPI {
     }
   }
 
-  async approveTLDRegistration(owner: string, names: Array<string>): Promise<TLDApproval> {
+  async approveTLDRegistration(
+    owner: string,
+    names: Array<string>,
+    feeToken?: Token
+  ): Promise<TLDApproval> {
+    feeToken = validateFeeToken(this.network, feeToken);
     const payload: TLDApprovalPayload = {
       name: names,
       owner: ethers.utils.getAddress(owner),
       chainid: this.chainId,
-      secret: '0x' + getRandomHex(32)
+      secret: '0x' + getRandomHex(32),
+      feeTokenAddress: getFeeTokenAddress(this.network, feeToken)
     };
+
     const result = await this.post<TLDApprovalRes>('/api/v1/approve-registration', {}, payload);
     if ('errorMessage' in result) {
       let message = result.errorMessage;
@@ -72,7 +76,9 @@ export class DecentrawebAPI {
       commitment: result.commitment,
       secret: payload.secret,
       signature: result.signature,
-      timestamp: result.timestamp
+      timestamp: result.timestamp,
+      feeToken,
+      feeTokenAddress: result.feeTokenAddress || ZERO_ADDRESS
     };
   }
 
@@ -80,9 +86,9 @@ export class DecentrawebAPI {
     sender: string,
     owner: string,
     entries: Array<SubdomainEntry>,
-    isFeesInDweb = false
+    feeToken?: Token
   ): Promise<{ payload: SubdomainApprovalPayload; typedData: TypedData }> {
-    const payload = this.getSLDApprovalPayload(owner, entries, isFeesInDweb, sender);
+    const payload = this.getSLDApprovalPayload(owner, entries, feeToken, sender);
     const typedData = await this.post<TypedData>(
       '/api/v1/get-approve-subdomain-registration',
       {},
@@ -109,9 +115,9 @@ export class DecentrawebAPI {
   async approveSLDRegistration(
     owner: string,
     entries: Array<SubdomainEntry>,
-    isFeesInDweb = false
+    feeToken?: Token
   ): Promise<SubdomainApproval> {
-    const payload = this.getSLDApprovalPayload(owner, entries, isFeesInDweb);
+    const payload = this.getSLDApprovalPayload(owner, entries, feeToken);
     const res = await this.post<SubdomainApprovalRes>(
       '/api/v1/approve-subdomain-registration',
       {},
@@ -154,6 +160,8 @@ export class DecentrawebAPI {
         usd: price,
         eth: BigNumber.from(res.eth[i]),
         dweb: BigNumber.from(res.dweb[i]),
+        usdt: BigNumber.from(res.usdt[i]),
+        usdc: BigNumber.from(res.usdc[i]),
         matic: res.matic ? BigNumber.from(res.matic[i]) : undefined
       };
     });
@@ -224,10 +232,10 @@ export class DecentrawebAPI {
   private getSLDApprovalPayload(
     owner: string,
     entries: Array<SubdomainEntry>,
-    isFeesInDweb = false,
+    feeToken?: Token,
     sender = ''
   ): SubdomainApprovalPayload {
-    const base: SubdomainApprovalPayloadBase = {
+    return {
       name: entries.map((e) => e.name),
       label: entries.map((e) => e.label),
       owner: ethers.utils.getAddress(owner),
@@ -236,23 +244,9 @@ export class DecentrawebAPI {
       duration: entries.map((e) => e.duration || 0),
       renewalFee: entries.map((e) =>
         'renewalFee' in e && e.renewalFee ? e.renewalFee.toString() : '0'
-      )
+      ),
+      feeTokenAddress: getFeeTokenAddress(this.network, feeToken)
     };
-    switch (this.network) {
-      case 'matic':
-      case 'maticmum':
-        return {
-          ...base,
-          feeTokenAddress: isFeesInDweb
-            ? getDwebAddress(this.network)
-            : getWethAddress(this.network)
-        } as PolySubdomainApprovalPayload;
-      default:
-        return {
-          ...base,
-          isFeeInDWEBToken: isFeesInDweb
-        } as EthSubdomainApprovalPayload;
-    }
   }
 }
 

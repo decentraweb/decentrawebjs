@@ -22,7 +22,7 @@ type Feature = 'address' | 'contentHash' | 'dns' | 'txt';
 
 function ethereumOnly(target: any, ctx: DecoratorContext): any {
   return function (this: DWEBName, ...args: any[]) {
-    if (this.network === 'matic' || this.network === 'maticmum') {
+    if (this.network === 'matic' || this.network === 'matic-amoy') {
       throw new NotSupportedError(target.name, this.network);
     }
     return target.apply(this, args);
@@ -51,7 +51,7 @@ export default class DWEBName {
     this.provider = provider;
     this.network = network;
     this.signer = signer;
-    const isMatic = this.network === 'matic' || this.network === 'maticmum';
+    const isMatic = this.network === 'matic' || this.network === 'matic-amoy';
     this.features = {
       address: true,
       contentHash: !isMatic,

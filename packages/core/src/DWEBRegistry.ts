@@ -10,7 +10,7 @@ import DecentrawebGraph from './graph';
 
 export default class DWEBRegistry extends DwebContractWrapper {
   constructor(options: DwebConfig) {
-    super(options, 'DWEBRegistry');
+    super(options, 'DWEBRegistryV2');
   }
 
   /**

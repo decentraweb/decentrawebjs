@@ -1,6 +1,7 @@
 import { Price } from './common';
 import { SubdomainApproval } from '../../api';
 import { DwebError } from '../../errors';
+import { NativeToken, Token } from '../../types/common';
 
 /**
  * Subdomain registration entry for registering subdomains for staked domains. Domain owned may specify if subdomains
@@ -35,8 +36,8 @@ export interface ApprovedRegistration {
   approval: SubdomainApproval;
   /** Domain owner address */
   owner: string;
-  /** If true, domain owner registration fee will be paid in DWEB tokens, otherwise in ETH */
-  isFeeInDWEB: boolean;
+  /** Token used to pay for registration */
+  feeToken: Token;
 }
 
 /**
@@ -46,11 +47,11 @@ export interface SubdomainFees {
   /**
    * Fee paid to domain owner. Paid in ETH or DWEB on Ethereum, in WETH or DWEB on Polygon
    */
-  ownerFee: Price<'ETH' | 'WETH' | 'DWEB'>;
+  ownerFee: Price;
   /**
    * Service fee paid to Decentraweb. Paid in ETH on Ethereum, in MATIC on Polygon
    */
-  serviceFee: Price<'ETH' | 'MATIC'>;
+  serviceFee: Price<NativeToken>;
 }
 
 /**
