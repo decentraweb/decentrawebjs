@@ -96,6 +96,18 @@ export class HTTPGateway {
     });
   }
 
+  closeHttps(): Promise<void> {
+    return new Promise((resolve) => {
+      this.httpsServer.close(() => resolve());
+    });
+  }
+
+  closeHttp(): Promise<void> {
+    return new Promise((resolve) => {
+      this.httpServer.close(() => resolve());
+    });
+  }
+
   handleSNI = async (name: string): Promise<SecureContext | undefined> => {
     let site = await this.greenlock.get({ servername: name });
     if (!name.toLowerCase().endsWith(this.baseDomain)) {
