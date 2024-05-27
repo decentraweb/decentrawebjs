@@ -7,6 +7,7 @@ import { RegistrarConfig } from '../BaseRegistrar';
 import { Token } from '../../types/common';
 import { validateFeeToken, ZERO_ADDRESS } from '../../tokens';
 import BaseTLDRegistrar from '../BaseTLDRegistrar';
+import { delay } from '../../utils/misc';
 
 export type {
   ApprovedRegistration,
@@ -97,8 +98,7 @@ export class EthereumTLDRegistrar extends BaseTLDRegistrar {
     return {
       ...request,
       status: 'committed',
-      tx: commitmentTx,
-      committedAt: new Date()
+      tx: commitmentTx
     };
   }
 
@@ -114,11 +114,10 @@ export class EthereumTLDRegistrar extends BaseTLDRegistrar {
       throw new Error('Registration is not committed, call `sendCommitment` first');
     }
     // Make sure that commitment transaction has at least 1 confirmation
-    await request.tx.wait(1);
-
-    if (request.committedAt.getTime() + REGISTRATION_WAIT > Date.now()) {
-      throw new Error('Registration is not ready, wait for 1 minute after commitment');
-    }
+    const receipt = await request.tx.wait(1);
+    // Wait for 1 minute after commitment was made
+    const block = await this.provider.getBlock(receipt.blockNumber);
+    await delay(REGISTRATION_WAIT - (Date.now() - block.timestamp * 1000));
 
     const domains = request.domains;
     const normalizedNames = domains.map((item) => item.name);

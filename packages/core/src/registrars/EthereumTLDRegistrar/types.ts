@@ -15,7 +15,6 @@ export interface ApprovedRegistration extends BaseRegistrationContext {
 export interface CommittedRegistration extends BaseRegistrationContext {
   status: 'committed';
   tx: providers.TransactionResponse;
-  committedAt: Date;
 }
 
 export type RegistrationContext = ApprovedRegistration | CommittedRegistration;
