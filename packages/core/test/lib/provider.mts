@@ -14,7 +14,7 @@ export function getProvider(chain: 'ethereum' | 'polygon') {
     network = 'sepolia';
     provider = new providers.JsonRpcProvider(`https://sepolia.infura.io/v3/${API_KEY}`, 'sepolia');
   } else {
-    network = 'maticmum';
+    network = 'matic-amoy';
     provider = new providers.JsonRpcProvider(
       `https://polygon-mumbai.infura.io/v3/${API_KEY}`,
       'maticmum'

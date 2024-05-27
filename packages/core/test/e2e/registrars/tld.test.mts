@@ -1,9 +1,9 @@
 import { Network, registrars } from '@decentraweb/core';
 import { expect } from 'chai';
 import { Chance } from 'chance';
-import nameExists from '../../lib/assertions/nameExists';
-import { getProvider } from '../../lib/provider';
-import { wait } from '../../lib/utils';
+import nameExists from '../../lib/assertions/nameExists.mjs';
+import { getProvider } from '../../lib/provider.mjs';
+import { wait } from '../../lib/utils.mjs';
 import { providers, Signer } from 'ethers';
 
 const chance = new Chance();
@@ -56,16 +56,17 @@ describe('Register TLD', function () {
         name: domain,
         duration: DURATION.ONE_YEAR
       };
-      const approval = await registrar.requestApproval(entry);
+      const approval = await registrar.requestApproval(entry, 'DWEB');
       expect(approval.status).to.be.equal('approved');
       expect(approval.domains[0]).to.deep.equal(entry);
       expect(approval.owner).to.be.equal(owner);
       const commitment = await registrar.sendCommitment(approval);
       expect(commitment.status).to.be.equal('committed');
       expect(commitment).to.have.property('tx');
+      expect(commitment.feeToken).to.be.equal('DWEB');
       await commitment.tx.wait(1);
       await wait(60000);
-      const tx = await registrar.register(commitment, true);
+      const tx = await registrar.register(commitment);
       await tx.wait(1);
       await nameExists(domain, 'ethereum');
     });
@@ -85,7 +86,7 @@ describe('Register TLD', function () {
       });
     });
 
-    it('should register a TLD and pay with ETH', async function () {
+    it('should register a TLD and pay with MATIC', async function () {
       const domain = chance.word({ syllables: 3 });
       const entry = {
         name: domain,
@@ -95,6 +96,7 @@ describe('Register TLD', function () {
       expect(commitment.status).to.be.equal('committed');
       expect(commitment.data).to.have.property('secret');
       expect(commitment.data).to.have.property('timestamp');
+      expect(commitment.feeToken).to.be.equal('MATIC');
       await wait(60000);
       const tx = await registrar.register(commitment);
       await tx.wait(1);
@@ -107,10 +109,11 @@ describe('Register TLD', function () {
         name: domain,
         duration: DURATION.ONE_YEAR
       };
-      const commitment = await registrar.sendCommitment(entry, true);
+      const commitment = await registrar.sendCommitment(entry, 'DWEB');
       expect(commitment.status).to.be.equal('committed');
       expect(commitment.data).to.have.property('secret');
       expect(commitment.data).to.have.property('timestamp');
+      expect(commitment.feeToken).to.be.equal('DWEB');
       await wait(60000);
       const tx = await registrar.register(commitment);
       await tx.wait(1);

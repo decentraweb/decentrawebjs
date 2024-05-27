@@ -1,8 +1,8 @@
 import { registrars } from '@decentraweb/core';
-import { getProvider } from '../../lib/provider.js';
+import { getProvider } from '../../lib/provider.mjs';
 import { expect } from 'chai';
 import { Chance } from 'chance';
-import nameExists from '../../lib/assertions/nameExists.js';
+import nameExists from '../../lib/assertions/nameExists.mjs';
 const { DURATION, SubdomainRegistrar } = registrars;
 
 const chance = new Chance();
@@ -18,7 +18,7 @@ describe('Renewable subdomain registration', function () {
     });
   });
 
-  it('should register a subdomain for staked domain for 2 years and pay in ETH/WETH', async function () {
+  it('should register a subdomain for staked domain for 2 years and pay in MATIC', async function () {
     const subdomain = chance.word();
     const registration = await registrar.approveOndemandRegistration({
       name: 'renewable',
@@ -28,7 +28,7 @@ describe('Renewable subdomain registration', function () {
     expect(registration).to.have.property('approval');
     expect(registration.approval.durations[0]).to.be.equal(DURATION.TWO_YEARS);
     expect(registration.owner).to.be.equal(await signer.getAddress());
-    expect(registration.isFeeInDWEB).to.be.false;
+    expect(registration.feeToken).to.be.equal('MATIC');
     const tx = await registrar.finishRegistration(registration);
     expect(tx).to.have.property('hash');
     await tx.wait(1);

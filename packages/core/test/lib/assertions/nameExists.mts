@@ -1,5 +1,5 @@
 import { DWEBRegistry } from '@decentraweb/core';
-import { getProvider } from '../provider.js';
+import { getProvider } from '../provider.mjs';
 import { expect } from 'chai';
 
 async function nameExists(domain: string, chain: 'ethereum' | 'polygon' = 'ethereum') {
