@@ -1,4 +1,4 @@
-import { BigNumber, ethers, providers } from 'ethers';
+import { BigNumber, Contract, ethers, providers } from 'ethers';
 import {
   ApprovedRegistration,
   OnDemandEntry,
@@ -11,8 +11,8 @@ import signTypedData from '../../utils/signTypedData';
 import { increaseByPercent } from '../../utils/misc';
 import { DURATION } from '../constants';
 import { normalizeDuration } from '../utils';
+import { getContract } from '../../contracts';
 import BaseRegistrar, { RegistrarConfig } from '../BaseRegistrar';
-import { SubdomainApproval } from '../../api';
 import { hashName, normalizeName } from '../../utils';
 import { InsufficientAllowanceError, InsufficientBalanceError } from '../../errors';
 import { Token } from '../../types/common';
@@ -42,8 +42,16 @@ import {
  *  ```
  */
 class SubdomainRegistrar extends BaseRegistrar {
+  readonly tldRegistrarContract: Contract;
+
   constructor(config: RegistrarConfig) {
     super(config, 'RootRegistrarControllerSld');
+    this.tldRegistrarContract = getContract({
+      address: this.contractConfig['RootRegistrarController'],
+      name: 'RootRegistrarController',
+      provider: this.signer || this.provider,
+      network: this.network
+    });
   }
   /**
    * Get subdomain registration approval for domain names owned by signer
@@ -270,7 +278,7 @@ class SubdomainRegistrar extends BaseRegistrar {
    * @returns - fee in USD
    */
   async getServiceFee(): Promise<number> {
-    const fee: BigNumber = await this.contract.subdomainFee();
+    const fee: BigNumber = await this.tldRegistrarContract.subdomainFee();
     return fee.div(1000000).toNumber();
   }
 
@@ -279,7 +287,7 @@ class SubdomainRegistrar extends BaseRegistrar {
    * @returns - fee in USD
    */
   async getRenewalServiceFee(): Promise<number> {
-    const fee: BigNumber = await this.contract.subdomainRenewalFee();
+    const fee: BigNumber = await this.tldRegistrarContract.subdomainRenewalFee();
     return fee.div(1000000).toNumber();
   }
 }
