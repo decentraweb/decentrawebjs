@@ -20,15 +20,6 @@ type NameConfig = {
 
 type Feature = 'address' | 'contentHash' | 'dns' | 'txt';
 
-function ethereumOnly(target: any, ctx: DecoratorContext): any {
-  return function (this: DWEBName, ...args: any[]) {
-    if (this.network === 'matic' || this.network === 'matic-amoy') {
-      throw new NotSupportedError(target.name, this.network);
-    }
-    return target.apply(this, args);
-  };
-}
-
 export default class DWEBName {
   readonly name: string;
   readonly namehash: string;
@@ -246,7 +237,6 @@ export default class DWEBName {
     return Resolver.setAllRecords([this.namehash], [coinTypes], [addresses]);
   }
 
-  @ethereumOnly
   async getText(key: string): Promise<string> {
     const Resolver = await this.getResolver();
     if (!Resolver) {
@@ -262,7 +252,6 @@ export default class DWEBName {
     }
   }
 
-  @ethereumOnly
   async setText(key: string, value: string): Promise<providers.TransactionResponse> {
     const Resolver = await this.getResolver(true);
     if (!Resolver) {
@@ -272,7 +261,6 @@ export default class DWEBName {
   }
 
   //TODO: This is not working properly currently. Looks like in go-ens it is broken too
-  @ethereumOnly
   async hasDNS() {
     const Resolver = await this.getResolver();
     if (!Resolver) {
@@ -285,7 +273,6 @@ export default class DWEBName {
    * Write DNS data in binary wire format
    * @param data - DNS records encoded in binary format
    */
-  @ethereumOnly
   async setDNS(data: Buffer): Promise<providers.TransactionResponse> {
     const Resolver = await this.getResolver(true);
     if (!Resolver) {
@@ -298,7 +285,6 @@ export default class DWEBName {
    * Get DNS records of given type. Records are in binary format.
    * @param type
    */
-  @ethereumOnly
   async getDNS(type: number): Promise<Buffer | null> {
     const Resolver = await this.getResolver();
     if (!Resolver) {
@@ -311,7 +297,6 @@ export default class DWEBName {
   /**
    * Remove all DNS records for name
    */
-  @ethereumOnly
   async clearDNS(): Promise<providers.TransactionResponse> {
     const Resolver = await this.getResolver(true);
     if (!Resolver) {
@@ -327,7 +312,6 @@ export default class DWEBName {
    *
    * @param contentUrl
    */
-  @ethereumOnly
   async setContenthash(contentUrl: string | null): Promise<providers.TransactionResponse> {
     const Resolver = await this.getResolver(true);
     if (!Resolver) {
@@ -337,7 +321,6 @@ export default class DWEBName {
     return Resolver.setContenthash(this.namehash, data);
   }
 
-  @ethereumOnly
   async getContenthash(): Promise<string | null> {
     const Resolver = await this.getResolver();
     if (!Resolver) {
