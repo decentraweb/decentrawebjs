@@ -13,7 +13,6 @@ export interface TLDApprovalSuccess {
   commitment: string;
   signature: string;
   timestamp: number;
-  feeTokenAddress: string | null;
 }
 
 export interface TLDApprovalError {
@@ -54,7 +53,7 @@ export interface RequestPolyTLDRegistrationPayload {
   secret: string;
   owner: string;
   timestamp: number;
-  feeTokenAddress: string;
+  feeTokenAddress: string | null;
   fee: string;
 }
 

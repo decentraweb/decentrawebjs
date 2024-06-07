@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "./test"
+  ],
+  "ts-node": {
+    "files": true,
+    "compilerOptions": {
+    }
+  }
+}

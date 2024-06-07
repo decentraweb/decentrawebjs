@@ -1,0 +1,11 @@
+{
+  "timeout": 180000,
+  "extension": [
+    "ts"
+  ],
+  "spec": "test/**/*.test.ts",
+  "require": [
+    "ts-node/register"
+  ],
+  "recursive": true
+}

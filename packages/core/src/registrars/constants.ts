@@ -32,4 +32,4 @@ export const APPROVAL_TTL = 30 * 60; // 30 minutes
 /**
  * Time to wait before calling `register` after `sendCommitment` call.
  */
-export const REGISTRATION_WAIT = 60 * 1000; // 1 minute
+export const REGISTRATION_WAIT = (60 + 5) * 1000; // 1 minute is required, adding 5 seconds for safety

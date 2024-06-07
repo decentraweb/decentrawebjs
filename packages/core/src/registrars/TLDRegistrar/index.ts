@@ -18,7 +18,7 @@ export type {
 };
 
 /**
- * Class that handles TLD registration on Ethereum network.
+ * Class that handles TLD registration.
  * Registration is done in 4 steps:
  * 1. Calling {@link requestApproval} to get registration approval.
  * 2. Calling {@link sendCommitment} to create commitment for registration.
@@ -43,7 +43,7 @@ export type {
  * await tx.wait(1);
  * ```
  */
-export class EthereumTLDRegistrar extends BaseTLDRegistrar {
+export class TLDRegistrar extends BaseTLDRegistrar {
   constructor(config: RegistrarConfig) {
     super(config, 'RootRegistrarController');
   }
@@ -145,4 +145,4 @@ export class EthereumTLDRegistrar extends BaseTLDRegistrar {
   }
 }
 
-export default EthereumTLDRegistrar;
+export default TLDRegistrar;

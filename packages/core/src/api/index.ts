@@ -78,7 +78,7 @@ export class DecentrawebAPI {
       signature: result.signature,
       timestamp: result.timestamp,
       feeToken,
-      feeTokenAddress: result.feeTokenAddress || ZERO_ADDRESS
+      feeTokenAddress: payload.feeTokenAddress || ZERO_ADDRESS
     };
   }
 

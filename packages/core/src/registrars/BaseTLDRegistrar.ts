@@ -49,7 +49,7 @@ abstract class BaseTLDRegistrar extends BaseRegistrar {
       error: null,
       price: rentPrice,
       safePrice,
-      currency: isPaidWithNative ? 'ETH' : feeToken
+      currency: feeToken
     };
 
     if (!isPaidWithNative) {

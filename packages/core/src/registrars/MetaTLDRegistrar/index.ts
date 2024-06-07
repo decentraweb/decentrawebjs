@@ -7,15 +7,30 @@ import { APPROVAL_TTL } from '../constants';
 import signTypedData from '../../utils/signTypedData';
 import { RegistrarConfig } from '../BaseRegistrar';
 import { PolygonNetwork, Token } from '../../types/common';
-import { getFeeTokenAddress, validateFeeToken } from '../../tokens';
+import { getFeeTokenAddress, ZERO_ADDRESS } from '../../tokens';
 import BaseTLDRegistrar from '../BaseTLDRegistrar';
 
 interface Config extends RegistrarConfig {
   network: PolygonNetwork;
 }
 
+type FeeToken = 'DWEB' | 'USDT' | 'WETH';
+
+const FEE_TOKENS: Array<FeeToken> = ['DWEB', 'USDT', 'WETH'];
+
+function validateFeeToken(token: any): FeeToken {
+  if (!token) {
+    throw new Error('Fee token is required. Valid options are DWEB, USDT, WETH');
+  }
+  token = token.toUpperCase();
+  if (FEE_TOKENS.indexOf(token) > -1) {
+    return token;
+  }
+  throw new Error(`Token "${token}" is not supported for registration fee`);
+}
+
 /**
- * Class that handles TLD registration on Polygon network.
+ * This registrar allow registering domains with 0 gas fees on Polygon. Fee can be paid with DWEB, USDT, WETH tokens only.
  * Registration is done in 2 steps:
  * 1. Calling {@link sendCommitment} to get registration approval.
  * 2. Calling {@link register} to finish registration.
@@ -34,7 +49,7 @@ interface Config extends RegistrarConfig {
  * await tx.wait(1);
  * ```
  */
-class PolygonTLDRegistrar extends BaseTLDRegistrar {
+class MetaTLDRegistrar extends BaseTLDRegistrar {
   readonly network: PolygonNetwork;
 
   constructor(options: Config) {
@@ -50,10 +65,10 @@ class PolygonTLDRegistrar extends BaseTLDRegistrar {
    */
   async sendCommitment(
     request: TLDEntry | Array<TLDEntry>,
-    feeToken?: Token,
+    feeToken: FeeToken,
     owner?: string
   ): Promise<CommittedRegistration> {
-    feeToken = validateFeeToken(this.network, feeToken);
+    feeToken = validateFeeToken(feeToken);
     const feeTokenAddress = getFeeTokenAddress(this.network, feeToken);
     const entries = normalizeDomainEntries(request);
     const { error, safePrice } = await this.verifySignerBalance(entries, feeToken);
@@ -103,7 +118,7 @@ class PolygonTLDRegistrar extends BaseTLDRegistrar {
       secret: request.data.secret,
       owner: request.owner,
       timestamp: request.data.timestamp,
-      feeTokenAddress: request.feeTokenAddress,
+      feeTokenAddress: request.feeTokenAddress === ZERO_ADDRESS ? null : request.feeTokenAddress,
       fee: request.fee.toString()
     };
     const typedData = await this.api.requestPolygonTLDRegistration(registrationPayload);
@@ -116,4 +131,4 @@ class PolygonTLDRegistrar extends BaseTLDRegistrar {
   }
 }
 
-export default PolygonTLDRegistrar;
+export default MetaTLDRegistrar;

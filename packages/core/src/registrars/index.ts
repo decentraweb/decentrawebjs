@@ -1,5 +1,5 @@
-import EthereumTLDRegistrar from './EthereumTLDRegistrar';
-import PolygonTLDRegistrar from './PolygonTLDRegistrar';
+import TLDRegistrar from './TLDRegistrar';
+import MetaTLDRegistrar from './MetaTLDRegistrar';
 import SubdomainRegistrar from './SubdomainRegistrar';
 import { RegistrarConfig } from './BaseRegistrar';
 
@@ -10,4 +10,4 @@ export * from './types/Subdomain';
 export * from './types/TLD';
 
 export * from './constants';
-export { EthereumTLDRegistrar, PolygonTLDRegistrar, SubdomainRegistrar };
+export { TLDRegistrar, MetaTLDRegistrar, SubdomainRegistrar };
