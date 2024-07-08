@@ -6,7 +6,6 @@ import { Buffer } from 'buffer';
 import { getContract } from './contracts';
 import { Network } from './types/common';
 import { hashName } from './utils';
-import { NotSupportedError } from './utils/errors';
 
 const NO_DATA = '0x';
 

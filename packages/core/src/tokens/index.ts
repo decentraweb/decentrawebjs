@@ -1,12 +1,5 @@
 import { ethers, providers } from 'ethers';
-import {
-  AltToken,
-  AltTokenConfig,
-  NativeToken,
-  Network,
-  PolygonNetwork,
-  Token
-} from '../types/common';
+import { AltToken, AltTokenConfig, NativeToken, Network, Token } from '../types/common';
 import ERC20 from './ERC20.json';
 import { isMaticChain } from '../utils/chains';
 
@@ -15,16 +8,16 @@ import { isMaticChain } from '../utils/chains';
  */
 const ALT_TOKEN_ADDRESSES: Record<Network, AltTokenConfig> = {
   mainnet: {
-    DWEB: '',
+    DWEB: '0xE7f58A92476056627f9FdB92286778aBd83b285F',
     WETH: null,
-    USDC: '',
-    USDT: ''
+    USDC: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+    USDT: '0xdac17f958d2ee523a2206206994597c13d831ec7'
   },
   matic: {
-    DWEB: '',
-    WETH: '',
-    USDC: '',
-    USDT: ''
+    DWEB: '0x8839e639F210B80ffea73AedF51baed8DAc04499',
+    WETH: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
+    USDC: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359',
+    USDT: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f'
   },
   sepolia: {
     DWEB: '0x729f486266BAa402ab0A1F0fD8372Cd9C6dbcF3D',

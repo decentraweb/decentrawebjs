@@ -58,12 +58,12 @@ import { isMaticChain } from '../utils/chains';
  */
 export const CONTRACT_ADDRESSES: Record<Network, ContractConfig> = {
   mainnet: {
-    DWEBRegistryV2: '',
-    DefaultReverseResolver: '',
-    PublicResolver: '',
-    ReverseRegistrar: '',
-    RootRegistrarController: '',
-    RootRegistrarControllerSld: ''
+    DWEBRegistryV2: '0x8eb93AB94A6Afa8d416aB1884Ebb5A3f00920a7A',
+    DefaultReverseResolver: '0x7d770Cfe9608Ff3AA3F5A34bdCd27c3870a370Da',
+    PublicResolver: '0xf157D3559DF1F8c69cb757A1A2cdF8736618E083',
+    ReverseRegistrar: '0x3D8f878584199e47a2d40A1E269042E10aa50754',
+    RootRegistrarController: '0xcCbCa4F9651Ef122D58d7EC5acCa27D806840209',
+    RootRegistrarControllerSld: '0x26cb2f1F3F0450d17CC86c72193d2E67601E6D35'
   },
   sepolia: {
     DWEBRegistryV2: '0x650b85399f263BdcD0A374164C7520Df35c28Bf4',
@@ -74,12 +74,12 @@ export const CONTRACT_ADDRESSES: Record<Network, ContractConfig> = {
     RootRegistrarControllerSld: '0xdb33a899e4015164807d76a10e7b87EcB81D1804'
   },
   matic: {
-    DWEBRegistryV2: '',
-    DefaultReverseResolver: '',
-    PublicResolver: '',
-    ReverseRegistrar: '',
-    RootRegistrarController: '',
-    RootRegistrarControllerSld: ''
+    DWEBRegistryV2: '0x9f3eadf2360Dc4432a003699398169A2c7C10211',
+    DefaultReverseResolver: '0xeEc93022ec031d6AD2E35AA36edFE80d73F8808a',
+    PublicResolver: '0xEF2a00dc4ecA8174Bcf59dd8e124ba8f99307FF8',
+    ReverseRegistrar: '0x662b0b6253e44F56DF387aCabd86A69D1e2A8cA9',
+    RootRegistrarController: '0x38CcdB2660C63374e475090aAbE4F8339Cf4232E',
+    RootRegistrarControllerSld: '0x27cB68E9B60BEAFA671d230d848bfB8a5b65F968'
   },
   'matic-amoy': {
     DWEBRegistryV2: '0xfB300317c70Da9ED624E4077E94A85999E2B9f81',
