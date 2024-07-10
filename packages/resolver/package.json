@@ -1,6 +1,6 @@
 {
   "name": "@decentraweb/resolver",
-  "version": "3.0.0-alpha.1",
+  "version": "3.0.0-alpha.2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/decentraweb/decentrawebjs.git"
@@ -26,8 +26,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@decentraweb/core": "^3.0.0-alpha.1",
-    "@decentraweb/namekit": "^3.0.0-alpha.1",
+    "@decentraweb/core": "^3.0.0-alpha.2",
+    "@decentraweb/namekit": "^3.0.0-alpha.2",
     "bs58": "^5.0.0",
     "dns-packet": "^5.6.0",
     "dotenv": "^16.0.3",
