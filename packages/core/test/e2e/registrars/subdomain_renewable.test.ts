@@ -4,7 +4,6 @@ import { expect } from 'chai';
 import { Chance } from 'chance';
 import nameExists from '../../lib/assertions/nameExists';
 import { TEST_DOMAINS } from '../../constants';
-import { before } from 'node:test';
 const { DURATION, SubdomainRegistrar } = registrars;
 
 const chance = new Chance();

@@ -5,7 +5,6 @@ import nameExists from '../../lib/assertions/nameExists';
 import { getProvider } from '../../lib/provider';
 import { wait } from '../../lib/utils';
 import { providers, Signer } from 'ethers';
-import { before } from 'node:test';
 
 const chance = new Chance();
 const { DURATION, TLDRegistrar, MetaTLDRegistrar } = registrars;
@@ -157,13 +156,11 @@ describe('Register TLD', function () {
         name: domain,
         duration: DURATION.ONE_YEAR
       };
-      await registrar.allowTokenUsage('WETH');
       const commitment = await registrar.sendCommitment(entry, 'WETH');
       expect(commitment.status).to.be.equal('committed');
       expect(commitment.data).to.have.property('secret');
       expect(commitment.data).to.have.property('timestamp');
       expect(commitment.feeToken).to.be.equal('WETH');
-      await wait(60000);
       const tx = await registrar.register(commitment);
       await tx.wait(1);
       await nameExists(domain, 'polygon');
@@ -175,13 +172,11 @@ describe('Register TLD', function () {
         name: domain,
         duration: DURATION.ONE_YEAR
       };
-      await registrar.allowTokenUsage('DWEB');
       const commitment = await registrar.sendCommitment(entry, 'DWEB');
       expect(commitment.status).to.be.equal('committed');
       expect(commitment.data).to.have.property('secret');
       expect(commitment.data).to.have.property('timestamp');
       expect(commitment.feeToken).to.be.equal('DWEB');
-      await wait(60000);
       const tx = await registrar.register(commitment);
       await tx.wait(1);
       await nameExists(domain, 'polygon');

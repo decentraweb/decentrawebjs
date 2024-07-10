@@ -22,6 +22,7 @@ import { SubdomainEntry as SubdomainEntry } from '../registrars/types/Subdomain'
 import { getChainId } from '../utils/chains';
 import { ChainId, Network, Token } from '../types/common';
 import { getFeeTokenAddress, validateFeeToken, ZERO_ADDRESS } from '../tokens';
+import { DwebApiError } from '../errors';
 
 export * from './types';
 
@@ -212,6 +213,9 @@ export class DecentrawebAPI {
     url.pathname = path;
     url.search = new URLSearchParams(query).toString();
     const response = await fetch(url.toString());
+    if (!response.ok) {
+      throw await DwebApiError.fromResponse(response);
+    }
     return response.json();
   }
 
@@ -226,6 +230,9 @@ export class DecentrawebAPI {
       },
       body: JSON.stringify(data)
     });
+    if (!response.ok) {
+      throw await DwebApiError.fromResponse(response);
+    }
     return response.json();
   }
 

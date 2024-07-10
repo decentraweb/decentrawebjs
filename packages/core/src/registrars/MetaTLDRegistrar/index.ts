@@ -3,12 +3,13 @@ import { normalizeDomainEntries, normalizeDuration } from '../utils';
 import getRandomHex from '../../utils/getRandomHex';
 import { TLDEntry } from '../types/TLD';
 import { CommittedRegistration } from './types';
-import { APPROVAL_TTL } from '../constants';
+import { APPROVAL_TTL, REGISTRATION_WAIT } from '../constants';
 import signTypedData from '../../utils/signTypedData';
 import { RegistrarConfig } from '../BaseRegistrar';
 import { PolygonNetwork, Token } from '../../types/common';
 import { getFeeTokenAddress, ZERO_ADDRESS } from '../../tokens';
 import BaseTLDRegistrar from '../BaseTLDRegistrar';
+import { delay } from '../../utils/misc';
 
 interface Config extends RegistrarConfig {
   network: PolygonNetwork;
@@ -92,6 +93,10 @@ class MetaTLDRegistrar extends BaseTLDRegistrar {
       signature: signature
     });
 
+    const commitmentTx = await this.provider.getTransaction(result.txid);
+
+    await commitmentTx.wait(1);
+
     return {
       domains: entries,
       owner: nameOwner,
@@ -100,6 +105,7 @@ class MetaTLDRegistrar extends BaseTLDRegistrar {
       feeTokenAddress,
       fee: safePrice,
       status: 'committed',
+      tx: commitmentTx,
       data: {
         secret,
         timestamp: result.timestamp
@@ -112,6 +118,12 @@ class MetaTLDRegistrar extends BaseTLDRegistrar {
    * @param request - data returned from `sendCommitment` step
    */
   async register(request: CommittedRegistration): Promise<providers.TransactionResponse> {
+    // Make sure that commitment transaction has at least 1 confirmation
+    const receipt = await request.tx.wait(1);
+    // Wait for 1 minute after commitment was made
+    const block = await this.provider.getBlock(receipt.blockNumber);
+    await delay(REGISTRATION_WAIT - (Date.now() - block.timestamp * 1000));
+
     const registrationPayload = {
       name: request.domains.map((e) => e.name),
       duration: request.domains.map((e) => e.duration),

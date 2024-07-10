@@ -1,5 +1,5 @@
 import { TLDEntry } from '../types/TLD';
-import { BigNumber } from 'ethers';
+import { BigNumber, providers } from 'ethers';
 import { Token } from '../../types/common';
 
 /**
@@ -22,10 +22,12 @@ export interface BaseRegistrationContext {
 /**
  * @extends BaseRegistrationContext
  * @property status - 'committed'
+ * @property tx - commitment transaction response
  * @property data - data needed to complete the registration
  */
 export interface CommittedRegistration extends BaseRegistrationContext {
   status: 'committed';
+  tx: providers.TransactionResponse;
   data: {
     secret: string;
     timestamp: number;

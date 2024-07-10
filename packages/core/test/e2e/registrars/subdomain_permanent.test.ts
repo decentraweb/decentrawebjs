@@ -4,7 +4,6 @@ import { expect } from 'chai';
 import { Chance } from 'chance';
 import nameExists from '../../lib/assertions/nameExists';
 import { TEST_DOMAINS } from '../../constants';
-import { before } from 'node:test';
 
 const chance = new Chance();
 const { network, provider, signer } = getProvider('ethereum');
