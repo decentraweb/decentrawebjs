@@ -1,4 +1,4 @@
-import { DWEBName, RecordSet } from '@decentraweb/core';
+import { DNSRecord, DWEBName, RecordSet } from '@decentraweb/core';
 import { supportsHTTPS } from './utils';
 import Cache from './Cache';
 
@@ -28,7 +28,7 @@ export async function resolveDNS(
     recordsRaw = await name.getDNS(RecordSet.recordType.toType('AAAA'));
   }
   if (recordsRaw && recordsRaw.length) {
-    const records = RecordSet.decode(recordsRaw);
+    const records = RecordSet.decode<DNSRecord.AAAA>(recordsRaw);
     const record = records[0];
     const result: DNSResult = {
       domain: name.name,
@@ -36,7 +36,7 @@ export async function resolveDNS(
       protocol: record.type === 'AAAA' ? 6 : 4,
       isHTTPS: await supportsHTTPS(record.data as string)
     };
-    await DNS_CACHE.write(name.namehash, result, record.ttl * 1000);
+    await DNS_CACHE.write(name.namehash, result, (record.ttl || 3600) * 1000);
     return result;
   }
 

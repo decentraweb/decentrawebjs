@@ -42,6 +42,7 @@
     "@babel/core": "^7.23.2",
     "@babel/preset-env": "^7.23.2",
     "@babel/preset-typescript": "^7.23.2",
+    "@types/dns-packet": "^5.6.5",
     "@types/punycode": "^2.1.0",
     "babel-loader": "^9.1.2",
     "buffer": "^6.0.3",
@@ -54,5 +55,6 @@
     "webpack": "^5.82.1",
     "webpack-bundle-analyzer": "^4.8.0",
     "webpack-cli": "^5.1.1"
-  }
+  },
+  "gitHead": "a7d00e195c2a9f08d97d20ef0239b5100100e112"
 }

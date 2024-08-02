@@ -6,7 +6,7 @@
     "decentraweb": "build/index.js"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -25,8 +25,10 @@
     "prompts": "^2.4.2"
   },
   "devDependencies": {
+    "@types/node": "^18.19.39",
     "@types/prompts": "^2.4.4",
     "rimraf": "^5.0.1",
     "typescript": "^5.0.4"
-  }
+  },
+  "gitHead": "a7d00e195c2a9f08d97d20ef0239b5100100e112"
 }

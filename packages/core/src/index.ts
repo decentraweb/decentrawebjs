@@ -11,7 +11,7 @@ import * as utils from './utils';
 
 export * from './types/common';
 export * from './types/TypedData';
-export type { DNSRecord, Record, RecordClass, RecordType } from './RecordSet/DNSRecord';
+export type { DNSRecord, RecordClass, RecordType } from './RecordSet/DNSRecord';
 
 export {
   DWEBName,

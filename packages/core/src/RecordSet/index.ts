@@ -1,7 +1,6 @@
-import { answer as answerCoder } from 'dns-packet';
+import { Answer, answer as answerCoder } from 'dns-packet';
 import * as recordType from './type';
 import { Buffer } from 'buffer';
-import { DNSRecord } from './DNSRecord';
 
 /**
  * Helper class for encoding and decoding DNS records. Record set is an array of DNS records.
@@ -13,9 +12,9 @@ export class RecordSet {
    * Decodes a buffer into an array of DNS records.
    * @param buf - dns record in binary format
    */
-  static decode(buf: Buffer): DNSRecord[] {
+  static decode<T = Answer>(buf: Buffer): T[] {
     let offset = 0;
-    const result = [];
+    const result: T[] = [];
     while (offset < buf.length) {
       result.push(answerCoder.decode(buf, offset));
       offset += answerCoder.decode.bytes;
@@ -27,7 +26,7 @@ export class RecordSet {
    * Encodes an array of DNS records into a binary format.
    * @param records
    */
-  static encode(records: DNSRecord[]): Buffer {
+  static encode(records: Answer[]): Buffer {
     const buffers: Buffer[] = [];
     records.forEach((record) => {
       buffers.push(answerCoder.encode(record));

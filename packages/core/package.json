@@ -33,6 +33,7 @@
     "@babel/preset-typescript": "^7.23.2",
     "@types/chai": "^4.3.6",
     "@types/chance": "^1.1.4",
+    "@types/dns-packet": "^5.6.5",
     "@types/mocha": "^10.0.1",
     "babel-loader": "^9.1.2",
     "buffer": "^6.0.3",
@@ -56,5 +57,6 @@
   },
   "browser": {
     "crypto": false
-  }
+  },
+  "gitHead": "a7d00e195c2a9f08d97d20ef0239b5100100e112"
 }

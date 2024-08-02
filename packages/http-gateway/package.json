@@ -15,7 +15,7 @@
     "url": "git+https://github.com/decentraweb/decentrawebjs.git"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "scripts": {
     "build": "rimraf ./build && tsc",
@@ -37,9 +37,10 @@
     "greenlock": "^4.0.4"
   },
   "devDependencies": {
-    "@types/node": "^16.18.31",
+    "@types/node": "^18.19.39",
     "nodemon": "^2.0.22",
     "rimraf": "^5.0.1",
     "typescript": "^5.0.4"
-  }
+  },
+  "gitHead": "a7d00e195c2a9f08d97d20ef0239b5100100e112"
 }

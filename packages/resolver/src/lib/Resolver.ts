@@ -105,7 +105,12 @@ class Resolver {
       return [];
     }
     if (resourceType !== 'CNAME') {
-      const [cname] = await this.resolve(domain, 'CNAME', logger, recursionLevel + 1);
+      const [cname] = (await this.resolve(
+        domain,
+        'CNAME',
+        logger,
+        recursionLevel + 1
+      )) as DNSRecord.CNAME[];
       if (cname) {
         return [
           cname,

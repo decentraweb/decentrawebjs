@@ -1,8 +1,15 @@
-import { DNSRecord, DWEBName, DWEBRegistry, Record, RecordSet } from '@decentraweb/core';
+import { DNSRecord, DWEBName, DWEBRegistry, RecordSet } from '@decentraweb/core';
 import prompts from 'prompts';
 import chalk from 'chalk';
 import { waitForTransaction } from '../utils/transaction';
 import Command from './Command';
+
+type SupportedRecord =
+  | DNSRecord.A
+  | DNSRecord.AAAA
+  | DNSRecord.CNAME
+  | DNSRecord.MX
+  | DNSRecord.TXT;
 
 interface Item {
   record: DNSRecord;
@@ -16,12 +23,12 @@ interface State {
 const SUPPORTER_TYPES = ['A', 'AAAA', 'CNAME', 'MX', 'TXT'];
 
 const FORMATTERS = {
-  A: (record: Record.A) => `${record.type}\t${record.class}\t${record.data}`,
-  AAAA: (record: Record.AAAA) => `${record.type}\t${record.class}\t${record.data}`,
-  CNAME: (record: Record.CNAME) => `${record.type}\t${record.class}\t${record.data}`,
-  MX: (record: Record.MX) =>
+  A: (record: DNSRecord.A) => `${record.type}\t${record.class}\t${record.data}`,
+  AAAA: (record: DNSRecord.AAAA) => `${record.type}\t${record.class}\t${record.data}`,
+  CNAME: (record: DNSRecord.CNAME) => `${record.type}\t${record.class}\t${record.data}`,
+  MX: (record: DNSRecord.MX) =>
     `${record.type}\t${record.class}\t${record.data.preference} ${record.data.exchange}`,
-  TXT: (record: Record.TXT) => `${record.type}\t${record.class}\t${record.data}`,
+  TXT: (record: DNSRecord.TXT) => `${record.type}\t${record.class}\t${record.data}`,
   UNKNOWN: (record: any) => `${record.type}\t${record.class}\t${record.data}`
 };
 
@@ -179,7 +186,7 @@ class DNSRecords extends Command {
         max: 86400
       }
     ]);
-    let record: DNSRecord;
+    let record: SupportedRecord;
     switch (recordType) {
       case 'A': {
         const { data } = await prompts([
@@ -281,9 +288,13 @@ class DNSRecords extends Command {
     this.state.records.sort((i1, i2) => {
       if (i1.record.type === i2.record.type) {
         if (i1.record.type === 'MX' && i2.record.type === 'MX') {
-          return i1.record.data.preference > i2.record.data.preference ? 1 : -1;
+          const preference1 = i1.record.data.preference || 0;
+          const preference2 = i2.record.data.preference || 0;
+          return preference1 > preference2 ? 1 : -1;
         }
-        return i1.record.data > i2.record.data ? 1 : -1;
+        const data1 = 'data' in i1.record ? i1.record.data : '';
+        const data2 = 'data' in i2.record ? i2.record.data : '';
+        return data1 > data2 ? 1 : -1;
       }
       const type1 = SUPPORTER_TYPES.indexOf(i1.record.type);
       const type2 = SUPPORTER_TYPES.indexOf(i2.record.type);
