@@ -1,4 +1,4 @@
-import { ethers, providers } from 'ethers';
+import { ethers, EnsResolver, AbstractProvider } from 'ethers';
 import { formatsByName } from '@ensdomains/address-encoder';
 import { PublicResolver as publicResolverContract } from '@ensdomains/ens-contracts';
 import BaseDomain from '../BaseDomain';
@@ -6,7 +6,7 @@ import { RecordSet, RecordType, utils } from '@decentraweb/core';
 import { dnsWireNameHash } from './utils';
 import { ENSConfig } from '../../types';
 
-export function getResolverContract(address: string, provider: providers.Provider) {
+export function getResolverContract(address: string, provider: AbstractProvider) {
   return new ethers.Contract(address, publicResolverContract, provider);
 }
 
@@ -18,7 +18,7 @@ export class ENSDomain extends BaseDomain {
     dns: true,
     txt: true
   };
-  private resolver?: providers.Resolver | null;
+  private resolver?: EnsResolver | null;
   private config: ENSConfig;
 
   constructor(name: string, config: ENSConfig) {

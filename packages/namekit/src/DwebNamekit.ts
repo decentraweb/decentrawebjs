@@ -6,6 +6,20 @@ import DWEBDomain from './domain/DWEBDomain';
 import getDomainProvider from './lib/getDomainProvider';
 import { getProviders } from './lib/providerUtils';
 import { DWEBRegistry } from '@decentraweb/core';
+import { getDefaultProvider } from 'ethers';
+
+export function getDefaultConfig(testNet: boolean = false): NamekitConfig {
+  return {
+    ethereum: {
+      network: testNet ? 'sepolia' : 'mainnet',
+      provider: testNet ? getDefaultProvider('sepolia') : getDefaultProvider('mainnet')
+    },
+    polygon: {
+      network: testNet ? 'matic-amoy' : 'matic',
+      provider: testNet ? getDefaultProvider('matic-amoy') : getDefaultProvider('matic')
+    }
+  };
+}
 
 /**
  * Helper class to resolve data for Decentraweb, ENS and classic domains.

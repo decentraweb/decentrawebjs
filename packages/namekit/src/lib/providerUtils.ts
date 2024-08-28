@@ -1,10 +1,18 @@
 import { EthereumNetwork, PolygonNetwork } from '@decentraweb/core';
-import { providers } from 'ethers';
+import {
+  AbstractProvider,
+  AlchemyProvider,
+  AnkrProvider,
+  CloudflareProvider,
+  EtherscanProvider,
+  InfuraProvider,
+  PocketProvider
+} from 'ethers';
 import { ApiProviderConfig, ProviderSet } from '../types';
 
-export async function detectEthNetwork(provider: providers.BaseProvider): Promise<EthereumNetwork> {
+export async function detectEthNetwork(provider: AbstractProvider): Promise<EthereumNetwork> {
   const network = await provider.getNetwork();
-  switch (network.chainId) {
+  switch (Number(network.chainId)) {
     case 1:
       return 'mainnet';
     case 11155111:
@@ -14,11 +22,9 @@ export async function detectEthNetwork(provider: providers.BaseProvider): Promis
   }
 }
 
-export async function detectMaticNetwork(
-  provider: providers.BaseProvider
-): Promise<PolygonNetwork> {
+export async function detectMaticNetwork(provider: AbstractProvider): Promise<PolygonNetwork> {
   const network = await provider.getNetwork();
-  switch (network.chainId) {
+  switch (Number(network.chainId)) {
     case 137:
       return 'matic';
     case 80001:
@@ -34,22 +40,22 @@ export function getProviders(config: ApiProviderConfig): ProviderSet {
   let ProviderClass;
   switch (config.apiProvider) {
     case 'etherscan':
-      ProviderClass = providers.EtherscanProvider;
+      ProviderClass = EtherscanProvider;
       break;
     case 'alchemy':
-      ProviderClass = providers.AlchemyProvider;
+      ProviderClass = AlchemyProvider;
       break;
     case 'infura':
-      ProviderClass = providers.InfuraProvider;
+      ProviderClass = InfuraProvider;
       break;
     case 'cloudflare':
-      ProviderClass = providers.CloudflareProvider;
+      ProviderClass = CloudflareProvider;
       break;
     case 'pocket':
-      ProviderClass = providers.PocketProvider;
+      ProviderClass = PocketProvider;
       break;
     case 'ankr':
-      ProviderClass = providers.AnkrProvider;
+      ProviderClass = AnkrProvider;
       break;
     default:
       throw new Error(`Unsupported provider: ${config.apiProvider}`);

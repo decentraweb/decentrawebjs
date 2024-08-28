@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node';
 import { addExtensionMethods } from '@sentry/tracing';
 import HTTPGateway from './index';
-import { providers } from 'ethers';
+import { WebSocketProvider } from 'ethers';
 import config from './config';
 
 const KEEPALIVE_INTERVAL = 10000;
@@ -24,7 +24,7 @@ if (config.sentry_dsn) {
   addExtensionMethods();
 }
 
-const provider = new providers.WebSocketProvider(config.websocket_url, config.eth_network);
+const provider = new WebSocketProvider(config.websocket_url, config.eth_network);
 
 setInterval(() => {
   const responseTimeout = setTimeout(() => {

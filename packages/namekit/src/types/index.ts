@@ -1,5 +1,5 @@
 import { EthereumNetwork, Network, PolygonNetwork } from '@decentraweb/core';
-import { providers } from 'ethers';
+import { AbstractProvider } from 'ethers';
 
 export type ApiProvider = 'etherscan' | 'infura' | 'alchemy' | 'cloudflare' | 'pocket' | 'ankr';
 
@@ -23,13 +23,13 @@ export interface ProviderSet {
     /** Ethereum network name */
     network: EthereumNetwork;
     /** Ethers.js provider instance */
-    provider: providers.BaseProvider;
+    provider: AbstractProvider;
   };
   polygon: {
     /** Polygon network name */
     network: PolygonNetwork;
     /** Ethers.js provider instance */
-    provider: providers.BaseProvider;
+    provider: AbstractProvider;
   };
 }
 
@@ -39,12 +39,12 @@ export interface NamekitConfig extends ProviderSet {
 
 export interface ENSConfig {
   network: EthereumNetwork;
-  provider: providers.BaseProvider;
+  provider: AbstractProvider;
 }
 
 export interface DwebConfig {
   network: Network;
-  provider: providers.BaseProvider;
+  provider: AbstractProvider;
 }
 
 export type DomainProvider = 'dweb' | 'ens' | 'icann';

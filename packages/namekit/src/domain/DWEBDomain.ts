@@ -13,12 +13,11 @@ export class DWEBDomain extends BaseDomain {
     this.config = config;
     const dweb = new DWEBRegistry({ network: config.network, provider: config.provider });
     this.dwebName = dweb.name(name);
-    const isMatic = this.config.network === 'matic' || this.config.network === 'matic-amoy';
     this.features = {
       address: true,
-      contentHash: !isMatic,
-      dns: !isMatic,
-      txt: !isMatic
+      contentHash: true,
+      dns: true,
+      txt: true
     };
   }
 

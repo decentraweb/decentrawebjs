@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { keccak256 } from 'ethers';
 
 export function dnsWireName(domain: string): Buffer {
   const name = domain.replace(/^\.|\.$/gm, '');
@@ -23,5 +23,5 @@ export function dnsWireName(domain: string): Buffer {
 }
 
 export function dnsWireNameHash(domain: string): string {
-  return ethers.utils.keccak256(dnsWireName(domain));
+  return keccak256(dnsWireName(domain));
 }

@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/node';
-import { providers } from 'ethers';
+import { AbstractProvider } from 'ethers';
 import Greenlock from 'greenlock';
 import path from 'path';
 import http, { IncomingMessage, RequestOptions, ServerResponse } from 'http';
@@ -12,7 +12,7 @@ import { errorPage } from './lib/errorPage';
 
 export interface GatewayOptions {
   baseDomain: string;
-  provider: providers.BaseProvider;
+  provider: AbstractProvider;
   network: EthereumNetwork;
   ipfsGatewayIp: string;
   certs: {

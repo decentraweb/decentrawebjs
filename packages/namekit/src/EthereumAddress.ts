@@ -1,7 +1,7 @@
-import { utils } from 'ethers';
 import { getDomainProvider } from './lib/getDomainProvider';
 import { DomainProvider, NamekitConfig } from './types';
 import { DWEBRegistry } from '@decentraweb/core';
+import { getAddress } from 'ethers';
 
 interface ResolutionResult {
   provider: DomainProvider;
@@ -49,7 +49,7 @@ export class EthereumAddress {
     address: string,
     domainProvider?: DomainProvider
   ): Promise<ResolutionResult[] | string | null> {
-    const checksumAddress = utils.getAddress(address);
+    const checksumAddress = getAddress(address);
     const result: ResolutionResult[] = [];
     if (!domainProvider || domainProvider === 'dweb') {
       let name = await this.ethRegistry.getReverseRecord(checksumAddress);
