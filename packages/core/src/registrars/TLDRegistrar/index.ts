@@ -1,4 +1,4 @@
-import { BigNumber, ethers, providers } from 'ethers';
+import { Block, ethers, TransactionReceipt, TransactionResponse } from 'ethers';
 import { ApprovedRegistration, CommittedRegistration, RegistrationContext } from './types';
 import { TLDBalanceVerificationResult, TLDEntry } from '../types/TLD';
 import { normalizeDomainEntries, normalizeDuration } from '../utils';
@@ -63,7 +63,7 @@ export class TLDRegistrar extends BaseTLDRegistrar {
   ): Promise<ApprovedRegistration> {
     feeToken = validateFeeToken(this.network, feeToken);
     const signerAddress = await this.signer.getAddress();
-    const nameOwner = owner ? ethers.utils.getAddress(owner) : signerAddress;
+    const nameOwner = owner ? ethers.getAddress(owner) : signerAddress;
     const entries = normalizeDomainEntries(request);
     const normalizedNames = entries.map((item) => item.name);
 
@@ -88,7 +88,7 @@ export class TLDRegistrar extends BaseTLDRegistrar {
    * @returns - commited registration object that can be used to register TLD
    */
   async sendCommitment(request: ApprovedRegistration): Promise<CommittedRegistration> {
-    const signature = ethers.utils.splitSignature(request.signature);
+    const signature = ethers.Signature.from(request.signature);
     const commitmentTx = await this.contract.commit(
       request.commitment,
       signature.v,
@@ -109,14 +109,14 @@ export class TLDRegistrar extends BaseTLDRegistrar {
    * @param request - data returned from `sendCommitment` step
    * @returns - Transaction response for registration
    */
-  async register(request: CommittedRegistration): Promise<providers.TransactionResponse> {
+  async register(request: CommittedRegistration): Promise<TransactionResponse> {
     if (request.status !== 'committed') {
       throw new Error('Registration is not committed, call `sendCommitment` first');
     }
     // Make sure that commitment transaction has at least 1 confirmation
-    const receipt = await request.tx.wait(1);
+    const receipt = (await request.tx.wait(1)) as TransactionReceipt;
     // Wait for 1 minute after commitment was made
-    const block = await this.provider.getBlock(receipt.blockNumber);
+    const block = (await this.provider.getBlock(receipt.blockNumber)) as Block;
     await delay(REGISTRATION_WAIT - (Date.now() - block.timestamp * 1000));
 
     const domains = request.domains;
@@ -140,7 +140,7 @@ export class TLDRegistrar extends BaseTLDRegistrar {
       request.timestamp,
       request.feeTokenAddress,
       safePrice,
-      { value: request.feeTokenAddress === ZERO_ADDRESS ? safePrice : BigNumber.from(0) }
+      { value: request.feeTokenAddress === ZERO_ADDRESS ? safePrice : BigInt(0) }
     );
   }
 }

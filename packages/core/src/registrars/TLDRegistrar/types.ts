@@ -1,4 +1,4 @@
-import { providers } from 'ethers';
+import { TransactionResponse } from 'ethers';
 import { TLDApproval } from '../../api';
 import { TLDEntry } from '../types/TLD';
 
@@ -14,7 +14,7 @@ export interface ApprovedRegistration extends BaseRegistrationContext {
 
 export interface CommittedRegistration extends BaseRegistrationContext {
   status: 'committed';
-  tx: providers.TransactionResponse;
+  tx: TransactionResponse;
 }
 
 export type RegistrationContext = ApprovedRegistration | CommittedRegistration;

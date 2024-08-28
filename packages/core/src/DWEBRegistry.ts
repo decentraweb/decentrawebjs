@@ -1,4 +1,4 @@
-import { ethers, providers } from 'ethers';
+import { ethers } from 'ethers';
 import DWEBName from './DWEBName';
 import { DEFAULT_TTL } from './utils/contracts';
 import { getContract } from './contracts';
@@ -48,7 +48,7 @@ export default class DWEBRegistry extends DwebContractWrapper {
    * @param name
    */
   @requiresSigner
-  async assignDefaultResolver(name: string): Promise<providers.TransactionResponse> {
+  async assignDefaultResolver(name: string): Promise<ethers.TransactionResponse> {
     const hash = hashName(name);
     return this.contract.setResolverAndTTL(hash, this.contractConfig.PublicResolver, DEFAULT_TTL);
   }
@@ -61,7 +61,7 @@ export default class DWEBRegistry extends DwebContractWrapper {
    * @param address - address of resolver contract
    */
   @requiresSigner
-  async setResolver(name: string, address: string): Promise<providers.TransactionResponse> {
+  async setResolver(name: string, address: string): Promise<ethers.TransactionResponse> {
     const hash = hashName(name);
     return this.contract.setResolver(hash, address);
   }
@@ -106,7 +106,7 @@ export default class DWEBRegistry extends DwebContractWrapper {
    * @param name
    */
   @requiresSigner
-  async setReverseRecord(name: string): Promise<providers.TransactionResponse> {
+  async setReverseRecord(name: string): Promise<ethers.TransactionResponse> {
     const signer = this.signer as ethers.Signer;
     const reverseRegistrar = getContract({
       address: this.contractConfig.ReverseRegistrar,

@@ -7,7 +7,7 @@ export function dnsWireName(domain: string): Buffer {
 }
 
 export function dnsWireNameHash(domain: string): string {
-  return ethers.utils.keccak256(dnsWireName(domain));
+  return ethers.keccak256(dnsWireName(domain));
 }
 
 export function isValidDomain(domain: string): boolean {

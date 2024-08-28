@@ -28,7 +28,7 @@
     "url": "https://github.com/decentraweb/decentrawebjs/issues"
   },
   "peerDependencies": {
-    "ethers": "^5.7.0"
+    "ethers": "^6.13.2"
   },
   "dependencies": {
     "@decentraweb/core": "^3.0.0-alpha.2",
@@ -48,7 +48,7 @@
     "buffer": "^6.0.3",
     "clean-webpack-plugin": "^4.0.0",
     "core-js": "^3.30.2",
-    "ethers": "^5.7.0",
+    "ethers": "^6.13.2",
     "jest": "^29.5.0",
     "rimraf": "^5.0.1",
     "typescript": "^5.0.4",

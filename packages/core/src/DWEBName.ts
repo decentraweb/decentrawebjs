@@ -1,4 +1,4 @@
-import { BigNumber, ethers, providers } from 'ethers';
+import { ethers, toUtf8Bytes } from 'ethers';
 import { formatsByName } from '@ensdomains/address-encoder';
 import { decode, encode } from './utils/content';
 import { dnsWireNameHash } from './utils/dns';
@@ -11,7 +11,7 @@ const NO_DATA = '0x';
 
 type NameConfig = {
   name: string;
-  provider: providers.BaseProvider;
+  provider: ethers.Provider;
   registry: ethers.Contract;
   network: Network;
   signer?: ethers.Signer;
@@ -28,7 +28,7 @@ export default class DWEBName {
    */
   readonly features: Record<Feature, boolean>;
 
-  private readonly provider: providers.BaseProvider;
+  private readonly provider: ethers.Provider;
   private readonly registryContract: ethers.Contract;
   private readonly signer?: ethers.Signer;
   private resolverAddress?: string;
@@ -73,8 +73,8 @@ export default class DWEBName {
    * Note that DNS records have TTL specified in the records themselves.
    */
   async getTTL(): Promise<number> {
-    const ttl = (await this.registryContract.ttl(this.namehash)) as BigNumber;
-    return ttl.toNumber();
+    const ttl = (await this.registryContract.ttl(this.namehash)) as bigint;
+    return Number(ttl);
   }
 
   /**
@@ -147,7 +147,7 @@ export default class DWEBName {
     }
   }
 
-  async setAddress(coinId: string, address: string): Promise<providers.TransactionResponse> {
+  async setAddress(coinId: string, address: string): Promise<ethers.TransactionResponse> {
     if (!coinId) {
       throw new Error('No coinId provided');
     }
@@ -162,7 +162,7 @@ export default class DWEBName {
       if (coinType === 60) {
         addressAsBytes = decoder('0x0000000000000000000000000000000000000000');
       } else {
-        addressAsBytes = Buffer.alloc(0);
+        addressAsBytes = new Uint8Array(0);
       }
     } else {
       addressAsBytes = decoder(address);
@@ -210,7 +210,7 @@ export default class DWEBName {
    * Set multiple coin addresses associated with name in a single transaction.
    * @param data - map of coinId to address `{'ETH': '0x1234', 'BTC': 'bc1q...'}`
    */
-  async setAddressBatch(data: Record<string, string>): Promise<providers.TransactionResponse> {
+  async setAddressBatch(data: Record<string, string>): Promise<ethers.TransactionResponse> {
     const Resolver = await this.getResolver(true);
     if (!Resolver) {
       throw new Error(`No resolver found for name ${this.name}`);
@@ -251,7 +251,7 @@ export default class DWEBName {
     }
   }
 
-  async setText(key: string, value: string): Promise<providers.TransactionResponse> {
+  async setText(key: string, value: string): Promise<ethers.TransactionResponse> {
     const Resolver = await this.getResolver(true);
     if (!Resolver) {
       throw new Error(`No resolver found for name ${this.name}`);
@@ -272,7 +272,7 @@ export default class DWEBName {
    * Write DNS data in binary wire format
    * @param data - DNS records encoded in binary format
    */
-  async setDNS(data: Buffer): Promise<providers.TransactionResponse> {
+  async setDNS(data: Buffer): Promise<ethers.TransactionResponse> {
     const Resolver = await this.getResolver(true);
     if (!Resolver) {
       throw new Error(`No resolver found for name ${this.name}`);
@@ -296,7 +296,7 @@ export default class DWEBName {
   /**
    * Remove all DNS records for name
    */
-  async clearDNS(): Promise<providers.TransactionResponse> {
+  async clearDNS(): Promise<ethers.TransactionResponse> {
     const Resolver = await this.getResolver(true);
     if (!Resolver) {
       throw new Error(`No resolver found for name ${this.name}`);
@@ -311,12 +311,12 @@ export default class DWEBName {
    *
    * @param contentUrl
    */
-  async setContenthash(contentUrl: string | null): Promise<providers.TransactionResponse> {
+  async setContenthash(contentUrl: string | null): Promise<ethers.TransactionResponse> {
     const Resolver = await this.getResolver(true);
     if (!Resolver) {
       throw new Error(`No resolver found for name ${this.name}`);
     }
-    const data = contentUrl ? encode(contentUrl) : Buffer.from('');
+    const data = contentUrl ? encode(contentUrl) : toUtf8Bytes('');
     return Resolver.setContenthash(this.namehash, data);
   }
 

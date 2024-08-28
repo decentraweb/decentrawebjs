@@ -1,4 +1,4 @@
-import { ethers, providers } from 'ethers';
+import { ethers } from 'ethers';
 import { ContractConfig, DwebConfig, DwebContract, Network } from './types/common';
 import { getContract, getContractConfig } from './contracts';
 import { getChainId } from './utils/chains';
@@ -16,7 +16,7 @@ export function requiresSigner(target: any, ctx: DecoratorContext): any {
 abstract class DwebContractWrapper {
   readonly network: Network;
   readonly chainId: number;
-  readonly provider: providers.BaseProvider;
+  readonly provider: ethers.Provider;
   readonly signer?: ethers.Signer;
   readonly contractConfig: ContractConfig;
   protected readonly contract: ethers.Contract;

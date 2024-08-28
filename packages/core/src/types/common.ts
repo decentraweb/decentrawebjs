@@ -1,4 +1,4 @@
-import { ethers, providers } from 'ethers';
+import { ethers } from 'ethers';
 
 export type EthereumNetwork = 'mainnet' | 'sepolia';
 
@@ -28,7 +28,7 @@ export type ContractOptions = {
   /** Contract name */
   name: DwebContract;
   /** Ethereum provider */
-  provider: ethers.Signer | providers.Provider;
+  provider: ethers.Signer | ethers.Provider;
   /** Contract address. Used to override default address */
   address?: string;
 };
@@ -42,7 +42,7 @@ export type ContractOptions = {
  */
 export type DwebConfig = {
   network: Network;
-  provider: providers.BaseProvider;
+  provider: ethers.Provider;
   signer?: ethers.Signer;
   contracts?: ContractConfig;
 };

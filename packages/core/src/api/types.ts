@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { ChainId, EthChainId, PolygonChainId, Token } from '../types/common';
 
 export interface TLDApprovalPayload {
@@ -122,20 +121,19 @@ export type StakedDomain =
     };
 
 export interface PriceConversionRes {
-  eth: string[];
+  native: string[];
   dweb: string[];
   usdt: string[];
   usdc: string[];
-  matic?: string[];
 }
 
 export interface PriceConversionResult {
   usd: number;
-  eth: BigNumber;
-  dweb: BigNumber;
-  usdt: BigNumber;
-  usdc: BigNumber;
-  matic?: BigNumber;
+  /* Either ETH or MATIC depending on the chain */
+  native: bigint;
+  dweb: bigint;
+  usdt: bigint;
+  usdc: bigint;
 }
 
 export interface DomainFromHashRes {

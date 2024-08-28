@@ -1,5 +1,3 @@
-import { BigNumber } from 'ethers';
-
 export abstract class DwebError extends Error {
   abstract code: string;
 
@@ -38,11 +36,11 @@ export class DwebApiError extends DwebError {
 
 export class InsufficientAllowanceError extends DwebError {
   readonly code: string = 'INSUFFICIENT_ALLOWANCE';
-  readonly allowedAmount: BigNumber;
-  readonly requiredAmount: BigNumber;
+  readonly allowedAmount: bigint;
+  readonly requiredAmount: bigint;
   readonly token: string;
 
-  constructor(allowed: BigNumber, required: BigNumber, token: string) {
+  constructor(allowed: bigint, required: bigint, token: string) {
     super(`Insufficient ${token} allowance. ${required} wei needed, ${allowed} wei approved.`);
     this.allowedAmount = allowed;
     this.requiredAmount = required;
@@ -52,11 +50,11 @@ export class InsufficientAllowanceError extends DwebError {
 
 export class InsufficientBalanceError extends DwebError {
   readonly code: string = 'INSUFFICIENT_BALANCE';
-  readonly balance: BigNumber;
-  readonly requiredAmount: BigNumber;
+  readonly balance: bigint;
+  readonly requiredAmount: bigint;
   readonly token: string;
 
-  constructor(balance: BigNumber, required: BigNumber, token: string) {
+  constructor(balance: bigint, required: bigint, token: string) {
     super(`Insufficient ${token} balance. ${required} wei needed, ${balance} wei found.`);
     this.balance = balance;
     this.requiredAmount = required;

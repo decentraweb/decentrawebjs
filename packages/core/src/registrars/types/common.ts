@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { Token } from '../../types/common';
 
 /**
@@ -6,7 +5,7 @@ import { Token } from '../../types/common';
  */
 export interface Price<C = Token> {
   /** price amount in wei */
-  amount: BigNumber;
+  amount: bigint;
   /** price currency */
   currency: C;
 }

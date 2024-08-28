@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { DwebError } from '../../errors';
 import { Token } from '../../types/common';
 
@@ -19,9 +18,9 @@ export interface TLDBalanceVerificationResult {
   success: boolean;
   error: DwebError | null;
   /** Registration fee in wei. */
-  price: BigNumber;
+  price: bigint;
   /** Registration fee in wei + 10%. Used to prevent failed transactions due to price fluctuations. */
-  safePrice: BigNumber;
+  safePrice: bigint;
   /** Currency used to pay for registration. */
   currency: Token;
 }

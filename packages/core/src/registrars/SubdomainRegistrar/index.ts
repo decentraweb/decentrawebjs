@@ -1,4 +1,4 @@
-import { BigNumber, Contract, ethers, providers } from 'ethers';
+import { Contract, ethers, TransactionResponse } from 'ethers';
 import {
   ApprovedRegistration,
   OnDemandEntry,
@@ -53,6 +53,7 @@ class SubdomainRegistrar extends BaseRegistrar {
       network: this.network
     });
   }
+
   /**
    * Get subdomain registration approval for domain names owned by signer
    * @param {SelfRegEntry | Array<SelfRegEntry>} entry - list of domains and subdomains to register
@@ -66,7 +67,7 @@ class SubdomainRegistrar extends BaseRegistrar {
   ): Promise<ApprovedRegistration> {
     feeToken = validateFeeToken(this.network, feeToken);
     const signerAddress = await this.signer.getAddress();
-    const ownerAddress = owner ? ethers.utils.getAddress(owner) : signerAddress;
+    const ownerAddress = owner ? ethers.getAddress(owner) : signerAddress;
     const normalizedEntries = await this.normalizeEntries(entry);
     const { payload, typedData } = await this.api.requestSelfSLDRegistration(
       signerAddress,
@@ -99,7 +100,7 @@ class SubdomainRegistrar extends BaseRegistrar {
   ): Promise<ApprovedRegistration> {
     feeToken = validateFeeToken(this.network, feeToken);
     const signerAddress = await this.signer.getAddress();
-    const ownerAddress = owner ? ethers.utils.getAddress(owner) : signerAddress;
+    const ownerAddress = owner ? ethers.getAddress(owner) : signerAddress;
     const normalizedEntries = await this.normalizeEntries(entry);
     const approval = await this.api.approveSLDRegistration(
       ownerAddress,
@@ -117,9 +118,7 @@ class SubdomainRegistrar extends BaseRegistrar {
    * Finish subdomain registration
    * @param approval - approval object received from `approveSelfRegistration` or `approveOndemandRegistration`
    */
-  async finishRegistration(
-    registration: ApprovedRegistration
-  ): Promise<providers.TransactionResponse> {
+  async finishRegistration(registration: ApprovedRegistration): Promise<TransactionResponse> {
     const { approval, owner, feeToken } = registration;
     const {
       error: priceError,
@@ -132,27 +131,27 @@ class SubdomainRegistrar extends BaseRegistrar {
 
     let baseCurrencyAmount = serviceFee.amount;
     if (serviceFee.currency === ownerFee.currency) {
-      baseCurrencyAmount = baseCurrencyAmount.add(ownerFee.amount);
+      baseCurrencyAmount = baseCurrencyAmount + ownerFee.amount;
     }
     const safeAmount = increaseByPercent(baseCurrencyAmount, 10);
 
-    const { v, r, s } = ethers.utils.splitSignature(approval.signature);
+    const sig = ethers.Signature.from(approval.signature);
+    const { v, r, s } = sig;
     const enc = new TextEncoder();
     const args = [
       approval.names.map((name) => hashName(name)),
-      approval.labels.map((label) => ethers.utils.keccak256(enc.encode(label))),
+      approval.labels.map((label) => ethers.keccak256(enc.encode(label))),
       approval.domainowner,
       owner,
       this.chainId,
       approval.expiry,
       approval.durations,
       getFeeTokenAddress(this.network, feeToken),
-      approval.fee.map((i) => ethers.BigNumber.from(i)),
-      approval.renewalFee.map((i) => ethers.BigNumber.from(i)),
+      approval.fee.map((i) => BigInt(i)),
+      approval.renewalFee.map((i) => BigInt(i)),
       v,
       r,
-      s,
-      safeAmount
+      s
     ];
     return this.contract.createSubnodeBatch(args, { value: safeAmount });
   }
@@ -180,12 +179,12 @@ class SubdomainRegistrar extends BaseRegistrar {
 
     let safeNativeBalance;
     if (isPaidWithNative) {
-      safeNativeBalance = increaseByPercent(serviceFee.amount.add(ownerFee.amount), 10);
+      safeNativeBalance = increaseByPercent(serviceFee.amount + ownerFee.amount, 10);
     } else {
       safeNativeBalance = increaseByPercent(serviceFee.amount, 10);
     }
 
-    if (nativeBalance.lt(safeNativeBalance)) {
+    if (nativeBalance < safeNativeBalance) {
       result.success = false;
       result.error = new InsufficientBalanceError(
         nativeBalance,
@@ -198,10 +197,10 @@ class SubdomainRegistrar extends BaseRegistrar {
     if (!isPaidWithNative) {
       const tokenContract = getTokenContract(this.network, feeToken, this.signer);
       const [feeTokenBalance, feeTokenAllowance] = await Promise.all([
-        tokenContract.balanceOf(signerAddress),
-        tokenContract.allowance(signerAddress, this.contract.address)
+        tokenContract.balanceOf(signerAddress) as Promise<bigint>,
+        tokenContract.allowance(signerAddress, await this.contract.getAddress()) as Promise<bigint>
       ]);
-      if (feeTokenBalance.lt(ownerFee.amount)) {
+      if (feeTokenBalance < ownerFee.amount) {
         result.success = false;
         result.error = new InsufficientBalanceError(
           feeTokenBalance,
@@ -210,7 +209,7 @@ class SubdomainRegistrar extends BaseRegistrar {
         );
         return result;
       }
-      if (feeTokenAllowance.lt(ownerFee.amount)) {
+      if (feeTokenAllowance < ownerFee.amount) {
         result.success = false;
         result.error = new InsufficientAllowanceError(
           feeTokenAllowance,
@@ -235,28 +234,25 @@ class SubdomainRegistrar extends BaseRegistrar {
     const renewalServiceFeeUSD = await this.getRenewalServiceFee();
     const renewalServiceFee = await this.api.convertPrice(renewalServiceFeeUSD);
 
-    const totalOwnerFee = approval.fee.reduce((a, b) => a.add(b), BigNumber.from(0));
-    const totalOwnerRenewalFee = approval.renewalFee.reduce((a, b) => a.add(b), BigNumber.from(0));
+    const totalOwnerFee = approval.fee.reduce((a, b) => a + BigInt(b), BigInt(0));
+    const totalOwnerRenewalFee = approval.renewalFee.reduce((a, b) => a + BigInt(b), BigInt(0));
 
-    const serviceFeeAmount = BigNumber.from(this.isMatic ? serviceFee.matic : serviceFee.eth);
-    const renewalServiceFeeAmount = BigNumber.from(
-      this.isMatic ? renewalServiceFee.matic : renewalServiceFee.eth
-    );
-
-    const totalServiceFee = serviceFeeAmount.mul(approval.labels.length);
+    const serviceFeeAmount = serviceFee.native;
+    const renewalServiceFeeAmount = renewalServiceFee.native;
+    const totalServiceFee = serviceFeeAmount * BigInt(approval.labels.length);
     const totalRenewalServiceFee = approval.durations.reduce((total, duration) => {
       const renewalYears = duration > DURATION.ONE_YEAR ? duration / DURATION.ONE_YEAR - 1 : 0;
-      return total.add(renewalServiceFeeAmount.mul(renewalYears));
-    }, BigNumber.from(0));
+      return total + renewalServiceFeeAmount * BigInt(renewalYears);
+    }, BigInt(0));
 
     return {
       serviceFee: {
         currency: this.isMatic ? 'MATIC' : 'ETH',
-        amount: totalServiceFee.add(totalRenewalServiceFee)
+        amount: totalServiceFee + totalRenewalServiceFee
       },
       ownerFee: {
         currency: feeToken,
-        amount: totalOwnerFee.add(totalOwnerRenewalFee)
+        amount: totalOwnerFee + totalOwnerRenewalFee
       }
     };
   }
@@ -278,8 +274,8 @@ class SubdomainRegistrar extends BaseRegistrar {
    * @returns - fee in USD
    */
   async getServiceFee(): Promise<number> {
-    const fee: BigNumber = await this.tldRegistrarContract.subdomainFee();
-    return fee.div(1000000).toNumber();
+    const fee: bigint = await this.tldRegistrarContract.subdomainFee();
+    return Number(fee / BigInt(1000000));
   }
 
   /**
@@ -287,8 +283,8 @@ class SubdomainRegistrar extends BaseRegistrar {
    * @returns - fee in USD
    */
   async getRenewalServiceFee(): Promise<number> {
-    const fee: BigNumber = await this.tldRegistrarContract.subdomainRenewalFee();
-    return fee.div(1000000).toNumber();
+    const fee: bigint = await this.tldRegistrarContract.subdomainRenewalFee();
+    return Number(fee / BigInt(1000000));
   }
 }
 

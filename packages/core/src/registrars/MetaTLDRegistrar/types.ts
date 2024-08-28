@@ -1,5 +1,5 @@
 import { TLDEntry } from '../types/TLD';
-import { BigNumber, providers } from 'ethers';
+import { TransactionResponse } from 'ethers';
 import { Token } from '../../types/common';
 
 /**
@@ -16,7 +16,7 @@ export interface BaseRegistrationContext {
   expiresAt: Date;
   feeToken: Token;
   feeTokenAddress: string;
-  fee: BigNumber;
+  fee: bigint;
 }
 
 /**
@@ -27,7 +27,7 @@ export interface BaseRegistrationContext {
  */
 export interface CommittedRegistration extends BaseRegistrationContext {
   status: 'committed';
-  tx: providers.TransactionResponse;
+  tx: TransactionResponse;
   data: {
     secret: string;
     timestamp: number;

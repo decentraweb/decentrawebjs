@@ -1,4 +1,4 @@
-import { ethers, providers } from 'ethers';
+import { ethers, Provider } from 'ethers';
 import { AltToken, AltTokenConfig, NativeToken, Network, Token } from '../types/common';
 import ERC20 from './ERC20.json';
 import { isMaticChain } from '../utils/chains';
@@ -104,7 +104,7 @@ export function getFeeTokenAddress(network: Network, token?: Token): string {
 export function getTokenContract(
   network: Network,
   token: AltToken,
-  provider: ethers.Signer | providers.Provider
+  provider: ethers.Signer | Provider
 ): ethers.Contract {
   const address = getTokenAddress(network, token);
   if (!address) {

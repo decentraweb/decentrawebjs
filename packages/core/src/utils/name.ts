@@ -1,5 +1,5 @@
 import { toUnicode } from 'tr46';
-import { ethers } from 'ethers';
+import { ethers, toUtf8Bytes } from 'ethers';
 
 export function hashName(inputName: string) {
   // Reject empty names:
@@ -14,8 +14,8 @@ export function hashName(inputName: string) {
     const labels = name.split('.');
 
     for (let i = labels.length - 1; i >= 0; i--) {
-      const labelSha = ethers.utils.keccak256(Buffer.from(labels[i])).split('0x')[1];
-      node = ethers.utils.keccak256(new Buffer(node + labelSha, 'hex')).split('0x')[1];
+      const labelSha = ethers.keccak256(toUtf8Bytes(labels[i])).split('0x')[1];
+      node = ethers.keccak256('0x' + node + labelSha).split('0x')[1];
     }
   }
 

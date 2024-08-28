@@ -1,5 +1,5 @@
 import { ChainId, Network } from '../types/common';
-import { providers } from 'ethers';
+import { ethers, JsonRpcProvider, Provider } from 'ethers';
 
 const CHAIN_IDS: Record<Network, ChainId> = {
   mainnet: 1,
@@ -38,10 +38,10 @@ export function isMaticChain(network: Network): boolean {
   return network === 'matic' || network === 'matic-amoy';
 }
 
-export function getDefaultProvider(network: Network): providers.BaseProvider {
+export function getDefaultProvider(network: Network): Provider {
   const rpcUrl = DEFAULT_RPC_URLS[network];
   if (rpcUrl) {
-    return new providers.JsonRpcProvider(rpcUrl, getChainId(network));
+    return new JsonRpcProvider(rpcUrl, getChainId(network));
   }
-  return providers.getDefaultProvider(network);
+  return ethers.getDefaultProvider(network);
 }

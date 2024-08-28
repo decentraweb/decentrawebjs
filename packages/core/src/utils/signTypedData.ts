@@ -6,7 +6,7 @@ async function signTypedData(signer: Signer, typedData: TypedData): Promise<stri
   const types: any = { ...typedData.types };
   delete types.EIP712Domain;
   //@ts-ignore
-  return signer._signTypedData(typedData.domain, types, typedData.message);
+  return signer.signTypedData(typedData.domain, types, typedData.message);
 }
 
 export default signTypedData;

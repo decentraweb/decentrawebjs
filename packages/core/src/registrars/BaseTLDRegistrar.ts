@@ -10,7 +10,6 @@ import {
 import { increaseByPercent } from '../utils/misc';
 import { InsufficientAllowanceError, InsufficientBalanceError } from '../errors';
 import { Token } from '../types/common';
-import { BigNumber } from 'ethers';
 import { normalizeName } from '../utils';
 import { normalizeDomainEntries, normalizeDuration } from './utils';
 
@@ -40,8 +39,8 @@ abstract class BaseTLDRegistrar extends BaseRegistrar {
 
     const [ethBalance, tokenBalance, tokenAllowance] = await Promise.all([
       this.provider.getBalance(signerAddress),
-      tokenContract?.balanceOf(signerAddress),
-      tokenContract?.allowance(signerAddress, this.contract.address)
+      tokenContract?.balanceOf(signerAddress) as Promise<bigint>,
+      tokenContract?.allowance(signerAddress, await this.contract.getAddress()) as Promise<bigint>
     ]);
     const safePrice = increaseByPercent(rentPrice, 10);
     const result: TLDBalanceVerificationResult = {
@@ -53,15 +52,15 @@ abstract class BaseTLDRegistrar extends BaseRegistrar {
     };
 
     if (!isPaidWithNative) {
-      if (tokenBalance.lt(safePrice)) {
+      if (tokenBalance < safePrice) {
         result.success = false;
         result.error = new InsufficientBalanceError(tokenBalance, safePrice, feeToken);
       }
-      if (tokenAllowance.lt(safePrice)) {
+      if (tokenAllowance < safePrice) {
         result.success = false;
         result.error = new InsufficientAllowanceError(tokenAllowance, safePrice, feeToken);
       }
-    } else if (ethBalance.lt(safePrice)) {
+    } else if (ethBalance < safePrice) {
       result.success = false;
       result.error = new InsufficientBalanceError(ethBalance, safePrice, 'ETH');
     }
@@ -75,7 +74,7 @@ abstract class BaseTLDRegistrar extends BaseRegistrar {
    * @param feeToken - token to be used for registration fee. Supported tokens DWEB, USDT, USDC. Also accepts WETH on Polygon
    * @returns - amount in wei
    */
-  async getRentPrice({ name, duration }: TLDEntry, feeToken?: Token): Promise<BigNumber> {
+  async getRentPrice({ name, duration }: TLDEntry, feeToken?: Token): Promise<bigint> {
     return await this.contract.rentPrice(
       normalizeName(name),
       normalizeDuration(duration),
@@ -89,11 +88,11 @@ abstract class BaseTLDRegistrar extends BaseRegistrar {
    * @param feeToken - token to be used for registration fee. Supported tokens DWEB, USDT, USDC. Also accepts WETH on Polygon
    * @returns - total amount in wei
    */
-  async getRentPriceBatch(entries: Array<TLDEntry>, feeToken?: Token): Promise<BigNumber> {
-    let totalPrice = BigNumber.from(0);
+  async getRentPriceBatch(entries: Array<TLDEntry>, feeToken?: Token): Promise<bigint> {
+    let totalPrice = BigInt(0);
     for (const entry of entries) {
       const price = await this.getRentPrice(entry, feeToken);
-      totalPrice = totalPrice.add(price);
+      totalPrice = totalPrice + price;
     }
     return totalPrice;
   }

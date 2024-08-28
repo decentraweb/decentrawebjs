@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import {
   DomainFromHashRes,
   PolyTLDCommitmentPayload,
@@ -59,7 +59,7 @@ export class DecentrawebAPI {
     feeToken = validateFeeToken(this.network, feeToken);
     const payload: TLDApprovalPayload = {
       name: names,
-      owner: ethers.utils.getAddress(owner),
+      owner: ethers.getAddress(owner),
       chainid: this.chainId,
       secret: '0x' + getRandomHex(32),
       feeTokenAddress: getFeeTokenAddress(this.network, feeToken)
@@ -159,11 +159,10 @@ export class DecentrawebAPI {
     return pricesUSD.map((price, i) => {
       return {
         usd: price,
-        eth: BigNumber.from(res.eth[i]),
-        dweb: BigNumber.from(res.dweb[i]),
-        usdt: BigNumber.from(res.usdt[i]),
-        usdc: BigNumber.from(res.usdc[i]),
-        matic: res.matic ? BigNumber.from(res.matic[i]) : undefined
+        native: BigInt(res.native[i]),
+        dweb: BigInt(res.dweb[i]),
+        usdt: BigInt(res.usdt[i]),
+        usdc: BigInt(res.usdc[i])
       };
     });
   }
@@ -245,9 +244,9 @@ export class DecentrawebAPI {
     return {
       name: entries.map((e) => e.name),
       label: entries.map((e) => e.label),
-      owner: ethers.utils.getAddress(owner),
+      owner: ethers.getAddress(owner),
       chainid: this.chainId,
-      sender: sender ? ethers.utils.getAddress(sender) : '',
+      sender: sender ? ethers.getAddress(sender) : '',
       duration: entries.map((e) => e.duration || 0),
       renewalFee: entries.map((e) =>
         'renewalFee' in e && e.renewalFee ? e.renewalFee.toString() : '0'

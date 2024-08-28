@@ -1,4 +1,4 @@
-import { BigNumber, ethers, providers } from 'ethers';
+import { ethers, TransactionReceipt, TransactionResponse } from 'ethers';
 import { normalizeDomainEntries, normalizeDuration } from '../utils';
 import getRandomHex from '../../utils/getRandomHex';
 import { TLDEntry } from '../types/TLD';
@@ -76,14 +76,14 @@ class MetaTLDRegistrar extends BaseTLDRegistrar {
     if (error) {
       throw error;
     }
-    const nameOwner = owner ? ethers.utils.getAddress(owner) : await this.signer.getAddress();
+    const nameOwner = owner ? ethers.getAddress(owner) : await this.signer.getAddress();
     const names = entries.map((e) => e.name);
     const secret = '0x' + getRandomHex(32);
-    const hash = ethers.utils.solidityKeccak256(
+    const hash = ethers.solidityPackedKeccak256(
       ['string', 'address', 'bytes32'],
       [names.join(','), nameOwner, secret]
     );
-    const signature = await this.signer.signMessage(ethers.utils.arrayify(hash));
+    const signature = await this.signer.signMessage(ethers.getBytes(hash));
 
     const result = await this.api.sendPolygonTLDCommitment({
       feeTokenAddress,
@@ -94,7 +94,9 @@ class MetaTLDRegistrar extends BaseTLDRegistrar {
     });
 
     const commitmentTx = await this.provider.getTransaction(result.txid);
-
+    if (!commitmentTx) {
+      throw new Error('Commitment transaction not found');
+    }
     await commitmentTx.wait(1);
 
     return {
@@ -117,11 +119,14 @@ class MetaTLDRegistrar extends BaseTLDRegistrar {
    * Step 2. Finish TLD registration. This step must be called 1 minute after `sendCommitment` step was completed.
    * @param request - data returned from `sendCommitment` step
    */
-  async register(request: CommittedRegistration): Promise<providers.TransactionResponse> {
+  async register(request: CommittedRegistration): Promise<TransactionResponse | null> {
     // Make sure that commitment transaction has at least 1 confirmation
-    const receipt = await request.tx.wait(1);
+    const receipt = (await request.tx.wait(1)) as TransactionReceipt;
     // Wait for 1 minute after commitment was made
     const block = await this.provider.getBlock(receipt.blockNumber);
+    if (!block) {
+      throw new Error('Block not found');
+    }
     await delay(REGISTRATION_WAIT - (Date.now() - block.timestamp * 1000));
 
     const registrationPayload = {

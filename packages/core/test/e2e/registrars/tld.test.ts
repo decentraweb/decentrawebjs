@@ -4,7 +4,7 @@ import { Chance } from 'chance';
 import nameExists from '../../lib/assertions/nameExists';
 import { getProvider } from '../../lib/provider';
 import { wait } from '../../lib/utils';
-import { providers, Signer } from 'ethers';
+import { Provider, Signer } from 'ethers';
 
 const chance = new Chance();
 const { DURATION, TLDRegistrar, MetaTLDRegistrar } = registrars;
@@ -15,7 +15,7 @@ function getRandomTLD() {
 
 describe('Register TLD', function () {
   let owner: string;
-  let provider: providers.BaseProvider;
+  let provider: Provider;
   let signer: Signer;
   let network: Network;
 
@@ -162,7 +162,7 @@ describe('Register TLD', function () {
       expect(commitment.data).to.have.property('timestamp');
       expect(commitment.feeToken).to.be.equal('WETH');
       const tx = await registrar.register(commitment);
-      await tx.wait(1);
+      await tx?.wait(1);
       await nameExists(domain, 'polygon');
     });
 
@@ -178,7 +178,7 @@ describe('Register TLD', function () {
       expect(commitment.data).to.have.property('timestamp');
       expect(commitment.feeToken).to.be.equal('DWEB');
       const tx = await registrar.register(commitment);
-      await tx.wait(1);
+      await tx?.wait(1);
       await nameExists(domain, 'polygon');
     });
   });

@@ -1,5 +1,5 @@
 import DwebContractWrapper from '../DwebContractWrapper';
-import { BigNumber, ethers, providers, Signer } from 'ethers';
+import { ethers, Signer } from 'ethers';
 import DecentrawebAPI from '../api';
 import { AltToken, DwebConfig, DwebContract, Network, Token } from '../types/common';
 import { NotStakedDomain, StakedDomain, StakingState } from './types/StakingState';
@@ -68,14 +68,10 @@ abstract class BaseRegistrar extends DwebContractWrapper {
    * @param token - token name. WETH is only supported on the Polygon network
    * @param amount - amount in wei
    */
-  async setTokenAllowance(
-    token: AltToken,
-    amount: BigNumber
-  ): Promise<providers.TransactionReceipt> {
+  async setTokenAllowance(token: AltToken, amount: bigint): Promise<ethers.TransactionReceipt> {
     const contract = getTokenContract(this.network, token, this.signer);
-    const tx = await contract.approve(this.contract.address, amount, {
-      value: '0x00'
-    });
+    const targetAddress = await this.contract.getAddress();
+    const tx = await contract.approve(targetAddress, amount);
     return tx.wait(1);
   }
 
@@ -83,17 +79,17 @@ abstract class BaseRegistrar extends DwebContractWrapper {
    * Get DWEB/WETH/USDT/USDC token amount that can be used by the registrar contract
    * @param token - token name. WETH is only supported on the Polygon network
    */
-  async getTokenAllowance(token: AltToken): Promise<BigNumber> {
+  async getTokenAllowance(token: AltToken): Promise<bigint> {
     const signerAddress = await this.signer.getAddress();
     const contract = getTokenContract(this.network, token, this.provider);
-    return contract.allowance(signerAddress, this.contract.address);
+    return contract.allowance(signerAddress, await this.contract.getAddress());
   }
 
   /**
    * Get DWEB/WETH/USDT/USDC token balance of the signer
    * @param token - token name. WETH is only supported on the Polygon network
    */
-  async getTokenBalance(token: AltToken): Promise<BigNumber> {
+  async getTokenBalance(token: AltToken): Promise<bigint> {
     const signerAddress = await this.signer.getAddress();
     const contract = getTokenContract(this.network, token, this.provider);
     return contract.balanceOf(signerAddress);
@@ -106,7 +102,7 @@ abstract class BaseRegistrar extends DwebContractWrapper {
   async allowTokenUsage(token: AltToken) {
     return this.setTokenAllowance(
       token,
-      ethers.utils.parseUnits(Number.MAX_SAFE_INTEGER.toString(), 'ether')
+      ethers.parseUnits(Number.MAX_SAFE_INTEGER.toString(), 'ether')
     );
   }
 

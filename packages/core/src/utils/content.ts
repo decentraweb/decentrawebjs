@@ -2,8 +2,6 @@ import contentHash from '@ensdomains/content-hash';
 import { ethers } from 'ethers';
 import bs58 from 'bs58';
 
-const utils = ethers.utils;
-
 //Helpers based on https://github.com/ensdomains/ensjs/blob/master/src/utils/contents.js
 
 export type ContentProtocol = 'ipfs' | 'ipns' | 'bzz' | 'onion' | 'onion3';
@@ -95,7 +93,7 @@ export function encode(text: string): string | null {
 export function isValid(encoded: string): boolean {
   try {
     const codec = contentHash.getCodec(encoded) as Codec;
-    return utils.isHexString(encoded) && !!CODEC_MAP[codec];
+    return ethers.isHexString(encoded) && !!CODEC_MAP[codec];
   } catch (e) {
     console.log(e);
     return false;

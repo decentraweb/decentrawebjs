@@ -1,4 +1,4 @@
-import { ContractInterface, ethers } from 'ethers';
+import { ethers, InterfaceAbi, Contract } from 'ethers';
 //Ethereum ABI
 import DWEBRegistryV2 from './abi/ethereum/DWEBRegistryV2.json';
 import DefaultReverseResolver from './abi/ethereum/DefaultReverseResolver.json';
@@ -94,7 +94,7 @@ export const CONTRACT_ADDRESSES: Record<Network, ContractConfig> = {
 /**
  * Contract ABIs for Ethereum network
  */
-export const ABI: Record<DwebContract, ContractInterface> = {
+export const ABI: Record<DwebContract, InterfaceAbi> = {
   DWEBRegistryV2,
   DefaultReverseResolver,
   PublicResolver,
@@ -106,7 +106,7 @@ export const ABI: Record<DwebContract, ContractInterface> = {
 /**
  * Contract ABIs for Polygon network. Some contracts are different from Ethereum.
  */
-export const POLYGON_ABI: Record<DwebContract, ContractInterface> = {
+export const POLYGON_ABI: Record<DwebContract, InterfaceAbi> = {
   DWEBRegistryV2: DWEBRegistryV2Polygon,
   DefaultReverseResolver: DefaultReverseResolverPolygon,
   PublicResolver: PublicResolverPolygon,
@@ -130,19 +130,14 @@ export function getContractConfig(network: Network): ContractConfig {
  * Get contract instance
  * @example const contract = getContract({ name: 'DecentraWebToken', network: 'mainnet', provider });
  */
-export function getContract({
-  address,
-  name,
-  provider,
-  network
-}: ContractOptions): ethers.Contract {
+export function getContract({ address, name, provider, network }: ContractOptions): Contract {
   if (!CONTRACT_ADDRESSES[network]) {
     throw new Error('Unknown network name');
   }
   const contractAddress = address || CONTRACT_ADDRESSES[network][name];
   if (isMaticChain(network)) {
-    return new ethers.Contract(contractAddress, POLYGON_ABI[name], provider);
+    return new Contract(contractAddress, POLYGON_ABI[name], provider);
   } else {
-    return new ethers.Contract(contractAddress, ABI[name], provider);
+    return new Contract(contractAddress, ABI[name], provider);
   }
 }
