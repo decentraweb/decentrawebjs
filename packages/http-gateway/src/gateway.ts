@@ -1,11 +1,7 @@
 import * as Sentry from '@sentry/node';
 import { addExtensionMethods } from '@sentry/tracing';
 import HTTPGateway from './index';
-import { WebSocketProvider } from 'ethers';
 import config from './config';
-
-const KEEPALIVE_INTERVAL = 10000;
-const PROVIDER_TIMEOUT = 3000;
 
 if (config.sentry_dsn) {
   Sentry.init({
@@ -24,22 +20,14 @@ if (config.sentry_dsn) {
   addExtensionMethods();
 }
 
-const provider = new WebSocketProvider(config.websocket_url, config.eth_network);
-
-setInterval(() => {
-  const responseTimeout = setTimeout(() => {
-    throw new Error('Ethereum provider timed out');
-  }, PROVIDER_TIMEOUT);
-  provider.getBlockNumber().then(() => {
-    clearTimeout(responseTimeout);
-  });
-}, KEEPALIVE_INTERVAL);
-
 const gateway = new HTTPGateway({
   baseDomain: config.gateway_domain,
   ipfsGatewayIp: config.ipfs_gateway,
-  network: config.eth_network,
-  provider,
+  resolution: {
+    apiProvider: config.provider,
+    apiKey: config.api_key,
+    production: config.production
+  },
   certs: {
     maintainerEmail: config.cert_maintainer_email,
     storageDir: config.cert_storage_dir

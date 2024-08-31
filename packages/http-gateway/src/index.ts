@@ -4,16 +4,17 @@ import Greenlock from 'greenlock';
 import path from 'path';
 import http, { IncomingMessage, RequestOptions, ServerResponse } from 'http';
 import { DWEBName, DWEBRegistry, EthereumNetwork } from '@decentraweb/core';
+import { NamekitConfig, ApiProviderConfig, DwebNamekit, DWEBDomain } from '@decentraweb/namekit';
 import * as https from 'https';
 import resolveDNS, { DNSResult } from './lib/resolveDNS';
 import { hasResolver } from './lib/hasResolver';
 import { createSecureContext, SecureContext } from 'tls';
 import { errorPage } from './lib/errorPage';
+import Cache from './lib/Cache';
 
 export interface GatewayOptions {
   baseDomain: string;
-  provider: AbstractProvider;
-  network: EthereumNetwork;
+  resolution: NamekitConfig | ApiProviderConfig;
   ipfsGatewayIp: string;
   certs: {
     maintainerEmail: string;
@@ -38,8 +39,9 @@ export class HTTPGateway {
   readonly ipfsGatewayIp: string;
   private httpServer: http.Server;
   private httpsServer: https.Server;
-  private dweb: DWEBRegistry;
+  private namekit: DwebNamekit;
   private greenlock: Greenlock.Greenlock;
+  private nameCache = new Cache<DWEBDomain | null>(5 * 60 * 1000);
 
   constructor(options: GatewayOptions) {
     this.baseDomain = options.baseDomain;
@@ -66,7 +68,7 @@ export class HTTPGateway {
     });
     this.httpServer.on('request', this.handleRequest);
     this.httpsServer.on('request', this.handleRequest);
-    this.dweb = new DWEBRegistry({ network: options.network, provider: options.provider });
+    this.namekit = new DwebNamekit(options.resolution);
     this.greenlock = Greenlock.create({
       packageRoot: process.cwd(),
       configDir: options.certs.storageDir,
@@ -197,13 +199,24 @@ export class HTTPGateway {
     return this.noContent(ctx);
   };
 
-  async getDwebName(domain: string): Promise<DWEBName | null> {
+  async getDwebName(domain: string): Promise<DWEBDomain | null> {
     if (!domain.endsWith(this.baseDomain)) {
       return null;
     }
     const dwebName = domain.slice(0, -1 - this.baseDomain.length);
-    const name = this.dweb.name(dwebName);
-    return (await hasResolver(name)) ? name : null;
+    const cached = await this.nameCache.read(dwebName);
+    if (cached) {
+      return cached;
+    }
+    const name = await this.namekit.domain(dwebName);
+    if (!name || name.provider !== 'dweb') {
+      await this.nameCache.write(dwebName, null);
+      return null;
+    }
+    const domainExists = await name.exists();
+    const result = domainExists ? name : null;
+    await this.nameCache.write(dwebName, result);
+    return result;
   }
 
   homePage(ctx: Context) {

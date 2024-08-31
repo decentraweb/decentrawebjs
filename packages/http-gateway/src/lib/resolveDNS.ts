@@ -1,6 +1,7 @@
-import { DNSRecord, DWEBName, RecordSet } from '@decentraweb/core';
 import { supportsHTTPS } from './utils';
 import Cache from './Cache';
+import { DWEBDomain } from '@decentraweb/namekit';
+import { StringAnswer } from 'dns-packet';
 
 export interface DNSResult {
   domain: string;
@@ -16,31 +17,30 @@ interface Options {
 }
 
 export async function resolveDNS(
-  name: DWEBName,
+  name: DWEBDomain,
   { ipfsGatewayIp }: Options
 ): Promise<DNSResult | null> {
-  const cached = await DNS_CACHE.read(name.namehash);
+  const cached = await DNS_CACHE.read(name.name);
   if (cached !== undefined) {
     return cached;
   }
-  let recordsRaw = await name.getDNS(RecordSet.recordType.toType('A'));
+  let recordsRaw = await name.dns('A');
   if (!recordsRaw) {
-    recordsRaw = await name.getDNS(RecordSet.recordType.toType('AAAA'));
+    recordsRaw = await name.dns('AAAA');
   }
   if (recordsRaw && recordsRaw.length) {
-    const records = RecordSet.decode<DNSRecord.AAAA>(recordsRaw);
-    const record = records[0];
+    const record = recordsRaw[0] as StringAnswer;
     const result: DNSResult = {
       domain: name.name,
-      address: record.data as string,
+      address: record.data,
       protocol: record.type === 'AAAA' ? 6 : 4,
       isHTTPS: await supportsHTTPS(record.data as string)
     };
-    await DNS_CACHE.write(name.namehash, result, (record.ttl || 3600) * 1000);
+    await DNS_CACHE.write(name.name, result, (record.ttl || 3600) * 1000);
     return result;
   }
 
-  const url = await name.getContenthash();
+  const url = await name.contentHash();
   if (url && /^\/?(ipfs|ipns)/.test(url)) {
     const result: DNSResult = {
       domain: name.name,
@@ -48,7 +48,7 @@ export async function resolveDNS(
       protocol: 4,
       isHTTPS: await supportsHTTPS(ipfsGatewayIp)
     };
-    await DNS_CACHE.write(name.namehash, result);
+    await DNS_CACHE.write(name.name, result);
     return result;
   }
   return null;

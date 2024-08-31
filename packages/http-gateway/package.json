@@ -28,7 +28,7 @@
     "url": "https://github.com/decentraweb/decentrawebjs/issues"
   },
   "dependencies": {
-    "@decentraweb/core": "^3.0.0-alpha.2",
+    "@decentraweb/namekit": "^3.0.0-alpha.2",
     "@sentry/node": "^7.75.1",
     "@sentry/tracing": "^7.75.1",
     "acme-http-01-webroot": "^3.0.0",
