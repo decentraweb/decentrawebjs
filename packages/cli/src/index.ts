@@ -6,7 +6,7 @@ import NameMenu from './commands/NameMenu';
 import chalk from 'chalk';
 
 let PKEY: string;
-let PROVIDER: ethers.providers.BaseProvider;
+let PROVIDER: ethers.AbstractProvider;
 
 async function showMenu(): Promise<void> {
   if (!PROVIDER) {
@@ -18,7 +18,7 @@ async function showMenu(): Promise<void> {
       }
     ]);
     if (projectId) {
-      PROVIDER = new ethers.providers.InfuraProvider('sepolia', projectId);
+      PROVIDER = new ethers.InfuraProvider('sepolia', projectId);
     } else {
       PROVIDER = ethers.getDefaultProvider('sepolia');
     }
