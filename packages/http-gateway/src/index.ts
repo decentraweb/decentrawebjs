@@ -1,13 +1,10 @@
 import * as Sentry from '@sentry/node';
-import { AbstractProvider } from 'ethers';
 import Greenlock from 'greenlock';
 import path from 'path';
 import http, { IncomingMessage, RequestOptions, ServerResponse } from 'http';
-import { DWEBName, DWEBRegistry, EthereumNetwork } from '@decentraweb/core';
 import { NamekitConfig, ApiProviderConfig, DwebNamekit, DWEBDomain } from '@decentraweb/namekit';
 import * as https from 'https';
 import resolveDNS, { DNSResult } from './lib/resolveDNS';
-import { hasResolver } from './lib/hasResolver';
 import { createSecureContext, SecureContext } from 'tls';
 import { errorPage } from './lib/errorPage';
 import Cache from './lib/Cache';
