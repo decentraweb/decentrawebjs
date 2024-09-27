@@ -8,4 +8,4 @@ dist
 .greenlockrc
 playground.ts
 /certs/
-./package-lock.json
+/package-lock.json
