@@ -1,6 +1,6 @@
 {
   "name": "@decentraweb/http-gateway",
-  "version": "3.0.0-alpha.4",
+  "version": "3.0.0-alpha.5",
   "description": "HTTP gateway service",
   "author": "Serhii Lytvynenko <lytvynenkosv@gmail.com>",
   "license": "ISC",
