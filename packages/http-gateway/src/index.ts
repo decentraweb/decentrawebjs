@@ -284,6 +284,7 @@ export class HTTPGateway {
         ...req.headers,
         host: domain
       },
+      family: 4, // Force IPv4, as it affect callback signature in Node.js > 18
       lookup: (hostname, options, callback) => {
         callback(null, address, protocol);
       }
