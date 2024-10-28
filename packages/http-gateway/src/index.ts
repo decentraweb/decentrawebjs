@@ -112,6 +112,11 @@ export class HTTPGateway {
     if (!name.toLowerCase().endsWith(this.baseDomain)) {
       return undefined;
     }
+    //Check if domain is registered in Decentraweb
+    const dwebName = await this.getDwebName(name);
+    if(!dwebName) {
+      return undefined;
+    }
 
     if (!site) {
       const transaction = Sentry.getCurrentHub().getScope()?.getTransaction();
